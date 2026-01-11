@@ -1,11 +1,11 @@
 # Interview
 
-* [Architecture](./architecture.md)
-    * [Monolith](./architecture.md#monolith)
-    * [Hexagonal architecture](./architecture.md#hexagonal-architecture)
-    * [Clean architecture](./architecture.md#clean-architecture)
-    * [Onion architecture](./architecture.md#onion-architecture)
-    * [Microservices](./architecture.md#microservices)
+* [Architecture](architecture/architecture.md)
+    * [Monolith](architecture/architecture.md#monolith)
+    * [Hexagonal architecture](architecture/architecture.md#hexagonal-architecture)
+    * [Clean architecture](architecture/architecture.md#clean-architecture)
+    * [Onion architecture](architecture/architecture.md#onion-architecture)
+    * [Microservices](architecture/architecture.md#microservices)
 * [Patterns](#patterns)
     * [Inbox pattern](#inbox-pattern)
     * [Outbox pattern](#outbox-pattern)
