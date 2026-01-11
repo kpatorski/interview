@@ -14,6 +14,7 @@
     * [Questions](#questions-3)
   * [Hexagonal vs Clean vs Onion architectures](#hexagonal-vs-clean-vs-onion-architectures)
   * [Microservices](#microservices)
+    * [Questions](#questions-4)
 <!-- TOC -->
 
 ## Monolith
@@ -37,6 +38,7 @@ Monolithic architecture is a traditional software design where an application is
 ⚠️ Slower Development: Small changes require redeploying the whole system, slowing CI/CD.  
 
 ---
+<div style="break-after: page;"></div>
 
 ## Hexagonal architecture
 
@@ -62,6 +64,7 @@ Adapters</span>** (e.g. `UserDatabaseRepository`, `UserFileSystemRepository`) th
 ⚠️ Maintenance Challenges: It can be excessive in small projects.
 
 ---
+<div style="break-after: page;"></div>
 
 ## Clean architecture
 
@@ -107,6 +110,7 @@ Most implementations follow this standard "onion" structure:
 ⚠️ A higher learning curve, and an increased number of boilerplate files and interfaces (if implemented restrictively e.g. a dedicated DTO for every layer even if it is simple, stable and identical for every layer)
 
 ---
+<div style="break-after: page;"></div>
 
 ## Onion architecture
 
@@ -147,6 +151,7 @@ While the exact number of layers can vary, a typical Onion Architecture consists
 ⚠️ **Potential Performance Overhead**: The process of mapping data objects across several abstraction layers can introduce minor runtime overhead compared to a simple, tightly coupled architecture.  
 
 ---
+<div style="break-after: page;"></div>
 
 ## Hexagonal vs Clean vs Onion architectures
 
@@ -171,6 +176,7 @@ talk</span>** to the outside world?
 business</span>** domain?  
 
 ---
+<div style="break-after: page;"></div>
 
 ## Microservices
 
