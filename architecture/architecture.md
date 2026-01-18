@@ -42,8 +42,8 @@ Monolithic architecture is a traditional software design where an application is
 
 ## Hexagonal architecture
 
-Hexagonal Architecture (or **<span style='color:cornflowerblue'>Ports & Adapters</span>**) is a software design pattern that **isolates the core business logic (domain) from external concerns** like UIs, databases, and third-party services, making the application flexible, maintainable, and testable.   
-It achieves this **by defining** technology-agnostic **interfaces** called **<span style='color:cornflowerblue'>Ports</span> (e.g. `UserRepository`)** within the core, which are **then implemented by <span style='color:cornflowerblue'>
+Hexagonal Architecture (or **<span style='color:darkseagreen'>Ports & Adapters</span>**) is a software design pattern that **isolates the core business logic (domain) from external concerns** like UIs, databases, and third-party services, making the application flexible, maintainable, and testable.   
+It achieves this **by defining** technology-agnostic **interfaces** called **<span style='color:darkseagreen'>Ports</span> (e.g. `UserRepository`)** within the core, which are **then implemented by <span style='color:darkseagreen'>
 Adapters</span>** (e.g. `UserDatabaseRepository`, `UserFileSystemRepository`) that handle specific technologies, allowing easy swapping of external components without affecting the business rules.
 
 <img src="hexagonal-architecture.png" alt="drawing" width="600"/>
@@ -169,10 +169,10 @@ While the exact number of layers can vary, a typical Onion Architecture consists
 
 ℹ️ **One-sentence intuition**
 
-**Hexagonal asks**: **<span style='color:cornflowerblue'>How</span>** does the application **<span style='color:cornflowerblue'>
+**Hexagonal asks**: **<span style='color:darkseagreen'>How</span>** does the application **<span style='color:darkseagreen'>
 talk</span>** to the outside world?  
-**Clean asks**: **<span style='color:cornflowerblue'>What does</span>** the application do (use cases)?  
-**Onion asks**: **<span style='color:cornflowerblue'>What is</span>** the core **<span style='color:cornflowerblue'>
+**Clean asks**: **<span style='color:darkseagreen'>What does</span>** the application do (use cases)?  
+**Onion asks**: **<span style='color:darkseagreen'>What is</span>** the core **<span style='color:darkseagreen'>
 business</span>** domain?  
 
 ---

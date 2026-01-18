@@ -56,7 +56,7 @@ The consumer remembers what it has already processed.
 
 1. **Message Receipt**: The consumer service receives a message from a broker (like Kafka or RabbitMQ).
 2. **Deduplication Check**: Before executing any logic, the service checks an inbox table in its database for the unique `message_id`.
-3. **<span style='color:cornflowerblue'>Atomic Transaction</span>**: In a single database transaction, the service:
+3. **<span style='color:darkseagreen'>Atomic Transaction</span>**: In a single database transaction, the service:
    1. Inserts the new `message_id` into the inbox table to mark it as "received".
    2. Executes the required business logic (e.g., updating an inventory count).
 4. **Acknowledgment**: Once the transaction commits, the message is acknowledged to the broker. If the same message arrives again, the inbox check will find the existing ID and skip processing.
