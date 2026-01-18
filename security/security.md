@@ -52,6 +52,18 @@
       * [🔶 Example 2 – Microservice (A) → Microservice (B) in a private network (HTTPS)](#-example-2--microservice-a--microservice-b-in-a-private-network-https)
       * [🔶 Example 3 – mTLS (mutual TLS)](#-example-3--mtls-mutual-tls)
   * [Public vs private key](#public-vs-private-key)
+    * [ℹ️ What is a key pair?](#ℹ-what-is-a-key-pair)
+    * [ℹ️ Two uses of the same key pair](#ℹ-two-uses-of-the-same-key-pair)
+      * [🔶 Use case A — Data encryption](#-use-case-a--data-encryption)
+      * [🔶 Use case B — Data signing (digital signature)](#-use-case-b--data-signing-digital-signature)
+    * [ℹ️ Why does this work?](#ℹ-why-does-this-work)
+    * [ℹ️ How does this look in practice?](#ℹ-how-does-this-look-in-practice)
+      * [🔶 TLS / HTTPS](#-tls--https)
+      * [🔶 Signed JWT (JWS)](#-signed-jwt-jws)
+      * [🔶 SSH](#-ssh)
+    * [ℹ️ Most important rules](#ℹ-most-important-rules)
+    * [ℹ️ The simplest possible metaphor](#ℹ-the-simplest-possible-metaphor)
+    * [ℹ️ Three-sentence summary](#ℹ-three-sentence-summary)
   * [CORS](#cors)
   * [OAuth](#oauth)
   * [LDAP](#ldap)
@@ -855,6 +867,125 @@ This **<span style='color:darkseagreen'>acts as mutual identity verification</sp
 <div style="break-after: page;"></div>
 
 ## Public vs private key
+
+### ℹ️ What is a key pair?
+
+A key pair consists of two mathematically related keys:
+
+- Public key 🔑 → can be shared with anyone
+- Private key 🔐 → known only to the owner (server, application, user)
+
+📌 Core principle:
+
+> What is encrypted with one key can only be decrypted with the other.
+
+---
+
+### ℹ️ Two uses of the same key pair
+#### 🔶 Use case A — Data encryption
+
+**When do we use the public key?**  
+When a client wants to send data securely to a server:
+
+- The client encrypts the data using the server’s public key
+- Only the server can decrypt it, because it owns the private key
+
+#### 🔶 Use case B — Data signing (digital signature)
+
+Here the process is reversed:
+
+- The server signs data using its private key
+- Anyone can verify the signature using the public key
+
+➡️ This is how JWTs work with RSA / EC algorithms
+➡️ This is how SSL/TLS certificates work
+➡️ This is how electronic (qualified) signatures work
+
+---
+
+### ℹ️ Why does this work?
+
+The mathematics of asymmetric cryptography (RSA, ECDSA, Ed25519) ensures that:
+
+- Knowing the public key 🔑 **<span style='color:deeppink'>does not allow</span>** reconstructing the private key 🔐
+- Yet both keys are mathematically linked, so that:
+  - 📌 **one key encrypts, the other decrypts**
+  - 📌 **one key signs, the other verifies**
+
+---
+
+### ℹ️ How does this look in practice?
+#### 🔶 TLS / HTTPS
+
+The server has in its keystore:
+
+- an X.509 certificate
+- a private key
+
+The client retrieves the certificate → obtains the trusted public key.  
+The client encrypts the session key using the public key → only the server can decrypt it.
+
+#### 🔶 Signed JWT (JWS)
+
+- The Authorization Server owns the private key
+- It uses it to sign JWTs
+- The Resource Server retrieves the public key from /jwks.json
+- It verifies the signature → no need to trust or know the private key
+
+This is why microservices do not need a shared secret.
+
+#### 🔶 SSH
+
+Each developer has:
+
+- private key 🔐 → `.ssh/id_rsa`
+- public key 🔑 → `.ssh/id_rsa.pub`
+
+The server stores **only** the public key 🔑, to verify that login signatures were created using the corresponding private key.
+
+---
+
+### ℹ️ Most important rules
+
+🔑 **Public key**:
+
+✔️ can be shared with anyone  
+✔️ can be published on a website  
+✔️ cannot decrypt data encrypted with the private key  
+✔️ cannot generate a valid signature  
+
+🔐 **Private key**:
+
+❗ must remain strictly secret  
+❗ must never leave the server  
+❗ must never be committed to a repository  
+❗ if compromised → the certificate or system must be replaced  
+
+---
+
+### ℹ️ The simplest possible metaphor
+
+Imagine a mailbox:
+
+- **Public key = the mail slot**  
+  Anyone can drop a letter in (encrypt data).
+- **Private key = the key to open the mailbox**  
+  Only the owner can open it and read the contents.
+
+Now the other side (digital signature):
+
+- **Private key = your personal wax seal**  
+  Only you can seal (sign) a letter.
+- **Public key = the publicly known seal pattern**  
+  Anyone can compare the seal and confirm authenticity.
+
+---
+
+### ℹ️ Three-sentence summary
+
+🔑 The public key is used for encryption or signature verification and can be publicly distributed.  
+🔐 The private key is used for decryption or signing and must remain secret at all times.  
+Asymmetry means that knowing one key does not allow reconstructing the other, yet enables paired cryptographic operations.  
 
 ---
 <div style="break-after: page;"></div>
