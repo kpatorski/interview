@@ -49,6 +49,7 @@
         * [Scope]()
 * [Database](#database)
     * [Optimistic locking]()
+    * [Pessimistic locking]()
     * [Connections pool]()
     * [Debugging]()
     * [Indexes]()
