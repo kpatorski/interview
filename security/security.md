@@ -64,7 +64,17 @@
     * [ℹ️ Most important rules](#ℹ-most-important-rules)
     * [ℹ️ The simplest possible metaphor](#ℹ-the-simplest-possible-metaphor)
     * [ℹ️ Three-sentence summary](#ℹ-three-sentence-summary)
-  * [CORS](#cors)
+  * [🌐 CORS — Cross-Origin Resource Sharing](#-cors--cross-origin-resource-sharing)
+    * [ℹ️ What is CORS?](#ℹ-what-is-cors)
+    * [ℹ️ Why does CORS exist?](#ℹ-why-does-cors-exist)
+    * [ℹ️ What exactly does CORS block?](#ℹ-what-exactly-does-cors-block)
+    * [ℹ️ When does a CORS problem occur?](#ℹ-when-does-a-cors-problem-occur)
+    * [ℹ️ How does CORS work technically?](#ℹ-how-does-cors-work-technically)
+    * [ℹ️ Most important CORS headers](#ℹ-most-important-cors-headers)
+    * [ℹ️ Credentials and CORS (very important)](#ℹ-credentials-and-cors-very-important)
+    * [ℹ️ CORS and JWT](#ℹ-cors-and-jwt)
+    * [ℹ️ CORS ≠ backend security](#ℹ-cors--backend-security)
+    * [ℹ️ Three-sentence summary](#ℹ-three-sentence-summary-1)
   * [OAuth](#oauth)
   * [LDAP](#ldap)
   * [Authorization](#authorization)
@@ -131,7 +141,7 @@ HMACSHA256(
 
 ### ℹ️ How does encryption relate to this?
 
-JWT is **<span style='color:firebrick'>NOT</span>** encrypted.  
+JWT is **<span style='color:hotpink'>NOT</span>** encrypted.  
 It is **<span style='color:forestgreen'>only</span>** signed.
 
 That means:
@@ -990,7 +1000,169 @@ Asymmetry means that knowing one key does not allow reconstructing the other, ye
 ---
 <div style="break-after: page;"></div>
 
-## CORS
+## 🌐 CORS — Cross-Origin Resource Sharing
+
+### ℹ️ What is CORS?
+
+> CORS is a browser security mechanism that controls:  
+> whether a web page from one origin is allowed to make an HTTP request to another origin.
+
+📌 CORS <span style='color:hotpink'>**is not**</span> a backend security mechanism  
+📌 CORS <span style='color:hotpink'>**does not**</span> apply to server-to-server communication  
+📌 CORS <span style='color:forestgreen'>**applies only**</span> to web browsers  
+
+### ℹ️ Why does CORS exist?
+
+CORS is a consequence of the Same-Origin Policy (SOP).
+
+> A script can freely communicate only with the same origin.
+
+`Origin = scheme + host + port` e.g.: https://example.com:443
+
+Changing any of these creates a different origin.
+
+### ℹ️ What exactly does CORS block?
+
+CORS does not block the request itself.
+
+- The request is sent  
+- The server may process it  
+- But the browser may block the response  
+
+Meaning:
+
+- the backend receives the request
+- the frontend does not get access to the response
+
+### ℹ️ When does a CORS problem occur?
+
+Frontend: https://app.example.com  
+Backend:  https://api.example.com
+
+From the browser’s perspective, these are two different origins.  
+⚠️ If the backend does not explicitly allow this → CORS error.
+
+### ℹ️ How does CORS work technically?
+
+🔶 **1. Simple request**
+
+A request is considered simple if it:
+
+- uses `GET`, `POST`, or `HEAD`
+- uses only simple headers
+- has no custom headers
+
+The browser:
+
+- sends the request
+- checks the response header: `Access-Control-Allow-Origin`
+
+✅ <span style='color:darkseagreen'>If it matches</span> → the response is exposed to JavaScript  
+❌ <span style='color:hotpink'>If not</span> → the response is blocked
+
+🔶 **2. Preflight request (OPTIONS)**
+
+For “non-simple” requests:
+
+- `PUT`, `DELETE`, `PATCH`
+- custom headers (e.g. Authorization)
+- `Content-Type: application/json`
+
+The browser first sends:
+
+- `OPTIONS /api/resource` 
+
+Asking:
+
+> “Am I allowed to send the real request?”
+
+🔶 **3. Preflight — what does the browser check?**
+
+The backend must respond with:
+
+```javascript
+Access-Control-Allow-Origin
+Access-Control-Allow-Methods
+Access-Control-Allow-Headers
+```
+
+If the response is valid:  
+✅ the browser **sends** the **actual** request
+
+If not:  
+❌ the request is **never** sent
+
+### ℹ️ Most important CORS headers
+
+🔸 **Response headers (from backend)**
+
+```javascript
+Access-Control-Allow-Origin: https://app.example.com
+Access-Control-Allow-Methods: GET, POST, PUT
+Access-Control-Allow-Headers: Authorization, Content-Type
+Access-Control-Allow-Credentials: true
+```
+
+🔸 **Request headers (from browser)**
+
+`Origin: https://app.example.com`
+
+### ℹ️ Credentials and CORS (very important)
+
+If you use:
+
+- cookies
+- Authorization header
+- sessions
+
+You **must** satisfy both conditions:
+
+```javascript
+Access-Control-Allow-Credentials: true
+Access-Control-Allow-Origin: MUST NOT be "*"
+```
+
+❌ This is invalid:
+
+```javascript
+Allow-Origin: *
+Allow-Credentials: true
+```
+
+### ℹ️ CORS and JWT
+
+🔸 JWT in the Authorization header
+
+`Authorization: Bearer <jwt>`
+
+- This is a custom header
+- It triggers a preflight request
+
+⚠️ The backend must explicitly allow:
+
+`Access-Control-Allow-Headers: Authorization`
+
+### ℹ️ CORS ≠ backend security
+
+This is critical to understand:
+
+❌ CORS **does not secure** your API  
+❌ CORS **does not replace** authentication  
+❌ CORS **does not block** curl / Postman / backend clients  
+
+✔ CORS protects the browser user
+
+If an endpoint has no authentication:
+
+- curl can call it
+- another backend can call it
+- the browser is the only one restricted
+
+### ℹ️ Three-sentence summary
+
+CORS is a browser mechanism that controls cross-origin access to HTTP responses.
+The backend declares CORS policy via headers, but the browser enforces it.
+CORS does not secure APIs — it protects browser users.
 
 ---
 <div style="break-after: page;"></div>

@@ -17,7 +17,7 @@
         * [SSL / TLS](security/security.md#ssl--tls)
     * [Keystore vs Truststore](security/security.md#keystore-vs-truststore)
     * [Public vs private key](security/security.md#public-vs-private-key)
-    * [CORS](security/security.md#cors)
+    * [CORS - Cross-Origin Resource Sharing](security/security.md#-cors--cross-origin-resource-sharing)
     * [OAuth](security/security.md#oauth)
     * [LDAP](security/security.md#ldap)
     * [Authorization](security/security.md#authorization)
