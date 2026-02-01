@@ -75,10 +75,16 @@
     * [ℹ️ CORS and JWT](#ℹ-cors-and-jwt)
     * [ℹ️ CORS ≠ backend security](#ℹ-cors--backend-security)
     * [ℹ️ Three-sentence summary](#ℹ-three-sentence-summary-1)
-  * [OAuth](#oauth)
-  * [LDAP](#ldap)
-  * [Authorization](#authorization)
-  * [Authentication](#authentication)
+  * [🔐 Authentication, Authorization, LDAP, OAuth — core identity concepts](#-authentication-authorization-ldap-oauth--core-identity-concepts)
+    * [ℹ️ Authentication (AuthN)](#ℹ-authentication-authn)
+    * [ℹ️ Authorization (AuthZ)](#ℹ-authorization-authz)
+    * [ℹ️ LDAP](#ℹ-ldap)
+    * [ℹ️ OAuth 2.0](#ℹ-oauth-20)
+    * [ℹ️ OAuth vs Authentication](#ℹ-oauth-vs-authentication)
+    * [ℹ️ How these concepts work together](#ℹ-how-these-concepts-work-together)
+    * [ℹ️ LDAP vs OAuth vs JWT](#ℹ-ldap-vs-oauth-vs-jwt)
+    * [ℹ️ Mental models (remember this)](#ℹ-mental-models-remember-this)
+    * [ℹ️ Three-sentence summary](#ℹ-three-sentence-summary-2)
 <!-- TOC -->
 
 ## JWT - JSON Web Token
@@ -1167,22 +1173,211 @@ CORS does not secure APIs — it protects browser users.
 ---
 <div style="break-after: page;"></div>
 
-## OAuth
+## 🔐 Authentication, Authorization, LDAP, OAuth — core identity concepts
 
----
-<div style="break-after: page;"></div>
+### ℹ️ Authentication (AuthN)
 
-## LDAP
+Authentication answers the question:
 
----
-<div style="break-after: page;"></div>
+> “Who are you?”
 
-## Authorization
+It is the process of verifying identity.
 
----
-<div style="break-after: page;"></div>
+🔸 **How authentication works**
 
-## Authentication
+A system checks proof of identity, for example:
+
+- username + password
+- certificate (TLS / mTLS)
+- token (JWT)
+- biometric data
+- hardware key (FIDO2)
+
+If verification <span style='color:darkseagreen'>**succeeds**</span> ➡️ the user/service is authenticated
+
+If it <span style='color:hotpink'>**fails**</span> ➡️ access is denied immediately
+
+🔸 **Examples**
+
+- Logging in with email + password
+- TLS client certificate authentication
+- Verifying a JWT signature
+- SSH key-based login
+
+🔸 **What authentication provides**
+
+✅ Identity verification      
+❌ No permission information  
+❌ No access control  
+
+### ℹ️ Authorization (AuthZ)
+
+Authorization answers the question:
+
+> “What are you allowed to do?”
+
+It happens after authentication.
+
+🔸 **How authorization works**
+
+The system checks:
+- roles
+- permissions
+- scopes
+- policies
+
+Based on identity + rules, the system decides:  
+➡️ <span style='color:darkseagreen'>**allow**</span> or <span style='color:hotpink'>**deny**</span> access to a resource or action
+
+🔸 **Examples**
+
+- ADMIN can create users
+- USER can only read data
+- JWT scope orders:read
+- RBAC / ABAC policies
+
+🔸 **What authorization provides**
+
+✅ Access control  
+✅ Resource protection  
+❌ Identity verification  
+
+🔸 **AuthN vs AuthZ (critical distinction)**
+
+| Question         | Concept        |
+|------------------|----------------|
+| Who are you?     | Authentication |
+| What can you do? | Authorization  |
+	
+❗ You **cannot** authorize without authentication
+
+### ℹ️ LDAP
+
+LDAP (Lightweight Directory Access Protocol) is a directory protocol used to:
+
+- store user identities
+- authenticate users
+- organize users and groups hierarchically
+
+LDAP **is not** an auth framework — it is a directory + protocol.
+
+🔸 **What LDAP stores**
+
+- users
+- passwords (hashed)
+- groups
+- organizational structure
+
+**Example structure:**
+
+```
+dc=company,dc=com
+├── ou=people
+│    └── uid=john
+└── ou=groups
+└── cn=admins
+```
+
+🔸 **What LDAP is used for**
+
+- Authentication (username + password)
+- User lookup
+- Group membership resolution
+
+🔸 **What LDAP does NOT do**
+
+❌ Token issuance  
+❌ Delegated authorization  
+❌ OAuth flows  
+
+🔸 **Typical LDAP systems**
+
+- Active Directory
+- OpenLDAP
+- FreeIPA
+
+### ℹ️ OAuth 2.0
+
+OAuth 2.0 is an authorization framework, not an authentication protocol.
+
+OAuth answers:
+
+> “Is this client allowed to access this resource on behalf of someone?”
+
+🔸 **OAuth roles**
+
+| Role                 | Meaning       |
+|----------------------|---------------|
+| Resource Owner       | user          |
+| Client               | application   |
+| Authorization Server | issues tokens |
+| Resource Server      | protects APIs |
+
+
+🔸 **What OAuth provides**
+
+✅ Delegated authorization  
+✅ Access tokens  
+✅ Scopes & consent
+
+🔸 **What OAuth does NOT provide**
+
+❌ Authentication by itself  
+❌ User identity verification (without extensions)  
+
+### ℹ️ OAuth vs Authentication
+
+OAuth tokens <span style='color:darkseagreen'>**answer**</span>:
+
+> “What can this token access?”
+
+They <span style='color:hotpink'>**do not**</span> answer:
+
+> “Who is the user?”
+
+That’s why:
+
+📌 OAuth ≠ login  
+📌 OAuth ≠ authentication  
+
+### ℹ️ How these concepts work together
+
+**Example:** `Web application login`
+
+1. User opens frontend
+2. Frontend redirects to Authorization Server
+3. User authenticates (password, MFA, etc.)
+4. Authorization Server:
+   1. authenticates the user
+   2. authorizes scopes
+   3. issues tokens (JWT)
+5. Frontend calls backend with Access Token
+6. Backend:
+   1. authenticates token (signature)
+   2. authorizes request (roles/scopes)
+
+### ℹ️ LDAP vs OAuth vs JWT
+
+| Concept        | Purpose                         |
+|----------------|---------------------------------|
+| LDAP           | User directory & authentication |
+| OAuth          | Delegated authorization         |
+| JWT            | Token format                    |
+| Authentication | Identity verification           |
+| Authorization  | Access control                  |
+
+### ℹ️ Mental models (remember this)
+
+- Authentication → **Who are you?**
+- Authorization → **What can you do?**
+- LDAP → **Where users and groups live**
+- OAuth → **Who is allowed to access what, on whose behalf**
+
+### ℹ️ Three-sentence summary
+
+Authentication verifies identity, authorization decides permissions.  
+LDAP is a directory used for storing users and authenticating them, not a token system.  
+OAuth is an authorization framework that issues access tokens, while OpenID Connect adds authentication on top.  
 
 ---
 <div style="break-after: page;"></div>
