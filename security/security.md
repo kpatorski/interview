@@ -913,9 +913,9 @@ Here the process is reversed:
 - The server signs data using its private key
 - Anyone can verify the signature using the public key
 
-➡️ This is how JWTs work with RSA / EC algorithms
-➡️ This is how SSL/TLS certificates work
-➡️ This is how electronic (qualified) signatures work
+➡️ This is how JWTs work with RSA / EC algorithms. 
+➡️ This is how SSL/TLS certificates work  
+➡️ This is how electronic (qualified) signatures work  
 
 ---
 
