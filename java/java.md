@@ -97,10 +97,19 @@
       * [2️⃣ Difference between synchronized and volatile](#2-difference-between-synchronized-and-volatile)
       * [3️⃣ Why use ExecutorService?](#3-why-use-executorservice)
       * [4️⃣ What is safe publication?](#4-what-is-safe-publication)
+  * [JDK vs JRE vs JVM](#jdk-vs-jre-vs-jvm)
+    * [JVM — Java Virtual Machine](#jvm--java-virtual-machine)
+    * [JRE — Java Runtime Environment](#jre--java-runtime-environment)
+    * [JDK — Java Development Kit](#jdk--java-development-kit)
   * [JIT](#jit)
-  * [JRE](#jre)
-  * [JDK](#jdk)
-  * [Cache implementation](#cache-implementation)
+    * [Why JIT Exists](#why-jit-exists)
+    * [How JIT Works](#how-jit-works)
+    * [JIT Optimizations](#jit-optimizations)
+    * [Warmup Phase](#warmup-phase)
+    * [Questions](#questions-5)
+      * [1️⃣ Is Java interpreted or compiled?](#1-is-java-interpreted-or-compiled)
+      * [2️⃣ Why Java sometimes faster than C++?](#2-why-java-sometimes-faster-than-c)
+      * [3️⃣ Where does JIT store compiled code?](#3-where-does-jit-store-compiled-code)
 <!-- TOC -->
 
 ## 🚰 Streams
@@ -1947,22 +1956,190 @@ Safe publication ensures:
 <div style="break-after: page;"></div>
 
 
+## JDK vs JRE vs JVM
+
+🔸 **Hierarchy**
+```java
+JDK
+ └── JRE
+      └── JVM
+```
+
+---
+
+### JVM — Java Virtual Machine
+
+The JVM is:
+
+> The runtime engine that executes Java bytecode.
+
+🔸 **Responsibilities:**
+
+✅ Load classes  
+✅ Verify bytecode  
+✅ Manage memory  
+✅ Execute bytecode  
+✅ Garbage collection  
+✅ JIT compilation  
+
+It does **<span style='color:hotpink'>NOT</span>**:
+
+❌ compile Java source code  
+❌ include developer tools  
+
+---
+
+### JRE — Java Runtime Environment
+
+The JRE is:
+
+> JVM + standard libraries.
+
+🔸 **Contains:**
+
+- JVM
+- Java class libraries
+- Supporting files
+
+It **<span style='color:darkseagreen'>is used</span>** to:
+
+✅ run Java applications. 
+
+It does **<span style='color:hotpink'>NOT</span>** include:
+
+❌ javac  
+❌ javadoc  
+❌ debugging tools  
+
+🔸 📌 **Note:**  
+Since Java **11**, Oracle no longer ships standalone JRE separately — JDK contains everything.
+
+---
+
+### JDK — Java Development Kit
+
+The JDK is:
+
+> JRE + development tools.
+
+🔸 **Includes:**
+
+- javac (compiler)
+- javadoc
+- jar
+- jlink
+- jdb
+- JVM
+- standard libraries
+
+🔸 **Used to:**
+
+✅ compile  
+✅ build  
+✅ debug  
+✅ package  
+
+---
+<div style="break-after: page;"></div>
+
 ## JIT
 
+> JIT = Just-In-Time Compiler.
+
+JIT is part of [JVM](#jdk-vs-jre-vs-jvm)
+
+```java
+.java → (javac) → .class (bytecode)
+.bytecode → (JVM) → interpreted
+frequently used code → JIT → native machine code
+```
+
 ---
-<div style="break-after: page;"></div>
 
-## JRE
+### Why JIT Exists
+
+Java is platform-independent:
+
+- source compiled to bytecode
+- bytecode executed by JVM
+
+⚠️ But interpretation is slow.  
+**JIT** compiles **hot** methods to <span style='color:dodgerblue'>native</span> code at <span style='color:darkseagreen'>
+runtime</span>.
 
 ---
-<div style="break-after: page;"></div>
 
-## JDK
+### How JIT Works
+
+JVM initially:
+
+- interprets bytecode
+
+It 👀 monitors :
+
+- method call frequency
+- loop execution count
+
+If method becomes 🔥 "<span style='color:hotpink'>**hot**</span>":
+
+- JIT compiles to native machine code
+- **future** calls use **<span style='color:darkseagreen'>optimized</span>** version
 
 ---
-<div style="break-after: page;"></div>
 
-## Cache implementation
+### JIT Optimizations
+
+JIT performs:
+
+✅ Method inlining  
+✅ Dead code elimination  
+✅ Loop unrolling  
+✅ Escape analysis  
+✅ Scalar replacement  
+✅ Lock elision  
+✅ Constant folding  
+
+---
+
+### Warmup Phase
+
+Java apps often:
+
+- start slower
+- speed up after warmup
+
+Because JIT needs:
+
+- profiling data
+- execution count
+
+This is important in:
+
+- benchmarks
+- microservices cold starts
+
+---
+
+### Questions
+
+#### 1️⃣ Is Java interpreted or compiled?
+
+> Both.
+
+- Source → compiled to bytecode
+- Bytecode → interpreted + JIT compiled
+
+#### 2️⃣ Why Java sometimes faster than C++?
+
+Because:
+
+- runtime profiling
+- dynamic optimization
+- speculative inlining
+
+#### 3️⃣ Where does JIT store compiled code?
+
+> In Code Cache (separate memory region)
 
 ---
 <div style="break-after: page;"></div>
