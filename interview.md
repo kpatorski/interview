@@ -70,7 +70,7 @@
         * [Aggregate Root]()
     * [Value object]()
     * [Entity]()
-* [♨️ Java](java/java.md#java)
+* [♨️ Java](java/java.md#-java)
     * [Streams](java/java.md#-streams)
     * [Collections](java/java.md#-collections)
     * [Record](java/java.md#record)
