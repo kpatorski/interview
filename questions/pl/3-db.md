@@ -1,12 +1,43 @@
+[💡 Questions](questions.md)
+
 # 🗄 BAZY DANYCH I PERSISTENCJA
+
+<!-- TOC -->
+* [🗄 BAZY DANYCH I PERSISTENCJA](#-bazy-danych-i-persistencja)
+  * [1️⃣ Podstawy Teorii Transakcji](#1-podstawy-teorii-transakcji)
+      * [🔹 1. Czym jest ACID?](#-1-czym-jest-acid)
+      * [🔹 2. Czym są poziomy izolacji i jakie anomalie eliminują?](#-2-czym-są-poziomy-izolacji-i-jakie-anomalie-eliminują)
+      * [🔹 3. Czym jest optimistic locking?](#-3-czym-jest-optimistic-locking)
+      * [🔹 4. Czym jest pessimistic locking?](#-4-czym-jest-pessimistic-locking)
+      * [🔹 5. Czym jest indeks i jak działa B-Tree?](#-5-czym-jest-indeks-i-jak-działa-b-tree)
+      * [🔹 6. Czym jest execution plan?](#-6-czym-jest-execution-plan)
+      * [🔹 7. Czym jest connection pool?](#-7-czym-jest-connection-pool)
+  * [2️⃣ JPA Internals](#2-jpa-internals)
+      * [🔹 8. Czym jest Persistence Context?](#-8-czym-jest-persistence-context)
+      * [🔹 9. Jakie są stany encji w JPA?](#-9-jakie-są-stany-encji-w-jpa)
+      * [🔹 10. Czym jest 1st level cache?](#-10-czym-jest-1st-level-cache)
+      * [🔹 11. Czym jest dirty checking?](#-11-czym-jest-dirty-checking)
+      * [🔹 12. Czym jest flush?](#-12-czym-jest-flush)
+      * [🔹 13. Czym jest N+1 problem?](#-13-czym-jest-n1-problem)
+      * [🔹 14. Czym różni się FetchType.LAZY od EAGER?](#-14-czym-różni-się-fetchtypelazy-od-eager)
+      * [🔹 15. Czym jest LazyInitializationException?](#-15-czym-jest-lazyinitializationexception)
+  * [3️⃣ SQL vs NoSQL i Architektoniczne Aspekty Danych](#3-sql-vs-nosql-i-architektoniczne-aspekty-danych)
+      * [🔹 16. Czym jest normalizacja i denormalizacja?](#-16-czym-jest-normalizacja-i-denormalizacja)
+      * [🔹 17. Czym jest twierdzenie CAP?](#-17-czym-jest-twierdzenie-cap)
+      * [🔹 18. Czym różni się SQL od NoSQL?](#-18-czym-różni-się-sql-od-nosql)
+      * [🔹 19. Czym jest eventual consistency?](#-19-czym-jest-eventual-consistency)
+      * [🔹 20. Czym jest replikacja?](#-20-czym-jest-replikacja)
+      * [🔹 21. Czym jest sharding?](#-21-czym-jest-sharding)
+      * [🔹 22. Jak skalować bazę danych?](#-22-jak-skalować-bazę-danych)
+<!-- TOC -->
 
 ---
 
-# 1️⃣ Podstawy Teorii Transakcji
+## 1️⃣ Podstawy Teorii Transakcji
 
-## 🔹 1. Czym jest ACID?
+#### 🔹 1. Czym jest ACID?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 ACID to cztery właściwości transakcji:
 
@@ -25,9 +56,9 @@ Durability (Trwałość)
 
 ---
 
-## 🔹 2. Czym są poziomy izolacji i jakie anomalie eliminują?
+#### 🔹 2. Czym są poziomy izolacji i jakie anomalie eliminują?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 READ_UNCOMMITTED
 - Pozwala na dirty reads (odczyt niezatwierdzonych danych).
@@ -53,9 +84,9 @@ Anomalie:
 
 ---
 
-## 🔹 3. Czym jest optimistic locking?
+#### 🔹 3. Czym jest optimistic locking?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Optimistic locking zakłada, że konflikt jest rzadki.
 
@@ -68,9 +99,9 @@ Brak blokad na poziomie bazy.
 
 ---
 
-## 🔹 4. Czym jest pessimistic locking?
+#### 🔹 4. Czym jest pessimistic locking?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Pessimistic locking zakłada, że konflikt jest prawdopodobny.
 
@@ -83,9 +114,9 @@ Większe bezpieczeństwo, mniejsza skalowalność.
 
 ---
 
-## 🔹 5. Czym jest indeks i jak działa B-Tree?
+#### 🔹 5. Czym jest indeks i jak działa B-Tree?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Indeks to struktura danych przyspieszająca wyszukiwanie.
 
@@ -98,9 +129,9 @@ Indeks przyspiesza SELECT, ale spowalnia INSERT/UPDATE.
 
 ---
 
-## 🔹 6. Czym jest execution plan?
+#### 🔹 6. Czym jest execution plan?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Execution plan to plan wykonania zapytania generowany przez optimizer.
 
@@ -113,9 +144,9 @@ Analizowany przez EXPLAIN.
 
 ---
 
-## 🔹 7. Czym jest connection pool?
+#### 🔹 7. Czym jest connection pool?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Connection pool zarządza pulą połączeń do bazy.
 
@@ -134,11 +165,11 @@ Zmniejsza koszt tworzenia połączeń.
 
 ---
 
-# 2️⃣ JPA Internals
+## 2️⃣ JPA Internals
 
-## 🔹 8. Czym jest Persistence Context?
+#### 🔹 8. Czym jest Persistence Context?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Persistence Context to kontekst zarządzania encjami przez EntityManager.
 
@@ -151,9 +182,9 @@ Każda encja w kontekście ma tylko jedną reprezentację (identity guarantee).
 
 ---
 
-## 🔹 9. Jakie są stany encji w JPA?
+#### 🔹 9. Jakie są stany encji w JPA?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 1. Transient — nowa encja, niezarządzana.
 2. Managed — zarządzana przez Persistence Context.
@@ -164,9 +195,9 @@ Tylko encje Managed podlegają dirty checking.
 
 ---
 
-## 🔹 10. Czym jest 1st level cache?
+#### 🔹 10. Czym jest 1st level cache?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 1st level cache to cache w ramach Persistence Context.
 
@@ -179,9 +210,9 @@ Jest powiązany z EntityManager.
 
 ---
 
-## 🔹 11. Czym jest dirty checking?
+#### 🔹 11. Czym jest dirty checking?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Dirty checking to mechanizm automatycznego wykrywania zmian w encjach.
 
@@ -194,9 +225,9 @@ Działa tylko dla encji Managed.
 
 ---
 
-## 🔹 12. Czym jest flush?
+#### 🔹 12. Czym jest flush?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Flush synchronizuje stan Persistence Context z bazą danych.
 
@@ -209,9 +240,9 @@ Może nastąpić:
 
 ---
 
-## 🔹 13. Czym jest N+1 problem?
+#### 🔹 13. Czym jest N+1 problem?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 N+1 występuje gdy:
 - Pobieramy listę encji (1 zapytanie),
@@ -227,9 +258,9 @@ Rozwiązania:
 
 ---
 
-## 🔹 14. Czym różni się FetchType.LAZY od EAGER?
+#### 🔹 14. Czym różni się FetchType.LAZY od EAGER?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 LAZY:
 - Relacja ładowana przy pierwszym użyciu.
@@ -243,9 +274,9 @@ EAGER często prowadzi do problemów wydajnościowych.
 
 ---
 
-## 🔹 15. Czym jest LazyInitializationException?
+#### 🔹 15. Czym jest LazyInitializationException?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Występuje gdy:
 - Próbujemy odczytać relację LAZY,
@@ -262,11 +293,11 @@ Rozwiązania:
 
 ---
 
-# 3️⃣ SQL vs NoSQL i Architektoniczne Aspekty Danych
+## 3️⃣ SQL vs NoSQL i Architektoniczne Aspekty Danych
 
-## 🔹 16. Czym jest normalizacja i denormalizacja?
+#### 🔹 16. Czym jest normalizacja i denormalizacja?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Normalizacja:
 - Proces organizowania danych w celu eliminacji redundancji.
@@ -283,9 +314,9 @@ Systemy analityczne / read-heavy → często denormalizacja.
 
 ---
 
-## 🔹 17. Czym jest twierdzenie CAP?
+#### 🔹 17. Czym jest twierdzenie CAP?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 CAP mówi, że w systemie rozproszonym można mieć maksymalnie dwie z trzech cech:
 
@@ -301,9 +332,9 @@ Wybór jest więc między:
 
 ---
 
-## 🔹 18. Czym różni się SQL od NoSQL?
+#### 🔹 18. Czym różni się SQL od NoSQL?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 SQL:
 - Relacyjny model danych.
@@ -328,9 +359,9 @@ NoSQL lepszy dla:
 
 ---
 
-## 🔹 19. Czym jest eventual consistency?
+#### 🔹 19. Czym jest eventual consistency?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Eventual consistency oznacza, że:
 - System może chwilowo zwracać niespójne dane,
@@ -345,9 +376,9 @@ Wymaga projektowania systemu z myślą o:
 
 ---
 
-## 🔹 20. Czym jest replikacja?
+#### 🔹 20. Czym jest replikacja?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Replikacja to kopiowanie danych na wiele węzłów.
 
@@ -364,9 +395,9 @@ Wady:
 
 ---
 
-## 🔹 21. Czym jest sharding?
+#### 🔹 21. Czym jest sharding?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Sharding to podział danych między wiele węzłów według klucza (shard key).
 
@@ -381,9 +412,9 @@ Wyzwania:
 
 ---
 
-## 🔹 22. Jak skalować bazę danych?
+#### 🔹 22. Jak skalować bazę danych?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Vertical scaling:
 - Więcej CPU/RAM.

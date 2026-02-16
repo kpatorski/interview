@@ -1,12 +1,31 @@
+[💡 Questions](questions.md)
+
 # 🧪 TESTOWANIE
+
+<!-- TOC -->
+* [🧪 TESTOWANIE](#-testowanie)
+  * [1️⃣ Fundamenty Testowania](#1-fundamenty-testowania)
+      * [🔹 1. Czym różni się test jednostkowy od integracyjnego?](#-1-czym-różni-się-test-jednostkowy-od-integracyjnego)
+      * [🔹 2. Czym jest test end-to-end (E2E)?](#-2-czym-jest-test-end-to-end-e2e)
+  * [2️⃣ Mockowanie i Izolacja](#2-mockowanie-i-izolacja)
+      * [🔹 3. Czym jest mock, stub i spy?](#-3-czym-jest-mock-stub-i-spy)
+      * [🔹 4. Kiedy mockowanie jest złym pomysłem?](#-4-kiedy-mockowanie-jest-złym-pomysłem)
+  * [3️⃣ Testy Integracyjne i Środowisko](#3-testy-integracyjne-i-środowisko)
+      * [🔹 5. Czym jest Testcontainers i dlaczego jest użyteczny?](#-5-czym-jest-testcontainers-i-dlaczego-jest-użyteczny)
+      * [🔹 6. Czym jest Contract Testing?](#-6-czym-jest-contract-testing)
+  * [4️⃣ Zaawansowane Techniki](#4-zaawansowane-techniki)
+      * [🔹 7. Czym jest TDD?](#-7-czym-jest-tdd)
+      * [🔹 8. Czym jest property-based testing?](#-8-czym-jest-property-based-testing)
+      * [🔹 9. Czym jest mutation testing?](#-9-czym-jest-mutation-testing)
+<!-- TOC -->
 
 ---
 
-# 1️⃣ Fundamenty Testowania
+## 1️⃣ Fundamenty Testowania
 
-## 🔹 1. Czym różni się test jednostkowy od integracyjnego?
+#### 🔹 1. Czym różni się test jednostkowy od integracyjnego?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Test jednostkowy (unit test):
 - Testuje pojedynczą klasę lub metodę.
@@ -20,9 +39,9 @@ Test integracyjny:
 
 ---
 
-## 🔹 2. Czym jest test end-to-end (E2E)?
+#### 🔹 2. Czym jest test end-to-end (E2E)?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Test E2E testuje cały system jako całość.
 
@@ -32,11 +51,11 @@ Test E2E testuje cały system jako całość.
 
 ---
 
-# 2️⃣ Mockowanie i Izolacja
+## 2️⃣ Mockowanie i Izolacja
 
-## 🔹 3. Czym jest mock, stub i spy?
+#### 🔹 3. Czym jest mock, stub i spy?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Mock:
 - Obiekt symulujący zachowanie zależności.
@@ -52,9 +71,9 @@ Spy:
 
 ---
 
-## 🔹 4. Kiedy mockowanie jest złym pomysłem?
+#### 🔹 4. Kiedy mockowanie jest złym pomysłem?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 - Gdy test staje się testem implementacji zamiast zachowania.
 - Gdy mockujemy zbyt wiele zależności.
@@ -64,11 +83,11 @@ Preferować testowanie zachowania, nie implementacji.
 
 ---
 
-# 3️⃣ Testy Integracyjne i Środowisko
+## 3️⃣ Testy Integracyjne i Środowisko
 
-## 🔹 5. Czym jest Testcontainers i dlaczego jest użyteczny?
+#### 🔹 5. Czym jest Testcontainers i dlaczego jest użyteczny?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Testcontainers pozwala uruchomić prawdziwe zależności (DB, Kafka) w Dockerze podczas testów.
 
@@ -79,9 +98,9 @@ Zalety:
 
 ---
 
-## 🔹 6. Czym jest Contract Testing?
+#### 🔹 6. Czym jest Contract Testing?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Contract Testing weryfikuje zgodność między serwisami.
 
@@ -92,11 +111,11 @@ Zapobiega breaking changes w mikroserwisach.
 
 ---
 
-# 4️⃣ Zaawansowane Techniki
+## 4️⃣ Zaawansowane Techniki
 
-## 🔹 7. Czym jest TDD?
+#### 🔹 7. Czym jest TDD?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 TDD (Test-Driven Development):
 
@@ -110,9 +129,9 @@ Cel:
 
 ---
 
-## 🔹 8. Czym jest property-based testing?
+#### 🔹 8. Czym jest property-based testing?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Property-based testing polega na testowaniu ogólnych właściwości funkcji zamiast konkretnych przypadków.
 
@@ -123,9 +142,9 @@ Generowane są losowe dane wejściowe.
 
 ---
 
-## 🔹 9. Czym jest mutation testing?
+#### 🔹 9. Czym jest mutation testing?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Mutation testing sprawdza jakość testów poprzez wprowadzanie małych zmian w kodzie (mutacje).
 

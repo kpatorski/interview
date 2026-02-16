@@ -1,12 +1,93 @@
+[💡 Questions](questions.md)
+
 # 📘 JAVA (Core / JVM)
+
+<!-- TOC -->
+* [📘 JAVA (Core / JVM)](#-java-core--jvm)
+  * [1️⃣ JVM i Model Pamięci](#1-jvm-i-model-pamięci)
+      * [🔹 1. Czym jest JVM i z jakich głównych obszarów pamięci się składa?](#-1-czym-jest-jvm-i-z-jakich-głównych-obszarów-pamięci-się-składa)
+      * [🔹 2. Czym jest Java Memory Model (JMM)?](#-2-czym-jest-java-memory-model-jmm)
+      * [🔹 3. Co to jest reordering i dlaczego jest problemem?](#-3-co-to-jest-reordering-i-dlaczego-jest-problemem)
+      * [🔹 4. Czym jest relacja happens-before?](#-4-czym-jest-relacja-happens-before)
+      * [🔹 5. Czym różni się visibility od atomicity?](#-5-czym-różni-się-visibility-od-atomicity)
+          * [✅ Visibility (widoczność)](#-visibility-widoczność)
+          * [✅ Atomicity (niepodzielność)](#-atomicity-niepodzielność)
+      * [🔹 6. Czym jest Escape Analysis?](#-6-czym-jest-escape-analysis)
+      * [🔹 7. Jak działa ClassLoader?](#-7-jak-działa-classloader)
+      * [🔹 8. Czym jest JIT?](#-8-czym-jest-jit)
+      * [🔹 9. Jak działa Garbage Collector w skrócie?](#-9-jak-działa-garbage-collector-w-skrócie)
+  * [2️⃣ Współbieżność (Concurrency)](#2-współbieżność-concurrency)
+      * [🔹 1. Jak działa `synchronized` w JVM?](#-1-jak-działa-synchronized-w-jvm)
+          * [Co dzieje się przy wejściu do bloku synchronized?](#co-dzieje-się-przy-wejściu-do-bloku-synchronized)
+          * [Gwarancje:](#gwarancje)
+      * [🔹 2. Czym jest `volatile` i co dokładnie gwarantuje?](#-2-czym-jest-volatile-i-co-dokładnie-gwarantuje)
+      * [🔹 3. Dlaczego `i++` nie jest bezpieczne wielowątkowo?](#-3-dlaczego-i-nie-jest-bezpieczne-wielowątkowo)
+      * [🔹 4. Czym jest CAS (Compare-And-Swap)?](#-4-czym-jest-cas-compare-and-swap)
+      * [🔹 5. Jak działają klasy Atomic*?](#-5-jak-działają-klasy-atomic)
+      * [🔹 6. Czym różni się ReentrantLock od synchronized?](#-6-czym-różni-się-reentrantlock-od-synchronized)
+      * [🔹 7. Czym jest deadlock?](#-7-czym-jest-deadlock)
+      * [🔹 8. Czym jest livelock?](#-8-czym-jest-livelock)
+      * [🔹 9. Czym jest starvation?](#-9-czym-jest-starvation)
+      * [🔹 10. Czym jest False Sharing?](#-10-czym-jest-false-sharing)
+      * [🔹 11. Jaki jest cykl życia wątku w Javie?](#-11-jaki-jest-cykl-życia-wątku-w-javie)
+      * [🔹 12. Dlaczego nie powinniśmy tworzyć wątków ręcznie (new Thread)?](#-12-dlaczego-nie-powinniśmy-tworzyć-wątków-ręcznie-new-thread)
+      * [🔹 13. Czym jest ExecutorService?](#-13-czym-jest-executorservice)
+      * [🔹 14. Jak działa ThreadPoolExecutor?](#-14-jak-działa-threadpoolexecutor)
+      * [🔹 15. Jakie są typowe implementacje ExecutorService?](#-15-jakie-są-typowe-implementacje-executorservice)
+      * [🔹 16. Czym jest ForkJoinPool i do czego służy?](#-16-czym-jest-forkjoinpool-i-do-czego-służy)
+      * [🔹 17. Czym jest work-stealing?](#-17-czym-jest-work-stealing)
+      * [🔹 18. Czym jest CompletableFuture?](#-18-czym-jest-completablefuture)
+      * [🔹 19. Czym różni się thenApply od thenCompose?](#-19-czym-różni-się-thenapply-od-thencompose)
+      * [🔹 20. Co oznacza blocking vs non-blocking?](#-20-co-oznacza-blocking-vs-non-blocking)
+      * [🔹 21. Czym jest backpressure?](#-21-czym-jest-backpressure)
+  * [3️⃣ Kolekcje i Struktury Danych](#3-kolekcje-i-struktury-danych)
+      * [🔹 22. Jak działa HashMap krok po kroku?](#-22-jak-działa-hashmap-krok-po-kroku)
+      * [🔹 23. Dlaczego equals() i hashCode() muszą być spójne?](#-23-dlaczego-equals-i-hashcode-muszą-być-spójne)
+      * [🔹 24. Czym jest loadFactor i dlaczego ma znaczenie?](#-24-czym-jest-loadfactor-i-dlaczego-ma-znaczenie)
+      * [🔹 25. Czym jest Red-Black Tree?](#-25-czym-jest-red-black-tree)
+      * [🔹 26. Czym różni się HashMap od ConcurrentHashMap?](#-26-czym-różni-się-hashmap-od-concurrenthashmap)
+      * [🔹 27. Co to jest segment-based locking?](#-27-co-to-jest-segment-based-locking)
+      * [🔹 28. Czym jest CopyOnWriteArrayList?](#-28-czym-jest-copyonwritearraylist)
+      * [🔹 29. Jakie są złożoności czasowe (Big-O) podstawowych kolekcji?](#-29-jakie-są-złożoności-czasowe-big-o-podstawowych-kolekcji)
+  * [4️⃣ Stream API](#4-stream-api)
+      * [🔹 30. Czym jest lazy evaluation w Stream API?](#-30-czym-jest-lazy-evaluation-w-stream-api)
+      * [🔹 31. Czym różnią się operacje stateless i stateful?](#-31-czym-różnią-się-operacje-stateless-i-stateful)
+      * [🔹 32. Czym różni się map od flatMap?](#-32-czym-różni-się-map-od-flatmap)
+      * [🔹 33. Dlaczego funkcja w reduce musi być asocjacyjna?](#-33-dlaczego-funkcja-w-reduce-musi-być-asocjacyjna)
+      * [🔹 34. Czym jest Spliterator?](#-34-czym-jest-spliterator)
+      * [🔹 35. Dlaczego parallel stream może być niebezpieczny?](#-35-dlaczego-parallel-stream-może-być-niebezpieczny)
+      * [🔹 36. Dlaczego efekty uboczne (side effects) łamią parallel stream?](#-36-dlaczego-efekty-uboczne-side-effects-łamią-parallel-stream)
+      * [🔹 37. Czym różni się forEach od forEachOrdered?](#-37-czym-różni-się-foreach-od-foreachordered)
+  * [5️⃣ Typy, OOP i Generics](#5-typy-oop-i-generics)
+      * [🔹 38. Czym jest type erasure w Generics?](#-38-czym-jest-type-erasure-w-generics)
+      * [🔹 39. Czym jest covariance i contravariance?](#-39-czym-jest-covariance-i-contravariance)
+      * [🔹 40. Dlaczego immutable objects są bezpieczne wielowątkowo?](#-40-dlaczego-immutable-objects-są-bezpieczne-wielowątkowo)
+      * [🔹 41. Czym różni się equals od ==?](#-41-czym-różni-się-equals-od-)
+      * [🔹 42. Czym jest record w Javie?](#-42-czym-jest-record-w-javie)
+      * [🔹 43. Czym są sealed classes?](#-43-czym-są-sealed-classes)
+      * [🔹 44. Kiedy Optional jest dobrym pomysłem, a kiedy złym?](#-44-kiedy-optional-jest-dobrym-pomysłem-a-kiedy-złym)
+      * [🔹 45. Czym są value-based classes?](#-45-czym-są-value-based-classes)
+  * [6️⃣ IO / NIO](#6-io--nio)
+      * [🔹 46. Czym różni się IO od NIO?](#-46-czym-różni-się-io-od-nio)
+      * [🔹 47. Czym jest Channel?](#-47-czym-jest-channel)
+      * [🔹 48. Czym jest Buffer?](#-48-czym-jest-buffer)
+      * [🔹 49. Czym jest Selector?](#-49-czym-jest-selector)
+      * [🔹 50. Czym jest memory-mapped file?](#-50-czym-jest-memory-mapped-file)
+  * [7️⃣ Wyjątki i API Design](#7-wyjątki-i-api-design)
+      * [🔹 51. Czym różnią się checked i unchecked exceptions?](#-51-czym-różnią-się-checked-i-unchecked-exceptions)
+      * [🔹 52. Czym jest exception wrapping?](#-52-czym-jest-exception-wrapping)
+      * [🔹 53. Czym są suppressed exceptions?](#-53-czym-są-suppressed-exceptions)
+      * [🔹 54. Czym jest defensive copying?](#-54-czym-jest-defensive-copying)
+      * [🔹 55. Jak projektować dobre API?](#-55-jak-projektować-dobre-api)
+<!-- TOC -->
 
 ## 1️⃣ JVM i Model Pamięci
 
 ---
 
-## 🔹 1. Czym jest JVM i z jakich głównych obszarów pamięci się składa?
+#### 🔹 1. Czym jest JVM i z jakich głównych obszarów pamięci się składa?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 JVM (Java Virtual Machine) to środowisko uruchomieniowe, które:
 - wykonuje bytecode (.class),
@@ -14,9 +95,9 @@ JVM (Java Virtual Machine) to środowisko uruchomieniowe, które:
 - zarządza wątkami,
 - zapewnia izolację i bezpieczeństwo.
 
-### Główne obszary pamięci:
+<span style='color:##a9b8c6;font-weight:bold;font-size:small;list-style-type:none'>Główne obszary pamięci:</span>
 
-#### 1️⃣ Heap
+🔸 **Heap**
 - Współdzielony między wątkami.
 - Przechowuje obiekty i ich pola.
 - Zarządzany przez Garbage Collector.
@@ -24,7 +105,7 @@ JVM (Java Virtual Machine) to środowisko uruchomieniowe, które:
   - Young Generation (Eden + Survivor)
   - Old Generation
 
-#### 2️⃣ Stack (dla każdego wątku osobny)
+🔸 **Stack (dla każdego wątku osobny)**
 - Przechowuje:
   - zmienne lokalne,
   - referencje do obiektów,
@@ -32,22 +113,22 @@ JVM (Java Virtual Machine) to środowisko uruchomieniowe, które:
 - Zarządzany automatycznie (LIFO).
 - Nie podlega GC.
 
-#### 3️⃣ Metaspace
+🔸 **3️⃣ Metaspace**
 - Przechowuje metadane klas.
 - Zastąpił PermGen od Java 8.
 - Alokowany w pamięci natywnej (poza heapem).
 
-#### 4️⃣ PC Register
+🔸 **4️⃣ PC Register**
 - Wskaźnik aktualnie wykonywanej instrukcji dla wątku.
 
-#### 5️⃣ Native Method Stack
+🔸 **5️⃣ Native Method Stack**
 - Dla metod natywnych (JNI).
 
 ---
 
-## 🔹 2. Czym jest Java Memory Model (JMM)?
+#### 🔹 2. Czym jest Java Memory Model (JMM)?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 JMM to specyfikacja opisująca:
 
@@ -64,9 +145,9 @@ Bez JMM kod wielowątkowy byłby nieprzewidywalny.
 
 ---
 
-## 🔹 3. Co to jest reordering i dlaczego jest problemem?
+#### 🔹 3. Co to jest reordering i dlaczego jest problemem?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Reordering to zmiana kolejności instrukcji przez:
 - kompilator,
@@ -83,9 +164,9 @@ Dlatego potrzebujemy:
 
 ---
 
-## 🔹 4. Czym jest relacja happens-before?
+#### 🔹 4. Czym jest relacja happens-before?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Happens-before to gwarancja JMM mówiąca:
 
@@ -100,9 +181,9 @@ Przykłady:
 
 ---
 
-## 🔹 5. Czym różni się visibility od atomicity?
+#### 🔹 5. Czym różni się visibility od atomicity?
 
-### ✅ Visibility (widoczność)
+###### ✅ Visibility (widoczność)
 
 Czy zmiana dokonana przez jeden wątek jest widoczna dla innego.
 
@@ -111,7 +192,7 @@ Zapewniają:
 - synchronized
 - locki
 
-### ✅ Atomicity (niepodzielność)
+###### ✅ Atomicity (niepodzielność)
 
 Czy operacja wykona się w całości, bez możliwości przerwania.
 
@@ -128,9 +209,9 @@ Atomowość zapewniają:
 
 ---
 
-## 🔹 6. Czym jest Escape Analysis?
+#### 🔹 6. Czym jest Escape Analysis?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Escape Analysis to optymalizacja JIT.
 
@@ -143,9 +224,9 @@ Jeśli nie ucieka:
 
 ---
 
-## 🔹 7. Jak działa ClassLoader?
+#### 🔹 7. Jak działa ClassLoader?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 ClassLoader:
 - ładuje klasy do JVM,
@@ -160,9 +241,9 @@ Działa w modelu parent-first — najpierw pyta rodzica, jeśli rodzic nie znajd
 
 ---
 
-## 🔹 8. Czym jest JIT?
+#### 🔹 8. Czym jest JIT?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 JIT (Just-In-Time compiler):
 - kompiluje bytecode do natywnego kodu maszynowego podczas działania programu,
@@ -176,9 +257,9 @@ Optymalizacje obejmują:
 
 ---
 
-## 🔹 9. Jak działa Garbage Collector w skrócie?
+#### 🔹 9. Jak działa Garbage Collector w skrócie?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 GC usuwa obiekty, do których nie ma referencji.
 
@@ -195,33 +276,33 @@ Nowoczesne GC:
 
 ---
 
-# 2️⃣ Współbieżność (Concurrency)
+## 2️⃣ Współbieżność (Concurrency)
 
-## 🔹 1. Jak działa `synchronized` w JVM?
+#### 🔹 1. Jak działa `synchronized` w JVM?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 `synchronized` używa monitora (monitor lock) przypisanego do obiektu.
 
 Każdy obiekt w Javie posiada nagłówek (object header), który zawiera informacje o stanie blokady.
 
-### Co dzieje się przy wejściu do bloku synchronized?
+###### Co dzieje się przy wejściu do bloku synchronized?
 
 1. Wątek próbuje przejąć monitor.
 2. Jeśli monitor jest wolny — zostaje właścicielem.
 3. Jeśli zajęty — wątek przechodzi w stan BLOCKED.
 4. Po wyjściu z bloku monitor jest zwalniany.
 
-### Gwarancje:
+###### Gwarancje:
 - Mutual exclusion (tylko jeden wątek naraz).
 - Visibility (flush do pamięci głównej przy wyjściu).
 - Relacja happens-before między unlock → lock.
 
 ---
 
-## 🔹 2. Czym jest `volatile` i co dokładnie gwarantuje?
+#### 🔹 2. Czym jest `volatile` i co dokładnie gwarantuje?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 `volatile` zapewnia:
 
@@ -235,9 +316,9 @@ JVM generuje instrukcje z barierami pamięci (memory barriers), które wymuszaj�
 
 ---
 
-## 🔹 3. Dlaczego `i++` nie jest bezpieczne wielowątkowo?
+#### 🔹 3. Dlaczego `i++` nie jest bezpieczne wielowątkowo?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Operacja `i++` składa się z:
 1. read
@@ -253,9 +334,9 @@ Rozwiązania:
 
 ---
 
-## 🔹 4. Czym jest CAS (Compare-And-Swap)?
+#### 🔹 4. Czym jest CAS (Compare-And-Swap)?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 CAS to atomowa instrukcja procesora wykonująca operację:
 
@@ -271,9 +352,9 @@ W Javie używana przez:
 
 ---
 
-## 🔹 5. Jak działają klasy Atomic*?
+#### 🔹 5. Jak działają klasy Atomic*?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Np. AtomicInteger:
 - przechowuje wartość jako volatile,
@@ -289,9 +370,9 @@ To jest podejście lock-free.
 
 ---
 
-## 🔹 6. Czym różni się ReentrantLock od synchronized?
+#### 🔹 6. Czym różni się ReentrantLock od synchronized?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 ReentrantLock oferuje:
 - tryLock()
@@ -307,9 +388,9 @@ Oba zapewniają mutual exclusion i visibility.
 
 ---
 
-## 🔹 7. Czym jest deadlock?
+#### 🔹 7. Czym jest deadlock?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Deadlock to sytuacja, gdy dwa lub więcej wątków czekają na zasoby trzymane przez siebie nawzajem.
 
@@ -321,25 +402,25 @@ Warunki deadlocka:
 
 ---
 
-## 🔹 8. Czym jest livelock?
+#### 🔹 8. Czym jest livelock?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Wątki nie są zablokowane, ale stale reagują na siebie i nie wykonują postępu.
 
 ---
 
-## 🔹 9. Czym jest starvation?
+#### 🔹 9. Czym jest starvation?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Wątek nigdy nie otrzymuje zasobu, ponieważ inne wątki są preferowane.
 
 ---
 
-## 🔹 10. Czym jest False Sharing?
+#### 🔹 10. Czym jest False Sharing?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 False sharing występuje, gdy dwie zmienne modyfikowane przez różne wątki znajdują się w tej samej cache line CPU.
 
@@ -352,9 +433,9 @@ Rozwiązania:
 
 ---
 
-## 🔹 11. Jaki jest cykl życia wątku w Javie?
+#### 🔹 11. Jaki jest cykl życia wątku w Javie?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Stany wątku (Thread.State):
 
@@ -369,9 +450,9 @@ Metoda start() powoduje przejście z NEW do RUNNABLE.
 
 ---
 
-## 🔹 12. Dlaczego nie powinniśmy tworzyć wątków ręcznie (new Thread)?
+#### 🔹 12. Dlaczego nie powinniśmy tworzyć wątków ręcznie (new Thread)?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Tworzenie wątków jest kosztowne:
 - alokacja pamięci stosu,
@@ -387,9 +468,9 @@ Dlatego stosuje się pule wątków.
 
 ---
 
-## 🔹 13. Czym jest ExecutorService?
+#### 🔹 13. Czym jest ExecutorService?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 ExecutorService to interfejs zarządzający wykonywaniem zadań asynchronicznych.
 
@@ -406,9 +487,9 @@ Pozwala:
 
 ---
 
-## 🔹 14. Jak działa ThreadPoolExecutor?
+#### 🔹 14. Jak działa ThreadPoolExecutor?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 ThreadPoolExecutor zarządza pulą wątków według parametrów:
 
@@ -426,9 +507,9 @@ Schemat działania:
 
 ---
 
-## 🔹 15. Jakie są typowe implementacje ExecutorService?
+#### 🔹 15. Jakie są typowe implementacje ExecutorService?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 - newFixedThreadPool(n) — stała liczba wątków.
 - newCachedThreadPool() — dynamiczna liczba wątków, brak ograniczenia (może być niebezpieczne).
@@ -440,9 +521,9 @@ W środowisku produkcyjnym zaleca się jawne konfigurowanie ThreadPoolExecutor.
 
 ---
 
-## 🔹 16. Czym jest ForkJoinPool i do czego służy?
+#### 🔹 16. Czym jest ForkJoinPool i do czego służy?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 ForkJoinPool to specjalizowana pula wątków zaprojektowana do zadań dzielonych rekurencyjnie (divide-and-conquer).
 
@@ -459,9 +540,9 @@ Używany przez:
 
 ---
 
-## 🔹 17. Czym jest work-stealing?
+#### 🔹 17. Czym jest work-stealing?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Work-stealing to strategia równoważenia obciążenia:
 
@@ -472,9 +553,9 @@ Zmniejsza contention na wspólnej kolejce i poprawia skalowalność.
 
 ---
 
-## 🔹 18. Czym jest CompletableFuture?
+#### 🔹 18. Czym jest CompletableFuture?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 CompletableFuture to rozszerzenie Future pozwalające na:
 - asynchroniczne przetwarzanie,
@@ -495,9 +576,9 @@ Przykłady metod:
 
 ---
 
-## 🔹 19. Czym różni się thenApply od thenCompose?
+#### 🔹 19. Czym różni się thenApply od thenCompose?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 thenApply:
 - Przekształca wynik synchronizacyjnie.
@@ -509,9 +590,9 @@ thenCompose:
 
 ---
 
-## 🔹 20. Co oznacza blocking vs non-blocking?
+#### 🔹 20. Co oznacza blocking vs non-blocking?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Blocking:
 - Wątek czeka na zakończenie operacji.
@@ -527,9 +608,9 @@ Non-blocking poprawia skalowalność przy operacjach IO.
 
 ---
 
-## 🔹 21. Czym jest backpressure?
+#### 🔹 21. Czym jest backpressure?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Backpressure to mechanizm kontroli przepływu danych między producentem a konsumentem.
 
@@ -548,11 +629,11 @@ W kontekście ThreadPoolExecutor:
 
 ---
 
-# 3️⃣ Kolekcje i Struktury Danych
+## 3️⃣ Kolekcje i Struktury Danych
 
-## 🔹 22. Jak działa HashMap krok po kroku?
+#### 🔹 22. Jak działa HashMap krok po kroku?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 1. Obliczany jest hashCode() klucza.
 2. Hash jest mieszany (bit spreading), aby lepiej rozłożyć bity.
@@ -571,9 +652,9 @@ Resize następuje po przekroczeniu threshold = capacity × loadFactor.
 
 ---
 
-## 🔹 23. Dlaczego equals() i hashCode() muszą być spójne?
+#### 🔹 23. Dlaczego equals() i hashCode() muszą być spójne?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Kontrakt:
 
@@ -588,9 +669,9 @@ Typowy błąd: nadpisanie equals bez hashCode.
 
 ---
 
-## 🔹 24. Czym jest loadFactor i dlaczego ma znaczenie?
+#### 🔹 24. Czym jest loadFactor i dlaczego ma znaczenie?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 loadFactor określa, przy jakim zapełnieniu nastąpi resize.
 
@@ -601,9 +682,9 @@ Domyślnie: 0.75.
 
 ---
 
-## 🔹 25. Czym jest Red-Black Tree?
+#### 🔹 25. Czym jest Red-Black Tree?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Red-Black Tree to samobalansujące drzewo binarne.
 
@@ -617,9 +698,9 @@ Zapewnia operacje w czasie O(log n).
 
 ---
 
-## 🔹 26. Czym różni się HashMap od ConcurrentHashMap?
+#### 🔹 26. Czym różni się HashMap od ConcurrentHashMap?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 HashMap:
 - Nie jest thread-safe.
@@ -634,9 +715,9 @@ Operacje odczytu są w większości bezblokujące.
 
 ---
 
-## 🔹 27. Co to jest segment-based locking?
+#### 🔹 27. Co to jest segment-based locking?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 W starszych wersjach ConcurrentHashMap (Java 7):
 - Mapa była podzielona na segmenty.
@@ -647,9 +728,9 @@ Od Java 8 zastąpione synchronizacją na bucket.
 
 ---
 
-## 🔹 28. Czym jest CopyOnWriteArrayList?
+#### 🔹 28. Czym jest CopyOnWriteArrayList?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 CopyOnWriteArrayList:
 - Przy każdej modyfikacji tworzy nową kopię tablicy.
@@ -663,9 +744,9 @@ Kosztowne przy częstych modyfikacjach.
 
 ---
 
-## 🔹 29. Jakie są złożoności czasowe (Big-O) podstawowych kolekcji?
+#### 🔹 29. Jakie są złożoności czasowe (Big-O) podstawowych kolekcji?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 HashMap:
 - get/put: O(1) średnio, O(log n) przy drzewie.
@@ -685,11 +766,11 @@ TreeMap:
 
 ---
 
-# 4️⃣ Stream API
+## 4️⃣ Stream API
 
-## 🔹 30. Czym jest lazy evaluation w Stream API?
+#### 🔹 30. Czym jest lazy evaluation w Stream API?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Lazy evaluation oznacza, że operacje pośrednie (intermediate operations) nie są wykonywane od razu.
 
@@ -702,9 +783,9 @@ Pozwala to na:
 
 ---
 
-## 🔹 31. Czym różnią się operacje stateless i stateful?
+#### 🔹 31. Czym różnią się operacje stateless i stateful?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Stateless:
 - Nie zależą od innych elementów.
@@ -720,9 +801,9 @@ Operacje stateful są droższe i trudniejsze do zrównoleglenia.
 
 ---
 
-## 🔹 32. Czym różni się map od flatMap?
+#### 🔹 32. Czym różni się map od flatMap?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 map:
 - Przekształca element na inny element.
@@ -737,9 +818,9 @@ flatMap jest odpowiednikiem flatMap z programowania funkcyjnego.
 
 ---
 
-## 🔹 33. Dlaczego funkcja w reduce musi być asocjacyjna?
+#### 🔹 33. Dlaczego funkcja w reduce musi być asocjacyjna?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Operacja asocjacyjna spełnia warunek:
 
@@ -753,9 +834,9 @@ Jeśli operacja nie jest asocjacyjna — wynik może być niepoprawny.
 
 ---
 
-## 🔹 34. Czym jest Spliterator?
+#### 🔹 34. Czym jest Spliterator?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Spliterator to iterator zaprojektowany do przetwarzania równoległego.
 
@@ -774,9 +855,9 @@ Stream używa Spliterator do podziału pracy w parallel stream.
 
 ---
 
-## 🔹 35. Dlaczego parallel stream może być niebezpieczny?
+#### 🔹 35. Dlaczego parallel stream może być niebezpieczny?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Problemy:
 
@@ -792,9 +873,9 @@ Parallel stream jest dobry dla:
 
 ---
 
-## 🔹 36. Dlaczego efekty uboczne (side effects) łamią parallel stream?
+#### 🔹 36. Dlaczego efekty uboczne (side effects) łamią parallel stream?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Side effect to modyfikacja współdzielonego stanu.
 
@@ -813,9 +894,9 @@ Stream powinien być funkcjonalny i bez efektów ubocznych.
 
 ---
 
-## 🔹 37. Czym różni się forEach od forEachOrdered?
+#### 🔹 37. Czym różni się forEach od forEachOrdered?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 forEach:
 - Nie gwarantuje kolejności w parallel stream.
@@ -830,11 +911,11 @@ W sequential stream działają identycznie.
 
 ---
 
-# 5️⃣ Typy, OOP i Generics
+## 5️⃣ Typy, OOP i Generics
 
-## 🔹 38. Czym jest type erasure w Generics?
+#### 🔹 38. Czym jest type erasure w Generics?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Type erasure oznacza, że informacje o typach generycznych są usuwane w czasie kompilacji.
 
@@ -850,9 +931,9 @@ Kompilator dodaje casty w bytecode, aby zachować bezpieczeństwo typów.
 
 ---
 
-## 🔹 39. Czym jest covariance i contravariance?
+#### 🔹 39. Czym jest covariance i contravariance?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Covariance — pozwala używać typu bardziej szczegółowego.
 
@@ -872,9 +953,9 @@ Zasada PECS:
 
 ---
 
-## 🔹 40. Dlaczego immutable objects są bezpieczne wielowątkowo?
+#### 🔹 40. Dlaczego immutable objects są bezpieczne wielowątkowo?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Obiekt immutable:
 - Nie zmienia stanu po konstrukcji.
@@ -889,9 +970,9 @@ Immutable upraszcza concurrency.
 
 ---
 
-## 🔹 41. Czym różni się equals od ==?
+#### 🔹 41. Czym różni się equals od ==?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 == porównuje referencje (czy to ten sam obiekt).
 
@@ -901,9 +982,9 @@ Dla klas własnych należy nadpisać equals i hashCode.
 
 ---
 
-## 🔹 42. Czym jest record w Javie?
+#### 🔹 42. Czym jest record w Javie?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 record to skrócona forma klasy immutable.
 
@@ -918,9 +999,9 @@ Record jest final i przeznaczony do przechowywania danych.
 
 ---
 
-## 🔹 43. Czym są sealed classes?
+#### 🔹 43. Czym są sealed classes?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Sealed class ogranicza, które klasy mogą ją rozszerzać.
 
@@ -933,9 +1014,9 @@ Pozwala:
 
 ---
 
-## 🔹 44. Kiedy Optional jest dobrym pomysłem, a kiedy złym?
+#### 🔹 44. Kiedy Optional jest dobrym pomysłem, a kiedy złym?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Dobry:
 - jako typ zwracany z metody.
@@ -950,9 +1031,9 @@ Optional nie jest zamiennikiem każdego null.
 
 ---
 
-## 🔹 45. Czym są value-based classes?
+#### 🔹 45. Czym są value-based classes?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Value-based class:
 - Reprezentuje wartość, nie tożsamość.
@@ -966,11 +1047,11 @@ W przyszłości Project Valhalla wprowadzi value types bez narzutu obiektowego.
 
 ---
 
-# 6️⃣ IO / NIO
+## 6️⃣ IO / NIO
 
-## 🔹 46. Czym różni się IO od NIO?
+#### 🔹 46. Czym różni się IO od NIO?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 IO (java.io):
 - Model strumieniowy (InputStream/OutputStream).
@@ -986,9 +1067,9 @@ NIO jest bardziej skalowalne przy dużej liczbie połączeń.
 
 ---
 
-## 🔹 47. Czym jest Channel?
+#### 🔹 47. Czym jest Channel?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Channel to dwukierunkowe połączenie do źródła danych.
 
@@ -1001,9 +1082,9 @@ Współpracuje z Buffer.
 
 ---
 
-## 🔹 48. Czym jest Buffer?
+#### 🔹 48. Czym jest Buffer?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Buffer to kontener na dane z polami:
 - capacity — maksymalny rozmiar,
@@ -1014,9 +1095,9 @@ Tryb zapisu → flip() → tryb odczytu.
 
 ---
 
-## 🔹 49. Czym jest Selector?
+#### 🔹 49. Czym jest Selector?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Selector pozwala jednemu wątkowi monitorować wiele kanałów.
 
@@ -1028,9 +1109,9 @@ Umożliwia model event-driven.
 
 ---
 
-## 🔹 50. Czym jest memory-mapped file?
+#### 🔹 50. Czym jest memory-mapped file?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Memory-mapped file (MappedByteBuffer):
 - Mapuje plik bezpośrednio do pamięci.
@@ -1045,11 +1126,11 @@ Wady:
 
 ---
 
-# 7️⃣ Wyjątki i API Design
+## 7️⃣ Wyjątki i API Design
 
-## 🔹 51. Czym różnią się checked i unchecked exceptions?
+#### 🔹 51. Czym różnią się checked i unchecked exceptions?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Checked:
 - Muszą być zadeklarowane lub obsłużone.
@@ -1063,9 +1144,9 @@ W nowoczesnym kodzie preferuje się unchecked.
 
 ---
 
-## 🔹 52. Czym jest exception wrapping?
+#### 🔹 52. Czym jest exception wrapping?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Exception wrapping polega na opakowaniu niższego wyjątku w wyższy:
 
@@ -1077,9 +1158,9 @@ Pozwala:
 
 ---
 
-## 🔹 53. Czym są suppressed exceptions?
+#### 🔹 53. Czym są suppressed exceptions?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Powstają przy try-with-resources.
 
@@ -1091,9 +1172,9 @@ Wyjątek z close() jest suppressed i dostępny przez getSuppressed().
 
 ---
 
-## 🔹 54. Czym jest defensive copying?
+#### 🔹 54. Czym jest defensive copying?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Defensive copying polega na tworzeniu kopii mutowalnych obiektów przekazywanych do klasy.
 
@@ -1104,9 +1185,9 @@ Stosowane w klasach immutable.
 
 ---
 
-## 🔹 55. Jak projektować dobre API?
+#### 🔹 55. Jak projektować dobre API?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Zasady:
 - Minimalna powierzchnia publiczna.

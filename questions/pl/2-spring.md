@@ -1,12 +1,56 @@
+[💡 Questions](questions.md)
+
 # 🌱 SPRING ECOSYSTEM
+
+<!-- TOC -->
+* [🌱 SPRING ECOSYSTEM](#-spring-ecosystem)
+  * [1️⃣ IoC i Dependency Injection](#1-ioc-i-dependency-injection)
+      * [🔹 1. Czym jest IoC (Inversion of Control)?](#-1-czym-jest-ioc-inversion-of-control)
+      * [🔹 2. Czym jest Dependency Injection?](#-2-czym-jest-dependency-injection)
+      * [🔹 3. Jak działa kontener Springa krok po kroku?](#-3-jak-działa-kontener-springa-krok-po-kroku)
+      * [🔹 4. Jakie są scope beanów?](#-4-jakie-są-scope-beanów)
+      * [🔹 5. Czym jest lifecycle beana?](#-5-czym-jest-lifecycle-beana)
+      * [🔹 6. Czym jest @Primary i @Qualifier?](#-6-czym-jest-primary-i-qualifier)
+  * [2️⃣ @Transactional (Mechanizm Transakcji)](#2-transactional-mechanizm-transakcji)
+      * [🔹 7. Jak działa @Transactional pod spodem?](#-7-jak-działa-transactional-pod-spodem)
+      * [🔹 8. Kiedy @Transactional NIE działa?](#-8-kiedy-transactional-nie-działa)
+      * [🔹 9. Jak działają propagacje transakcji?](#-9-jak-działają-propagacje-transakcji)
+      * [🔹 10. Jakie są poziomy izolacji?](#-10-jakie-są-poziomy-izolacji)
+      * [🔹 11. Kiedy rollback NIE nastąpi?](#-11-kiedy-rollback-nie-nastąpi)
+      * [🔹 12. Czym jest TransactionManager?](#-12-czym-jest-transactionmanager)
+  * [3️⃣ Spring AOP](#3-spring-aop)
+      * [🔹 13. Czym jest AOP (Aspect-Oriented Programming)?](#-13-czym-jest-aop-aspect-oriented-programming)
+      * [🔹 14. Jak działa AOP w Springu?](#-14-jak-działa-aop-w-springu)
+      * [🔹 15. Czym różni się JDK Dynamic Proxy od CGLIB?](#-15-czym-różni-się-jdk-dynamic-proxy-od-cglib)
+      * [🔹 16. Czym jest weaving?](#-16-czym-jest-weaving)
+      * [🔹 17. Jakie są typy advice?](#-17-jakie-są-typy-advice)
+      * [🔹 18. Czym jest pointcut?](#-18-czym-jest-pointcut)
+  * [🚀 4️⃣ Spring Boot](#-4-spring-boot)
+      * [🔹 19. Czym jest auto-configuration w Spring Boot?](#-19-czym-jest-auto-configuration-w-spring-boot)
+      * [🔹 20. Czym są adnotacje @Conditional?](#-20-czym-są-adnotacje-conditional)
+      * [🔹 21. Czym jest starter w Spring Boot?](#-21-czym-jest-starter-w-spring-boot)
+      * [🔹 22. Czym różni się ApplicationContext od WebApplicationContext?](#-22-czym-różni-się-applicationcontext-od-webapplicationcontext)
+      * [🔹 23. Jak działa binding właściwości (@ConfigurationProperties)?](#-23-jak-działa-binding-właściwości-configurationproperties)
+      * [🔹 24. Czym są profile w Spring?](#-24-czym-są-profile-w-spring)
+      * [🔹 25. Czym jest Spring Boot Actuator?](#-25-czym-jest-spring-boot-actuator)
+  * [🔐 5️⃣ Spring Security](#-5-spring-security)
+      * [🔹 26. Jak działa Spring Security wewnętrznie?](#-26-jak-działa-spring-security-wewnętrznie)
+      * [🔹 27. Czym różni się Authentication od Authorization?](#-27-czym-różni-się-authentication-od-authorization)
+      * [🔹 28. Czym jest SecurityContext?](#-28-czym-jest-securitycontext)
+      * [🔹 29. Jak działa JWT w Spring Security?](#-29-jak-działa-jwt-w-spring-security)
+      * [🔹 30. Czym jest OAuth2?](#-30-czym-jest-oauth2)
+      * [🔹 31. Czym jest CSRF i jak Spring go chroni?](#-31-czym-jest-csrf-i-jak-spring-go-chroni)
+      * [🔹 32. Czym jest CORS?](#-32-czym-jest-cors)
+      * [🔹 33. Jak bezpiecznie przechowywać hasła?](#-33-jak-bezpiecznie-przechowywać-hasła)
+<!-- TOC -->
 
 ---
 
-# 1️⃣ IoC i Dependency Injection
+## 1️⃣ IoC i Dependency Injection
 
-## 🔹 1. Czym jest IoC (Inversion of Control)?
+#### 🔹 1. Czym jest IoC (Inversion of Control)?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Inversion of Control oznacza odwrócenie kontroli nad tworzeniem i zarządzaniem zależnościami.
 
@@ -23,9 +67,9 @@ Korzyści:
 
 ---
 
-## 🔹 2. Czym jest Dependency Injection?
+#### 🔹 2. Czym jest Dependency Injection?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Dependency Injection to mechanizm dostarczania zależności do klasy z zewnątrz.
 
@@ -41,9 +85,9 @@ Constructor injection:
 
 ---
 
-## 🔹 3. Jak działa kontener Springa krok po kroku?
+#### 🔹 3. Jak działa kontener Springa krok po kroku?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 1. Odczyt konfiguracji (@Configuration, @ComponentScan).
 2. Rejestracja definicji beanów (BeanDefinition).
@@ -56,9 +100,9 @@ Spring używa refleksji do tworzenia i łączenia obiektów.
 
 ---
 
-## 🔹 4. Jakie są scope beanów?
+#### 🔹 4. Jakie są scope beanów?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 - singleton (domyślny) — jedna instancja na kontekst.
 - prototype — nowa instancja przy każdym pobraniu.
@@ -70,9 +114,9 @@ Singleton w Springu ≠ Singleton w sensie wzorca projektowego (jest per Applica
 
 ---
 
-## 🔹 5. Czym jest lifecycle beana?
+#### 🔹 5. Czym jest lifecycle beana?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Etapy:
 1. Instancja.
@@ -86,9 +130,9 @@ BeanPostProcessor umożliwia modyfikację beanów (np. tworzenie proxy).
 
 ---
 
-## 🔹 6. Czym jest @Primary i @Qualifier?
+#### 🔹 6. Czym jest @Primary i @Qualifier?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Jeśli istnieje wiele implementacji interfejsu:
 
@@ -100,11 +144,11 @@ Zapobiega NoUniqueBeanDefinitionException.
 
 ---
 
-# 2️⃣ @Transactional (Mechanizm Transakcji)
+## 2️⃣ @Transactional (Mechanizm Transakcji)
 
-## 🔹 7. Jak działa @Transactional pod spodem?
+#### 🔹 7. Jak działa @Transactional pod spodem?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 @Transactional działa poprzez AOP.
 
@@ -119,9 +163,9 @@ Jeśli metoda jest wywołana bezpośrednio (self-invocation) — proxy nie jest 
 
 ---
 
-## 🔹 8. Kiedy @Transactional NIE działa?
+#### 🔹 8. Kiedy @Transactional NIE działa?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 - Metoda private.
 - Metoda final (przy CGLIB ograniczenia proxy).
@@ -131,9 +175,9 @@ Jeśli metoda jest wywołana bezpośrednio (self-invocation) — proxy nie jest 
 
 ---
 
-## 🔹 9. Jak działają propagacje transakcji?
+#### 🔹 9. Jak działają propagacje transakcji?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Propagation określa zachowanie przy wywołaniu metody wewnątrz istniejącej transakcji.
 
@@ -163,9 +207,9 @@ NESTED:
 
 ---
 
-## 🔹 10. Jakie są poziomy izolacji?
+#### 🔹 10. Jakie są poziomy izolacji?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 READ_UNCOMMITTED:
 - Możliwe dirty reads.
@@ -189,9 +233,9 @@ Phantom read — nowe rekordy pojawiają się w wyniku tego samego zapytania.
 
 ---
 
-## 🔹 11. Kiedy rollback NIE nastąpi?
+#### 🔹 11. Kiedy rollback NIE nastąpi?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Domyślnie rollback następuje tylko dla RuntimeException i Error.
 
@@ -204,9 +248,9 @@ Można wymusić rollback:
 
 ---
 
-## 🔹 12. Czym jest TransactionManager?
+#### 🔹 12. Czym jest TransactionManager?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 PlatformTransactionManager zarządza cyklem życia transakcji.
 
@@ -224,11 +268,11 @@ Odpowiada za:
 
 ---
 
-# 3️⃣ Spring AOP
+## 3️⃣ Spring AOP
 
-## 🔹 13. Czym jest AOP (Aspect-Oriented Programming)?
+#### 🔹 13. Czym jest AOP (Aspect-Oriented Programming)?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 AOP pozwala wydzielić logikę przekrojową (cross-cutting concerns), taką jak:
 - transakcje,
@@ -240,9 +284,9 @@ Zamiast umieszczać ją w każdej metodzie — definiuje się aspekt.
 
 ---
 
-## 🔹 14. Jak działa AOP w Springu?
+#### 🔹 14. Jak działa AOP w Springu?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Spring AOP działa w oparciu o proxy.
 
@@ -255,9 +299,9 @@ Spring AOP działa tylko na metodach publicznych beanów zarządzanych przez Spr
 
 ---
 
-## 🔹 15. Czym różni się JDK Dynamic Proxy od CGLIB?
+#### 🔹 15. Czym różni się JDK Dynamic Proxy od CGLIB?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 JDK Dynamic Proxy:
 - Tworzy proxy na podstawie interfejsu.
@@ -274,9 +318,9 @@ Spring domyślnie używa:
 
 ---
 
-## 🔹 16. Czym jest weaving?
+#### 🔹 16. Czym jest weaving?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Weaving to proces wstrzykiwania aspektów do kodu.
 
@@ -289,9 +333,9 @@ Spring używa runtime weaving przez proxy.
 
 ---
 
-## 🔹 17. Jakie są typy advice?
+#### 🔹 17. Jakie są typy advice?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 - @Before — przed metodą.
 - @After — po metodzie (zawsze).
@@ -303,9 +347,9 @@ Spring używa runtime weaving przez proxy.
 
 ---
 
-## 🔹 18. Czym jest pointcut?
+#### 🔹 18. Czym jest pointcut?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Pointcut definiuje, które metody mają być objęte aspektem.
 
@@ -322,11 +366,11 @@ Pointcut + Advice = Aspect.
 
 ---
 
-# 🚀 4️⃣ Spring Boot
+## 🚀 4️⃣ Spring Boot
 
-## 🔹 19. Czym jest auto-configuration w Spring Boot?
+#### 🔹 19. Czym jest auto-configuration w Spring Boot?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Auto-configuration to mechanizm automatycznego konfigurowania beanów na podstawie:
 - obecności klas w classpath,
@@ -342,9 +386,9 @@ Pozwala to uruchomić aplikację bez ręcznej konfiguracji infrastruktury.
 
 ---
 
-## 🔹 20. Czym są adnotacje @Conditional?
+#### 🔹 20. Czym są adnotacje @Conditional?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 @Conditional pozwala tworzyć bean tylko jeśli spełniony jest warunek.
 
@@ -358,9 +402,9 @@ Mechanizm ten jest fundamentem auto-config.
 
 ---
 
-## 🔹 21. Czym jest starter w Spring Boot?
+#### 🔹 21. Czym jest starter w Spring Boot?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Starter to zestaw zależności (dependency descriptor), który:
 - agreguje biblioteki,
@@ -374,9 +418,9 @@ Ułatwia konfigurację poprzez konwencję zamiast konfiguracji.
 
 ---
 
-## 🔹 22. Czym różni się ApplicationContext od WebApplicationContext?
+#### 🔹 22. Czym różni się ApplicationContext od WebApplicationContext?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 ApplicationContext:
 - Ogólny kontener beanów.
@@ -389,9 +433,9 @@ W aplikacjach web tworzony jest kontekst webowy.
 
 ---
 
-## 🔹 23. Jak działa binding właściwości (@ConfigurationProperties)?
+#### 🔹 23. Jak działa binding właściwości (@ConfigurationProperties)?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 @ConfigurationProperties pozwala mapować właściwości z application.yml na obiekt.
 
@@ -407,9 +451,9 @@ Zalety:
 
 ---
 
-## 🔹 24. Czym są profile w Spring?
+#### 🔹 24. Czym są profile w Spring?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Profile pozwalają aktywować różne konfiguracje zależnie od środowiska.
 
@@ -421,9 +465,9 @@ Umożliwiają separację konfiguracji dev/test/prod.
 
 ---
 
-## 🔹 25. Czym jest Spring Boot Actuator?
+#### 🔹 25. Czym jest Spring Boot Actuator?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Actuator dostarcza endpointy monitorujące aplikację.
 
@@ -443,11 +487,11 @@ Często używany z Prometheus.
 
 ---
 
-# 🔐 5️⃣ Spring Security
+## 🔐 5️⃣ Spring Security
 
-## 🔹 26. Jak działa Spring Security wewnętrznie?
+#### 🔹 26. Jak działa Spring Security wewnętrznie?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Spring Security działa jako łańcuch filtrów (Security Filter Chain).
 
@@ -460,9 +504,9 @@ SecurityContext przechowywany jest w ThreadLocal (SecurityContextHolder).
 
 ---
 
-## 🔹 27. Czym różni się Authentication od Authorization?
+#### 🔹 27. Czym różni się Authentication od Authorization?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Authentication (uwierzytelnienie):
 - Kim jesteś?
@@ -476,9 +520,9 @@ Authentication poprzedza Authorization.
 
 ---
 
-## 🔹 28. Czym jest SecurityContext?
+#### 🔹 28. Czym jest SecurityContext?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 SecurityContext przechowuje informacje o aktualnie uwierzytelnionym użytkowniku.
 
@@ -491,9 +535,9 @@ Domyślnie przechowywany w ThreadLocal.
 
 ---
 
-## 🔹 29. Jak działa JWT w Spring Security?
+#### 🔹 29. Jak działa JWT w Spring Security?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 JWT (JSON Web Token):
 - Token zawiera zakodowane dane użytkownika.
@@ -509,9 +553,9 @@ JWT jest stateless — serwer nie przechowuje sesji.
 
 ---
 
-## 🔹 30. Czym jest OAuth2?
+#### 🔹 30. Czym jest OAuth2?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 OAuth2 to protokół autoryzacji.
 
@@ -531,9 +575,9 @@ Spring Security może działać jako Resource Server lub OAuth2 Client.
 
 ---
 
-## 🔹 31. Czym jest CSRF i jak Spring go chroni?
+#### 🔹 31. Czym jest CSRF i jak Spring go chroni?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 CSRF (Cross-Site Request Forgery):
 - Atak polegający na wysłaniu żądania w imieniu użytkownika bez jego wiedzy.
@@ -546,9 +590,9 @@ W aplikacjach stateless (JWT) często wyłączany.
 
 ---
 
-## 🔹 32. Czym jest CORS?
+#### 🔹 32. Czym jest CORS?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 CORS (Cross-Origin Resource Sharing):
 - Mechanizm przeglądarki kontrolujący dostęp między domenami.
@@ -561,9 +605,9 @@ Spring pozwala konfigurować CORS globalnie lub per endpoint.
 
 ---
 
-## 🔹 33. Jak bezpiecznie przechowywać hasła?
+#### 🔹 33. Jak bezpiecznie przechowywać hasła?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Hasła nie powinny być szyfrowane, lecz haszowane.
 

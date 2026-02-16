@@ -1,12 +1,33 @@
+[💡 Questions](questions.md)
+
 # 🧠 SYSTEM DESIGN / THINKING
+
+<!-- TOC -->
+* [🧠 SYSTEM DESIGN / THINKING](#-system-design--thinking)
+  * [1️⃣ Myślenie Architektoniczne](#1-myślenie-architektoniczne)
+      * [🔹 1. Czym są trade-offs w architekturze?](#-1-czym-są-trade-offs-w-architekturze)
+      * [🔹 2. Jak rozumieć CAP w praktyce projektowej?](#-2-jak-rozumieć-cap-w-praktyce-projektowej)
+  * [2️⃣ Projektowanie pod Skalę](#2-projektowanie-pod-skalę)
+      * [🔹 3. Czym jest skalowalność funkcjonalna vs techniczna?](#-3-czym-jest-skalowalność-funkcjonalna-vs-techniczna)
+      * [🔹 4. Czym jest latency budget?](#-4-czym-jest-latency-budget)
+  * [3️⃣ Projektowanie na Awarię](#3-projektowanie-na-awarię)
+      * [🔹 5. Co oznacza "design for failure"?](#-5-co-oznacza-design-for-failure)
+      * [🔹 6. Czym jest graceful degradation?](#-6-czym-jest-graceful-degradation)
+  * [4️⃣ Backpressure i Przepływ Danych](#4-backpressure-i-przepływ-danych)
+      * [🔹 7. Czym jest backpressure na poziomie systemowym?](#-7-czym-jest-backpressure-na-poziomie-systemowym)
+  * [5️⃣ Failure Modes i Analiza Ryzyka](#5-failure-modes-i-analiza-ryzyka)
+      * [🔹 8. Jak analizować failure modes systemu?](#-8-jak-analizować-failure-modes-systemu)
+  * [6️⃣ Myślenie Długoterminowe](#6-myślenie-długoterminowe)
+      * [🔹 9. Jak podejmować decyzje technologiczne długoterminowo?](#-9-jak-podejmować-decyzje-technologiczne-długoterminowo)
+<!-- TOC -->
 
 ---
 
-# 1️⃣ Myślenie Architektoniczne
+## 1️⃣ Myślenie Architektoniczne
 
-## 🔹 1. Czym są trade-offs w architekturze?
+#### 🔹 1. Czym są trade-offs w architekturze?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Każda decyzja architektoniczna to kompromis między:
 - wydajnością,
@@ -21,9 +42,9 @@ Architekt powinien jasno rozumieć konsekwencje wyborów.
 
 ---
 
-## 🔹 2. Jak rozumieć CAP w praktyce projektowej?
+#### 🔹 2. Jak rozumieć CAP w praktyce projektowej?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 W systemach rozproszonych Partition Tolerance jest obowiązkowe.
 
@@ -38,11 +59,11 @@ Projekt musi uwzględniać konsekwencje chwilowej niespójności.
 
 ---
 
-# 2️⃣ Projektowanie pod Skalę
+## 2️⃣ Projektowanie pod Skalę
 
-## 🔹 3. Czym jest skalowalność funkcjonalna vs techniczna?
+#### 🔹 3. Czym jest skalowalność funkcjonalna vs techniczna?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Skalowalność techniczna:
 - Więcej instancji, więcej zasobów.
@@ -55,9 +76,9 @@ Obie są kluczowe dla systemów długowiecznych.
 
 ---
 
-## 🔹 4. Czym jest latency budget?
+#### 🔹 4. Czym jest latency budget?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Latency budget to maksymalny czas odpowiedzi systemu rozłożony na komponenty.
 
@@ -71,11 +92,11 @@ Pomaga kontrolować zależności i unikać kaskadowych opóźnień.
 
 ---
 
-# 3️⃣ Projektowanie na Awarię
+## 3️⃣ Projektowanie na Awarię
 
-## 🔹 5. Co oznacza "design for failure"?
+#### 🔹 5. Co oznacza "design for failure"?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 W systemach rozproszonych zakładamy, że:
 - sieć zawiedzie,
@@ -90,9 +111,9 @@ System powinien:
 
 ---
 
-## 🔹 6. Czym jest graceful degradation?
+#### 🔹 6. Czym jest graceful degradation?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Graceful degradation oznacza, że przy awarii części systemu:
 - system nadal działa,
@@ -103,11 +124,11 @@ Przykład:
 
 ---
 
-# 4️⃣ Backpressure i Przepływ Danych
+## 4️⃣ Backpressure i Przepływ Danych
 
-## 🔹 7. Czym jest backpressure na poziomie systemowym?
+#### 🔹 7. Czym jest backpressure na poziomie systemowym?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Backpressure to kontrola przepływu danych między komponentami.
 
@@ -123,11 +144,11 @@ Mechanizmy:
 
 ---
 
-# 5️⃣ Failure Modes i Analiza Ryzyka
+## 5️⃣ Failure Modes i Analiza Ryzyka
 
-## 🔹 8. Jak analizować failure modes systemu?
+#### 🔹 8. Jak analizować failure modes systemu?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Należy zidentyfikować:
 - pojedyncze punkty awarii (SPOF),
@@ -144,11 +165,11 @@ Celem jest zwiększenie odporności systemu.
 
 ---
 
-# 6️⃣ Myślenie Długoterminowe
+## 6️⃣ Myślenie Długoterminowe
 
-## 🔹 9. Jak podejmować decyzje technologiczne długoterminowo?
+#### 🔹 9. Jak podejmować decyzje technologiczne długoterminowo?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Należy brać pod uwagę:
 - dojrzałość technologii,

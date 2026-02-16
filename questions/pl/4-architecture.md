@@ -1,12 +1,33 @@
+[💡 Questions](questions.md)
+
 # 🏗 ARCHITEKTURA APLIKACJI
+
+<!-- TOC -->
+* [🏗 ARCHITEKTURA APLIKACJI](#-architektura-aplikacji)
+  * [1️⃣ Fundamenty Architektoniczne](#1-fundamenty-architektoniczne)
+      * [🔹 1. Czym jest Separation of Concerns?](#-1-czym-jest-separation-of-concerns)
+      * [🔹 2. Czym jest Dependency Inversion Principle?](#-2-czym-jest-dependency-inversion-principle)
+  * [2️⃣ Clean / Hexagonal / Onion](#2-clean--hexagonal--onion)
+      * [🔹 3. Czym jest Clean Architecture?](#-3-czym-jest-clean-architecture)
+      * [🔹 4. Czym jest Hexagonal Architecture?](#-4-czym-jest-hexagonal-architecture)
+      * [🔹 5. Czym jest Onion Architecture?](#-5-czym-jest-onion-architecture)
+  * [3️⃣ Domain-Driven Design (DDD)](#3-domain-driven-design-ddd)
+      * [🔹 6. Czym jest Bounded Context?](#-6-czym-jest-bounded-context)
+      * [🔹 7. Czym jest Aggregate?](#-7-czym-jest-aggregate)
+      * [🔹 8. Czym jest CQRS?](#-8-czym-jest-cqrs)
+      * [🔹 9. Czym jest Event Sourcing?](#-9-czym-jest-event-sourcing)
+  * [4️⃣ Modularność i Skalowanie](#4-modularność-i-skalowanie)
+      * [🔹 10. Czym jest Modular Monolith?](#-10-czym-jest-modular-monolith)
+      * [🔹 11. Jak podejmować decyzje architektoniczne?](#-11-jak-podejmować-decyzje-architektoniczne)
+<!-- TOC -->
 
 ---
 
-# 1️⃣ Fundamenty Architektoniczne
+## 1️⃣ Fundamenty Architektoniczne
 
-## 🔹 1. Czym jest Separation of Concerns?
+#### 🔹 1. Czym jest Separation of Concerns?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Separation of Concerns (SoC) oznacza rozdzielenie systemu na części odpowiedzialne za różne aspekty.
 
@@ -23,9 +44,9 @@ Celem jest:
 
 ---
 
-## 🔹 2. Czym jest Dependency Inversion Principle?
+#### 🔹 2. Czym jest Dependency Inversion Principle?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Dependency Inversion Principle (DIP):
 
@@ -40,11 +61,11 @@ Zmniejsza sprzężenie i ułatwia testowanie.
 
 ---
 
-# 2️⃣ Clean / Hexagonal / Onion
+## 2️⃣ Clean / Hexagonal / Onion
 
-## 🔹 3. Czym jest Clean Architecture?
+#### 🔹 3. Czym jest Clean Architecture?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Clean Architecture dzieli system na warstwy koncentryczne:
 
@@ -59,9 +80,9 @@ Zasada:
 
 ---
 
-## 🔹 4. Czym jest Hexagonal Architecture?
+#### 🔹 4. Czym jest Hexagonal Architecture?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Hexagonal (Ports & Adapters):
 
@@ -75,9 +96,9 @@ Pozwala oddzielić:
 
 ---
 
-## 🔹 5. Czym jest Onion Architecture?
+#### 🔹 5. Czym jest Onion Architecture?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Onion Architecture:
 - Warstwy koncentryczne.
@@ -88,11 +109,11 @@ Podobna do Clean i Hexagonal — różni się nazewnictwem i akcentem.
 
 ---
 
-# 3️⃣ Domain-Driven Design (DDD)
+## 3️⃣ Domain-Driven Design (DDD)
 
-## 🔹 6. Czym jest Bounded Context?
+#### 🔹 6. Czym jest Bounded Context?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Bounded Context to granica modelu domenowego.
 
@@ -106,9 +127,9 @@ Ułatwia modularność i skalowanie organizacyjne.
 
 ---
 
-## 🔹 7. Czym jest Aggregate?
+#### 🔹 7. Czym jest Aggregate?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Aggregate to klaster encji traktowany jako jedna jednostka spójności.
 
@@ -121,9 +142,9 @@ Transakcje powinny obejmować jeden agregat.
 
 ---
 
-## 🔹 8. Czym jest CQRS?
+#### 🔹 8. Czym jest CQRS?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 CQRS (Command Query Responsibility Segregation):
 
@@ -138,9 +159,9 @@ Wady:
 
 ---
 
-## 🔹 9. Czym jest Event Sourcing?
+#### 🔹 9. Czym jest Event Sourcing?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Event Sourcing:
 - Stan systemu przechowywany jako sekwencja zdarzeń.
@@ -156,11 +177,11 @@ Wyzwania:
 
 ---
 
-# 4️⃣ Modularność i Skalowanie
+## 4️⃣ Modularność i Skalowanie
 
-## 🔹 10. Czym jest Modular Monolith?
+#### 🔹 10. Czym jest Modular Monolith?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Modular Monolith:
 - Jedna aplikacja.
@@ -175,9 +196,9 @@ Może być etapem przed mikroserwisami.
 
 ---
 
-## 🔹 11. Jak podejmować decyzje architektoniczne?
+#### 🔹 11. Jak podejmować decyzje architektoniczne?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Architektura to kompromisy.
 

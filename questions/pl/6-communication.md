@@ -1,12 +1,31 @@
+[💡 Questions](questions.md)
+
 # 🔌 KOMUNIKACJA I INTEGRACJA
+
+<!-- TOC -->
+* [🔌 KOMUNIKACJA I INTEGRACJA](#-komunikacja-i-integracja)
+  * [1️⃣ REST i Semantyka HTTP](#1-rest-i-semantyka-http)
+      * [🔹 1. Co oznacza idempotency w HTTP i które metody są idempotentne?](#-1-co-oznacza-idempotency-w-http-i-które-metody-są-idempotentne)
+      * [🔹 2. Jakie są najważniejsze klasy kodów HTTP i jak ich używać?](#-2-jakie-są-najważniejsze-klasy-kodów-http-i-jak-ich-używać)
+      * [🔹 3. Czym jest caching w HTTP?](#-3-czym-jest-caching-w-http)
+  * [2️⃣ gRPC](#2-grpc)
+      * [🔹 4. Czym jest gRPC i kiedy jest lepsze od REST?](#-4-czym-jest-grpc-i-kiedy-jest-lepsze-od-rest)
+  * [3️⃣ Messaging: Kafka vs RabbitMQ](#3-messaging-kafka-vs-rabbitmq)
+      * [🔹 5. Kafka vs RabbitMQ — kluczowe różnice](#-5-kafka-vs-rabbitmq--kluczowe-różnice)
+      * [🔹 6. Co oznacza at-least-once, at-most-once, exactly-once delivery?](#-6-co-oznacza-at-least-once-at-most-once-exactly-once-delivery)
+      * [🔹 7. Jak radzić sobie z duplikatami wiadomości?](#-7-jak-radzić-sobie-z-duplikatami-wiadomości)
+      * [🔹 8. Czym jest ordering i dlaczego jest trudny?](#-8-czym-jest-ordering-i-dlaczego-jest-trudny)
+  * [4️⃣ Schema Evolution](#4-schema-evolution)
+      * [🔹 9. Czym jest schema evolution?](#-9-czym-jest-schema-evolution)
+<!-- TOC -->
 
 ---
 
-# 1️⃣ REST i Semantyka HTTP
+## 1️⃣ REST i Semantyka HTTP
 
-## 🔹 1. Co oznacza idempotency w HTTP i które metody są idempotentne?
+#### 🔹 1. Co oznacza idempotency w HTTP i które metody są idempotentne?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Idempotency oznacza, że wielokrotne wykonanie tego samego requestu daje ten sam efekt końcowy.
 
@@ -24,9 +43,9 @@ Idempotency jest kluczowa dla retry.
 
 ---
 
-## 🔹 2. Jakie są najważniejsze klasy kodów HTTP i jak ich używać?
+#### 🔹 2. Jakie są najważniejsze klasy kodów HTTP i jak ich używać?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 2xx — sukces
 - 200 OK
@@ -51,9 +70,9 @@ Poprawne statusy zwiększają czytelność API i ułatwiają integracje.
 
 ---
 
-## 🔹 3. Czym jest caching w HTTP?
+#### 🔹 3. Czym jest caching w HTTP?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Caching pozwala ograniczyć liczbę requestów i poprawić wydajność.
 
@@ -66,11 +85,11 @@ ETag pozwala na walidację wersji zasobu (304 Not Modified).
 
 ---
 
-# 2️⃣ gRPC
+## 2️⃣ gRPC
 
-## 🔹 4. Czym jest gRPC i kiedy jest lepsze od REST?
+#### 🔹 4. Czym jest gRPC i kiedy jest lepsze od REST?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 gRPC:
 - Protokół RPC oparty o HTTP/2.
@@ -87,11 +106,11 @@ REST częściej dla komunikacji z frontendem (łatwiejsze debugowanie i kompatyb
 
 ---
 
-# 3️⃣ Messaging: Kafka vs RabbitMQ
+## 3️⃣ Messaging: Kafka vs RabbitMQ
 
-## 🔹 5. Kafka vs RabbitMQ — kluczowe różnice
+#### 🔹 5. Kafka vs RabbitMQ — kluczowe różnice
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Kafka:
 - Log zdarzeń (append-only).
@@ -108,9 +127,9 @@ RabbitMQ świetny do work distribution.
 
 ---
 
-## 🔹 6. Co oznacza at-least-once, at-most-once, exactly-once delivery?
+#### 🔹 6. Co oznacza at-least-once, at-most-once, exactly-once delivery?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 At-most-once:
 - Wiadomość może zginąć.
@@ -130,9 +149,9 @@ W praktyce exactly-once jest trudne i zwykle osiąga się je przez:
 
 ---
 
-## 🔹 7. Jak radzić sobie z duplikatami wiadomości?
+#### 🔹 7. Jak radzić sobie z duplikatami wiadomości?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Ponieważ at-least-once jest częste, system powinien tolerować duplikaty.
 
@@ -143,9 +162,9 @@ Techniki:
 
 ---
 
-## 🔹 8. Czym jest ordering i dlaczego jest trudny?
+#### 🔹 8. Czym jest ordering i dlaczego jest trudny?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Ordering oznacza zachowanie kolejności zdarzeń.
 
@@ -158,11 +177,11 @@ Rozwiązanie:
 
 ---
 
-# 4️⃣ Schema Evolution
+## 4️⃣ Schema Evolution
 
-## 🔹 9. Czym jest schema evolution?
+#### 🔹 9. Czym jest schema evolution?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Schema evolution to zmiana formatu danych bez psucia kompatybilności.
 

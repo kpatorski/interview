@@ -1,12 +1,29 @@
+[💡 Questions](questions.md)
+
 # 📈 WYDAJNOŚĆ I DIAGNOSTYKA
+
+<!-- TOC -->
+* [📈 WYDAJNOŚĆ I DIAGNOSTYKA](#-wydajność-i-diagnostyka)
+  * [1️⃣ Zrozumienie Wydajności](#1-zrozumienie-wydajności)
+      * [🔹 1. Czym różni się latency od throughput?](#-1-czym-różni-się-latency-od-throughput)
+      * [🔹 2. Czym jest bottleneck i jak go znaleźć?](#-2-czym-jest-bottleneck-i-jak-go-znaleźć)
+  * [2️⃣ JVM Profilowanie](#2-jvm-profilowanie)
+      * [🔹 3. Czym jest heap dump i kiedy go używać?](#-3-czym-jest-heap-dump-i-kiedy-go-używać)
+      * [🔹 4. Czym jest thread dump?](#-4-czym-jest-thread-dump)
+      * [🔹 5. Jak działa Garbage Collection i kiedy może być problemem?](#-5-jak-działa-garbage-collection-i-kiedy-może-być-problemem)
+  * [3️⃣ Analiza Algorytmiczna](#3-analiza-algorytmiczna)
+      * [🔹 6. Dlaczego Big-O jest ważne w systemach backendowych?](#-6-dlaczego-big-o-jest-ważne-w-systemach-backendowych)
+  * [4️⃣ Load Testing](#4-load-testing)
+      * [🔹 7. Czym jest load testing i czym różni się od stress testing?](#-7-czym-jest-load-testing-i-czym-różni-się-od-stress-testing)
+<!-- TOC -->
 
 ---
 
-# 1️⃣ Zrozumienie Wydajności
+## 1️⃣ Zrozumienie Wydajności
 
-## 🔹 1. Czym różni się latency od throughput?
+#### 🔹 1. Czym różni się latency od throughput?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Latency:
 - Czas obsługi pojedynczego żądania.
@@ -24,9 +41,9 @@ Optymalizacja zależy od wymagań biznesowych.
 
 ---
 
-## 🔹 2. Czym jest bottleneck i jak go znaleźć?
+#### 🔹 2. Czym jest bottleneck i jak go znaleźć?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Bottleneck to element systemu ograniczający wydajność całości.
 
@@ -47,11 +64,11 @@ Optymalizuje się wąskie gardło, nie wszystko naraz.
 
 ---
 
-# 2️⃣ JVM Profilowanie
+## 2️⃣ JVM Profilowanie
 
-## 🔹 3. Czym jest heap dump i kiedy go używać?
+#### 🔹 3. Czym jest heap dump i kiedy go używać?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Heap dump to zrzut pamięci heap w danym momencie.
 
@@ -66,9 +83,9 @@ Narzędzia:
 
 ---
 
-## 🔹 4. Czym jest thread dump?
+#### 🔹 4. Czym jest thread dump?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Thread dump pokazuje stan wszystkich wątków.
 
@@ -81,9 +98,9 @@ Zawiera stack trace każdego wątku.
 
 ---
 
-## 🔹 5. Jak działa Garbage Collection i kiedy może być problemem?
+#### 🔹 5. Jak działa Garbage Collection i kiedy może być problemem?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 GC usuwa nieosiągalne obiekty.
 
@@ -99,11 +116,11 @@ Rozwiązania:
 
 ---
 
-# 3️⃣ Analiza Algorytmiczna
+## 3️⃣ Analiza Algorytmiczna
 
-## 🔹 6. Dlaczego Big-O jest ważne w systemach backendowych?
+#### 🔹 6. Dlaczego Big-O jest ważne w systemach backendowych?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Big-O opisuje złożoność algorytmu względem rozmiaru danych.
 
@@ -117,11 +134,11 @@ Przy dużej skali różnice stają się krytyczne.
 
 ---
 
-# 4️⃣ Load Testing
+## 4️⃣ Load Testing
 
-## 🔹 7. Czym jest load testing i czym różni się od stress testing?
+#### 🔹 7. Czym jest load testing i czym różni się od stress testing?
 
-### ✅ Odpowiedź
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
 
 Load testing:
 - Test przy oczekiwanym obciążeniu.
