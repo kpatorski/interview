@@ -1,9 +1,9 @@
 [Back to index](../interview.md)
 
-# Java
+# ♨️ Java
 
 <!-- TOC -->
-* [Java](#java)
+* [♨️ Java](#-java)
   * [🚰 Streams](#-streams)
     * [Intermediate vs Terminal Operations](#intermediate-vs-terminal-operations)
     * [Evaluation](#evaluation)
