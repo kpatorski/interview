@@ -80,8 +80,23 @@
       * [Why cycles are NOT a problem in Java](#why-cycles-are-not-a-problem-in-java)
     * [What Actually Prevents GC?](#what-actually-prevents-gc)
   * [Threading](#threading)
-    * [Executor](#executor)
-    * [CallableFuture](#callablefuture)
+    * [Thread Lifecycle](#thread-lifecycle)
+    * [Creating Threads](#creating-threads)
+    * [Concurrency vs Parallelism](#concurrency-vs-parallelism)
+    * [Synchronization](#synchronization)
+    * [Intrinsic Locks (Monitors)](#intrinsic-locks-monitors)
+    * [Volatile](#volatile)
+    * [Atomic Classes](#atomic-classes)
+    * [Executors](#executors)
+      * [Thread Pools Types](#thread-pools-types)
+    * [Callable](#callable)
+    * [Thread vs Core](#thread-vs-core)
+    * [Virtual Threads](#virtual-threads)
+    * [Questions](#questions-4)
+      * [1️⃣ What is happens-before?](#1-what-is-happens-before)
+      * [2️⃣ Difference between synchronized and volatile](#2-difference-between-synchronized-and-volatile)
+      * [3️⃣ Why use ExecutorService?](#3-why-use-executorservice)
+      * [4️⃣ What is safe publication?](#4-what-is-safe-publication)
   * [JIT](#jit)
   * [JRE](#jre)
   * [JDK](#jdk)
@@ -1486,13 +1501,447 @@ But these **<span style='color:hotpink'>do</span>**:
 
 ## Threading
 
+> A lightweight unit of execution inside a process.
+
+Each thread has:
+
+- its own stack
+- program counter
+- registers
+
+But shares:
+
+- heap memory
+- static fields
+- class metadata
+
+--- 
+
+### Thread Lifecycle
+
+States:
+
+- NEW
+- RUNNABLE
+- BLOCKED
+- WAITING
+- TIMED_WAITING
+- TERMINATED
+
+🔸 **Typical Flow**
+
+```text
+NEW → RUNNABLE → (RUNNING) → TERMINATED
+```
+
+Or may enter:
+
+- BLOCKED (waiting for monitor)
+- WAITING (`wait()`, `join()`)
+- TIMED_WAITING (`sleep()`)
+
 ---
 
-### Executor
+### Creating Threads
+
+🔸 **Old way**
+
+```java
+new Thread(() -> {
+    // work
+}).start();
+```
+
+🔸 **Runnable**
+
+```java
+class MyTask implements Runnable {
+    public void run() { }
+}
+```
+
+🔸 **Callable**
+
+```java
+Callable<String> task = () -> "result";
+```
+Returns value, can throw checked exception.
 
 ---
 
-### CallableFuture
+### Concurrency vs Parallelism
+
+Concurrency:
+
+- multiple tasks in progress
+- may not run simultaneously
+
+Parallelism:
+
+- tasks running simultaneously on multiple cores
+
+Java threads enable both.
+
+---
+
+### Synchronization
+
+Java provides:
+```java
+synchronized (lock) {
+   // critical section
+}
+```
+
+Ensures:
+
+- mutual exclusion
+- visibility
+
+🔸 **What synchronized really does**
+
+1. Acquires monitor
+2. Establishes happens-before relationship
+3. Flushes memory
+4. Executes block
+5. Releases monitor
+
+---
+
+### Intrinsic Locks (Monitors)
+
+Every object has **monitor lock**
+
+`synchronized(this)` uses object’s monitor.
+
+---
+
+### Volatile
+
+Volatile <span style='color:darkseagreen'>**ensures**</span>:
+
+- visibility
+- no reordering
+
+But <span style='color:hotpink'>**NOT**</span>:
+
+- atomicity
+
+Example:
+```java
+volatile boolean running = true;
+```
+
+Good for flags.  
+Bad for counters.
+
+---
+
+### Atomic Classes
+
+From `java.util.concurrent.atomic`
+
+Examples:
+
+- AtomicInteger
+- AtomicLong
+
+Use CAS internally.
+
+---
+
+### Executors
+
+> Do NOT create raw threads in production.
+ 
+Use:
+```java
+ExecutorService executor =
+    Executors.newFixedThreadPool(4);
+```
+
+Benefits:
+
+- thread reuse
+- lifecycle management
+- task abstraction
+
+#### Thread Pools Types
+
+🔸 **FixedThreadPool**
+
+```java
+Executors.newFixedThreadPool(n);
+```
+- Fixed number of threads
+- Unbounded queue
+
+✅ **Good for:**  
+- CPU-bound tasks  
+
+❌ **Risk:**  
+- queue grows unbounded → OOM  
+
+---
+
+🔸 **CachedThreadPool**
+
+```java
+Executors.newCachedThreadPool();
+```
+
+- Unlimited threads
+- No queue
+- Reuses idle threads
+
+✅ **Good for:**
+- CPU-bound tasks
+
+❌ **Risk:**
+- thread explosion
+
+---
+
+🔸 **SingleThreadExecutor**
+
+One thread only.
+Tasks executed sequentially.
+
+✅ **Good for:**
+
+- ordering
+- event processing
+
+---
+
+🔸 **ScheduledThreadPool**
+
+A ScheduledThreadPool runs tasks:
+
+- after a delay (schedule)
+- periodically (scheduleAtFixedRate, scheduleWithFixedDelay)
+
+It’s built on `ScheduledExecutorService`.
+
+```java
+scheduleAtFixedRate(...);
+scheduleWithFixedDelay(...);
+```
+
+✅ **Good for:**
+
+- Periodic housekeeping: refresh caches, cleanup temp files, rotate tokens
+- Polling / health checks / “pull” integrations
+- Time-based workflows (simple)
+- Debounced / delayed actions (one-shot scheduling)
+
+👍 **Rule of thumb: “run something later” or “run something every X”.**
+
+🔸 **Use it when:**
+
+- tasks are short
+- scheduling frequency is predictable
+- you don’t need distributed guarantees (single JVM is enough)
+
+🔸 **Examples:**
+
+- every minute: refresh exchange rates
+- every 10 seconds: drain a buffer to DB
+- at startup + periodic: warm up caches
+
+---
+
+🔸 **ForkJoinPool**
+
+ForkJoinPool is a thread pool optimized for:
+
+> many small tasks that can be recursively split (divide-and-conquer)
+
+It uses work-stealing:
+
+- each worker has a deque
+- idle workers steal tasks from others
+
+✅ **Good for:**
+
+- CPU-bound parallel computations
+- Divide-and-conquer problems (recursive splitting)
+- Bulk array processing
+- Stream-style parallelism (it’s behind parallelStream())
+
+🔸 **Examples:**
+
+- parallel sum, histogram, map-reduce on arrays
+- recursive file indexing (CPU-heavy parsing)
+- splitting large tasks into smaller chunks
+
+🔸 **When to use**
+
+Use ForkJoinPool when:
+
+- work is CPU-bound
+- tasks can be broken into independent chunks
+- each chunk is small enough to benefit from stealing
+- minimal blocking / IO
+
+---
+
+### Callable
+
+🔸 **Runnable vs Callable**
+
+| Feature                  | Runnable | Callable |
+|--------------------------|----------|----------|
+| Returns value            | ❌        | ✅        |
+| Throws checked exception | ❌        | ✅        |
+
+🔸 **Callable**
+
+```java
+Callable<String> task = () -> {
+    return "result";
+};
+```
+
+Used with:
+
+- ExecutorService
+- Future
+
+🔸 **Future**
+
+```java
+Future<String> future = executor.submit(task);
+future.get();
+```
+
+Future:
+
+- blocks
+- can cancel
+- can check status
+
+---
+
+### Thread vs Core
+
+`Thread`:
+
+- logical execution unit
+- managed by OS/JVM
+
+`Core`:
+
+- physical CPU execution unit
+
+🔸 **You can have:**
+
+- more threads than cores
+- OS schedules threads onto cores
+
+🔸 **Example:**
+- 8 cores
+- 100 threads
+
+Threads are time-sliced.
+
+---
+
+### Virtual Threads
+
+Virtual threads are:
+
+> Lightweight threads managed by the JVM instead of OS.
+
+📌 Introduced in Java **21** (stable).
+
+🔸 **Traditional threads**
+
+- 1:1 mapping to OS threads
+- heavy (MB stack)
+- expensive context switching
+
+🔸 **Virtual threads**
+
+- thousands/millions possible
+- tiny memory footprint
+- scheduled by JVM
+- block without blocking OS thread
+
+🔸 **Example**
+```java
+Thread.startVirtualThread(() -> {
+    // code
+});
+```
+
+🔸 **Why important?**
+
+✅ Enables simple blocking code  
+✅ Scales like async frameworks  
+✅ No thread explosion  
+
+---
+
+### Questions
+
+#### 1️⃣ What is happens-before?
+
+**Happens-before** is a rule in the Java Memory Model that guarantees:
+
+> If A happens-before B, then all memory writes by A are visible to B.
+
+It defines visibility and ordering guarantees between threads.
+
+---
+
+#### 2️⃣ Difference between synchronized and volatile
+
+| Feature               | synchronized | volatile |
+|-----------------------|--------------|----------|
+| Mutual exclusion      | ✅            | ❌        |
+| Visibility            | ✅            | ✅        |
+| Atomicity             | ✅            | ❌        |
+| Blocks threads        | ✅            | ❌        |
+| Reordering prevention | ✅            | ✅        |
+
+🔸 **synchronized**
+
+- Provides mutual exclusion (one thread at a time)
+- Provides visibility guarantees
+- Establishes happens-before
+
+🔸 **volatile**
+
+- Guarantees visibility
+- Prevents reordering
+- Does NOT guarantee atomic operations
+
+---
+
+#### 3️⃣ Why use ExecutorService?
+
+`ExecutorService` provides:
+
+✅ Thread reuse  
+✅ Controlled concurrency  
+✅ Task abstraction  
+✅ Graceful shutdown  
+✅ Resource management  
+
+Without it:
+
+❌ too many threads  
+❌ memory exhaustion  
+❌ poor performance  
+
+---
+
+#### 4️⃣ What is safe publication?
+
+Safe publication ensures:
+
+> An object is made visible to other threads with fully constructed state.
 
 ---
 <div style="break-after: page;"></div>
