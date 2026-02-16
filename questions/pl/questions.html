@@ -1,0 +1,3126 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>1-jvm</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+</head>
+<body>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#java-core-jvm" id="toc-java-core-jvm">📘 JAVA (Core /
+JVM)</a>
+<ul>
+<li><a href="#jvm-i-model-pamięci" id="toc-jvm-i-model-pamięci">1️⃣ JVM i
+Model Pamięci</a></li>
+<li><a href="#współbieżność-concurrency"
+id="toc-współbieżność-concurrency">2️⃣ Współbieżność
+(Concurrency)</a></li>
+<li><a href="#kolekcje-i-struktury-danych"
+id="toc-kolekcje-i-struktury-danych">3️⃣ Kolekcje i Struktury
+Danych</a></li>
+<li><a href="#stream-api" id="toc-stream-api">4️⃣ Stream API</a></li>
+<li><a href="#typy-oop-i-generics" id="toc-typy-oop-i-generics">5️⃣ Typy,
+OOP i Generics</a></li>
+<li><a href="#io-nio" id="toc-io-nio">6️⃣ IO / NIO</a></li>
+<li><a href="#wyjątki-i-api-design" id="toc-wyjątki-i-api-design">7️⃣
+Wyjątki i API Design</a></li>
+</ul></li>
+<li><a href="#spring-ecosystem" id="toc-spring-ecosystem">🌱 SPRING
+ECOSYSTEM</a>
+<ul>
+<li><a href="#ioc-i-dependency-injection"
+id="toc-ioc-i-dependency-injection">1️⃣ IoC i Dependency
+Injection</a></li>
+<li><a href="#transactional-mechanizm-transakcji"
+id="toc-transactional-mechanizm-transakcji">2️⃣ <span class="citation"
+data-cites="Transactional">@Transactional</span> (Mechanizm
+Transakcji)</a></li>
+<li><a href="#spring-aop" id="toc-spring-aop">3️⃣ Spring AOP</a></li>
+<li><a href="#spring-boot" id="toc-spring-boot">🚀 4️⃣ Spring
+Boot</a></li>
+<li><a href="#spring-security" id="toc-spring-security">🔐 5️⃣ Spring
+Security</a></li>
+</ul></li>
+<li><a href="#bazy-danych-i-persistencja"
+id="toc-bazy-danych-i-persistencja">🗄 BAZY DANYCH I PERSISTENCJA</a>
+<ul>
+<li><a href="#podstawy-teorii-transakcji"
+id="toc-podstawy-teorii-transakcji">1️⃣ Podstawy Teorii
+Transakcji</a></li>
+<li><a href="#jpa-internals" id="toc-jpa-internals">2️⃣ JPA
+Internals</a></li>
+<li><a href="#sql-vs-nosql-i-architektoniczne-aspekty-danych"
+id="toc-sql-vs-nosql-i-architektoniczne-aspekty-danych">3️⃣ SQL vs NoSQL
+i Architektoniczne Aspekty Danych</a></li>
+</ul></li>
+<li><a href="#architektura-aplikacji" id="toc-architektura-aplikacji">🏗
+ARCHITEKTURA APLIKACJI</a>
+<ul>
+<li><a href="#fundamenty-architektoniczne"
+id="toc-fundamenty-architektoniczne">1️⃣ Fundamenty
+Architektoniczne</a></li>
+<li><a href="#clean-hexagonal-onion" id="toc-clean-hexagonal-onion">2️⃣
+Clean / Hexagonal / Onion</a></li>
+<li><a href="#domain-driven-design-ddd"
+id="toc-domain-driven-design-ddd">3️⃣ Domain-Driven Design (DDD)</a></li>
+<li><a href="#modularność-i-skalowanie"
+id="toc-modularność-i-skalowanie">4️⃣ Modularność i Skalowanie</a></li>
+</ul></li>
+<li><a href="#mikroserwisy" id="toc-mikroserwisy">🌐 MIKROSERWISY</a>
+<ul>
+<li><a href="#fundamenty-mikroserwisów"
+id="toc-fundamenty-mikroserwisów">1️⃣ Fundamenty Mikroserwisów</a></li>
+<li><a href="#odporność-i-stabilność" id="toc-odporność-i-stabilność">2️⃣
+Odporność i Stabilność</a></li>
+<li><a href="#spójność-w-systemie-rozproszonym"
+id="toc-spójność-w-systemie-rozproszonym">3️⃣ Spójność w systemie
+rozproszonym</a></li>
+<li><a href="#obserwowalność" id="toc-obserwowalność">4️⃣
+Obserwowalność</a></li>
+</ul></li>
+<li><a href="#komunikacja-i-integracja"
+id="toc-komunikacja-i-integracja">🔌 KOMUNIKACJA I INTEGRACJA</a>
+<ul>
+<li><a href="#rest-i-semantyka-http" id="toc-rest-i-semantyka-http">1️⃣
+REST i Semantyka HTTP</a></li>
+<li><a href="#grpc" id="toc-grpc">2️⃣ gRPC</a></li>
+<li><a href="#messaging-kafka-vs-rabbitmq"
+id="toc-messaging-kafka-vs-rabbitmq">3️⃣ Messaging: Kafka vs
+RabbitMQ</a></li>
+<li><a href="#schema-evolution" id="toc-schema-evolution">4️⃣ Schema
+Evolution</a></li>
+</ul></li>
+<li><a href="#devops-runtime-produkcja"
+id="toc-devops-runtime-produkcja">🧰 DEVOPS / RUNTIME / PRODUKCJA</a>
+<ul>
+<li><a href="#kontenery-i-artefakty" id="toc-kontenery-i-artefakty">1️⃣
+Kontenery i Artefakty</a></li>
+<li><a href="#cicd" id="toc-cicd">2️⃣ CI/CD</a></li>
+<li><a href="#monitoring-i-observability"
+id="toc-monitoring-i-observability">3️⃣ Monitoring i
+Observability</a></li>
+<li><a href="#health-checks-i-deploy" id="toc-health-checks-i-deploy">4️⃣
+Health Checks i Deploy</a></li>
+<li><a href="#skalowanie" id="toc-skalowanie">5️⃣ Skalowanie</a></li>
+</ul></li>
+<li><a href="#bezpieczeństwo" id="toc-bezpieczeństwo">🛡
+BEZPIECZEŃSTWO</a>
+<ul>
+<li><a href="#podstawy-kryptografii" id="toc-podstawy-kryptografii">1️⃣
+Podstawy Kryptografii</a></li>
+<li><a href="#tls-i-transport" id="toc-tls-i-transport">2️⃣ TLS i
+Transport</a></li>
+<li><a href="#owasp-i-najczęstsze-ataki"
+id="toc-owasp-i-najczęstsze-ataki">3️⃣ OWASP i Najczęstsze Ataki</a></li>
+<li><a href="#autoryzacja-i-dostęp" id="toc-autoryzacja-i-dostęp">4️⃣
+Autoryzacja i Dostęp</a></li>
+</ul></li>
+<li><a href="#testowanie" id="toc-testowanie">🧪 TESTOWANIE</a>
+<ul>
+<li><a href="#fundamenty-testowania" id="toc-fundamenty-testowania">1️⃣
+Fundamenty Testowania</a></li>
+<li><a href="#mockowanie-i-izolacja" id="toc-mockowanie-i-izolacja">2️⃣
+Mockowanie i Izolacja</a></li>
+<li><a href="#testy-integracyjne-i-środowisko"
+id="toc-testy-integracyjne-i-środowisko">3️⃣ Testy Integracyjne i
+Środowisko</a></li>
+<li><a href="#zaawansowane-techniki" id="toc-zaawansowane-techniki">4️⃣
+Zaawansowane Techniki</a></li>
+</ul></li>
+<li><a href="#wydajność-i-diagnostyka"
+id="toc-wydajność-i-diagnostyka">📈 WYDAJNOŚĆ I DIAGNOSTYKA</a>
+<ul>
+<li><a href="#zrozumienie-wydajności" id="toc-zrozumienie-wydajności">1️⃣
+Zrozumienie Wydajności</a></li>
+<li><a href="#jvm-profilowanie" id="toc-jvm-profilowanie">2️⃣ JVM
+Profilowanie</a></li>
+<li><a href="#analiza-algorytmiczna" id="toc-analiza-algorytmiczna">3️⃣
+Analiza Algorytmiczna</a></li>
+<li><a href="#load-testing" id="toc-load-testing">4️⃣ Load
+Testing</a></li>
+</ul></li>
+<li><a href="#system-design-thinking" id="toc-system-design-thinking">🧠
+SYSTEM DESIGN / THINKING</a>
+<ul>
+<li><a href="#myślenie-architektoniczne"
+id="toc-myślenie-architektoniczne">1️⃣ Myślenie Architektoniczne</a></li>
+<li><a href="#projektowanie-pod-skalę"
+id="toc-projektowanie-pod-skalę">2️⃣ Projektowanie pod Skalę</a></li>
+<li><a href="#projektowanie-na-awarię"
+id="toc-projektowanie-na-awarię">3️⃣ Projektowanie na Awarię</a></li>
+<li><a href="#backpressure-i-przepływ-danych"
+id="toc-backpressure-i-przepływ-danych">4️⃣ Backpressure i Przepływ
+Danych</a></li>
+<li><a href="#failure-modes-i-analiza-ryzyka"
+id="toc-failure-modes-i-analiza-ryzyka">5️⃣ Failure Modes i Analiza
+Ryzyka</a></li>
+<li><a href="#myślenie-długoterminowe"
+id="toc-myślenie-długoterminowe">6️⃣ Myślenie Długoterminowe</a></li>
+</ul></li>
+</ul>
+</nav>
+<p><a href="questions.md">💡 Questions</a></p>
+<h1 id="java-core-jvm">📘 JAVA (Core / JVM)</h1>
+<!-- TOC -->
+<ul>
+<li><a href="#-java-core--jvm">📘 JAVA (Core / JVM)</a>
+<ul>
+<li><a href="#1-jvm-i-model-pamięci">1️⃣ JVM i Model Pamięci</a>
+<ul>
+<li><a
+href="#-1-czym-jest-jvm-i-z-jakich-głównych-obszarów-pamięci-się-składa">🔹
+1. Czym jest JVM i z jakich głównych obszarów pamięci się
+składa?</a></li>
+<li><a href="#-2-czym-jest-java-memory-model-jmm">🔹 2. Czym jest Java
+Memory Model (JMM)?</a></li>
+<li><a href="#-3-co-to-jest-reordering-i-dlaczego-jest-problemem">🔹 3.
+Co to jest reordering i dlaczego jest problemem?</a></li>
+<li><a href="#-4-czym-jest-relacja-happens-before">🔹 4. Czym jest
+relacja happens-before?</a></li>
+<li><a href="#-5-czym-różni-się-visibility-od-atomicity">🔹 5. Czym
+różni się visibility od atomicity?</a>
+<ul>
+<li><a href="#-visibility-widoczność">✅ Visibility
+(widoczność)</a></li>
+<li><a href="#-atomicity-niepodzielność">✅ Atomicity
+(niepodzielność)</a></li>
+</ul></li>
+<li><a href="#-6-czym-jest-escape-analysis">🔹 6. Czym jest Escape
+Analysis?</a></li>
+<li><a href="#-7-jak-działa-classloader">🔹 7. Jak działa
+ClassLoader?</a></li>
+<li><a href="#-8-czym-jest-jit">🔹 8. Czym jest JIT?</a></li>
+<li><a href="#-9-jak-działa-garbage-collector-w-skrócie">🔹 9. Jak
+działa Garbage Collector w skrócie?</a></li>
+</ul></li>
+<li><a href="#2-współbieżność-concurrency">2️⃣ Współbieżność
+(Concurrency)</a>
+<ul>
+<li><a href="#-1-jak-działa-synchronized-w-jvm">🔹 1. Jak działa
+<code>synchronized</code> w JVM?</a>
+<ul>
+<li><a href="#co-dzieje-się-przy-wejściu-do-bloku-synchronized">Co
+dzieje się przy wejściu do bloku synchronized?</a></li>
+<li><a href="#gwarancje">Gwarancje:</a></li>
+</ul></li>
+<li><a href="#-2-czym-jest-volatile-i-co-dokładnie-gwarantuje">🔹 2.
+Czym jest <code>volatile</code> i co dokładnie gwarantuje?</a></li>
+<li><a href="#-3-dlaczego-i-nie-jest-bezpieczne-wielowątkowo">🔹 3.
+Dlaczego <code>i++</code> nie jest bezpieczne wielowątkowo?</a></li>
+<li><a href="#-4-czym-jest-cas-compare-and-swap">🔹 4. Czym jest CAS
+(Compare-And-Swap)?</a></li>
+<li><a href="#-5-jak-działają-klasy-atomic">🔹 5. Jak działają klasy
+Atomic*?</a></li>
+<li><a href="#-6-czym-różni-się-reentrantlock-od-synchronized">🔹 6.
+Czym różni się ReentrantLock od synchronized?</a></li>
+<li><a href="#-7-czym-jest-deadlock">🔹 7. Czym jest deadlock?</a></li>
+<li><a href="#-8-czym-jest-livelock">🔹 8. Czym jest livelock?</a></li>
+<li><a href="#-9-czym-jest-starvation">🔹 9. Czym jest
+starvation?</a></li>
+<li><a href="#-10-czym-jest-false-sharing">🔹 10. Czym jest False
+Sharing?</a></li>
+<li><a href="#-11-jaki-jest-cykl-życia-wątku-w-javie">🔹 11. Jaki jest
+cykl życia wątku w Javie?</a></li>
+<li><a
+href="#-12-dlaczego-nie-powinniśmy-tworzyć-wątków-ręcznie-new-thread">🔹
+12. Dlaczego nie powinniśmy tworzyć wątków ręcznie (new
+Thread)?</a></li>
+<li><a href="#-13-czym-jest-executorservice">🔹 13. Czym jest
+ExecutorService?</a></li>
+<li><a href="#-14-jak-działa-threadpoolexecutor">🔹 14. Jak działa
+ThreadPoolExecutor?</a></li>
+<li><a href="#-15-jakie-są-typowe-implementacje-executorservice">🔹 15.
+Jakie są typowe implementacje ExecutorService?</a></li>
+<li><a href="#-16-czym-jest-forkjoinpool-i-do-czego-służy">🔹 16. Czym
+jest ForkJoinPool i do czego służy?</a></li>
+<li><a href="#-17-czym-jest-work-stealing">🔹 17. Czym jest
+work-stealing?</a></li>
+<li><a href="#-18-czym-jest-completablefuture">🔹 18. Czym jest
+CompletableFuture?</a></li>
+<li><a href="#-19-czym-różni-się-thenapply-od-thencompose">🔹 19. Czym
+różni się thenApply od thenCompose?</a></li>
+<li><a href="#-20-co-oznacza-blocking-vs-non-blocking">🔹 20. Co oznacza
+blocking vs non-blocking?</a></li>
+<li><a href="#-21-czym-jest-backpressure">🔹 21. Czym jest
+backpressure?</a></li>
+</ul></li>
+<li><a href="#3-kolekcje-i-struktury-danych">3️⃣ Kolekcje i Struktury
+Danych</a>
+<ul>
+<li><a href="#-22-jak-działa-hashmap-krok-po-kroku">🔹 22. Jak działa
+HashMap krok po kroku?</a></li>
+<li><a href="#-23-dlaczego-equals-i-hashcode-muszą-być-spójne">🔹 23.
+Dlaczego equals() i hashCode() muszą być spójne?</a></li>
+<li><a href="#-24-czym-jest-loadfactor-i-dlaczego-ma-znaczenie">🔹 24.
+Czym jest loadFactor i dlaczego ma znaczenie?</a></li>
+<li><a href="#-25-czym-jest-red-black-tree">🔹 25. Czym jest Red-Black
+Tree?</a></li>
+<li><a href="#-26-czym-różni-się-hashmap-od-concurrenthashmap">🔹 26.
+Czym różni się HashMap od ConcurrentHashMap?</a></li>
+<li><a href="#-27-co-to-jest-segment-based-locking">🔹 27. Co to jest
+segment-based locking?</a></li>
+<li><a href="#-28-czym-jest-copyonwritearraylist">🔹 28. Czym jest
+CopyOnWriteArrayList?</a></li>
+<li><a
+href="#-29-jakie-są-złożoności-czasowe-big-o-podstawowych-kolekcji">🔹
+29. Jakie są złożoności czasowe (Big-O) podstawowych kolekcji?</a></li>
+</ul></li>
+<li><a href="#4-stream-api">4️⃣ Stream API</a>
+<ul>
+<li><a href="#-30-czym-jest-lazy-evaluation-w-stream-api">🔹 30. Czym
+jest lazy evaluation w Stream API?</a></li>
+<li><a href="#-31-czym-różnią-się-operacje-stateless-i-stateful">🔹 31.
+Czym różnią się operacje stateless i stateful?</a></li>
+<li><a href="#-32-czym-różni-się-map-od-flatmap">🔹 32. Czym różni się
+map od flatMap?</a></li>
+<li><a href="#-33-dlaczego-funkcja-w-reduce-musi-być-asocjacyjna">🔹 33.
+Dlaczego funkcja w reduce musi być asocjacyjna?</a></li>
+<li><a href="#-34-czym-jest-spliterator">🔹 34. Czym jest
+Spliterator?</a></li>
+<li><a href="#-35-dlaczego-parallel-stream-może-być-niebezpieczny">🔹
+35. Dlaczego parallel stream może być niebezpieczny?</a></li>
+<li><a
+href="#-36-dlaczego-efekty-uboczne-side-effects-łamią-parallel-stream">🔹
+36. Dlaczego efekty uboczne (side effects) łamią parallel
+stream?</a></li>
+<li><a href="#-37-czym-różni-się-foreach-od-foreachordered">🔹 37. Czym
+różni się forEach od forEachOrdered?</a></li>
+</ul></li>
+<li><a href="#5-typy-oop-i-generics">5️⃣ Typy, OOP i Generics</a>
+<ul>
+<li><a href="#-38-czym-jest-type-erasure-w-generics">🔹 38. Czym jest
+type erasure w Generics?</a></li>
+<li><a href="#-39-czym-jest-covariance-i-contravariance">🔹 39. Czym
+jest covariance i contravariance?</a></li>
+<li><a
+href="#-40-dlaczego-immutable-objects-są-bezpieczne-wielowątkowo">🔹 40.
+Dlaczego immutable objects są bezpieczne wielowątkowo?</a></li>
+<li><a href="#-41-czym-różni-się-equals-od-">🔹 41. Czym różni się
+equals od ==?</a></li>
+<li><a href="#-42-czym-jest-record-w-javie">🔹 42. Czym jest record w
+Javie?</a></li>
+<li><a href="#-43-czym-są-sealed-classes">🔹 43. Czym są sealed
+classes?</a></li>
+<li><a href="#-44-kiedy-optional-jest-dobrym-pomysłem-a-kiedy-złym">🔹
+44. Kiedy Optional jest dobrym pomysłem, a kiedy złym?</a></li>
+<li><a href="#-45-czym-są-value-based-classes">🔹 45. Czym są
+value-based classes?</a></li>
+</ul></li>
+<li><a href="#6-io--nio">6️⃣ IO / NIO</a>
+<ul>
+<li><a href="#-46-czym-różni-się-io-od-nio">🔹 46. Czym różni się IO od
+NIO?</a></li>
+<li><a href="#-47-czym-jest-channel">🔹 47. Czym jest Channel?</a></li>
+<li><a href="#-48-czym-jest-buffer">🔹 48. Czym jest Buffer?</a></li>
+<li><a href="#-49-czym-jest-selector">🔹 49. Czym jest
+Selector?</a></li>
+<li><a href="#-50-czym-jest-memory-mapped-file">🔹 50. Czym jest
+memory-mapped file?</a></li>
+</ul></li>
+<li><a href="#7-wyjątki-i-api-design">7️⃣ Wyjątki i API Design</a>
+<ul>
+<li><a href="#-51-czym-różnią-się-checked-i-unchecked-exceptions">🔹 51.
+Czym różnią się checked i unchecked exceptions?</a></li>
+<li><a href="#-52-czym-jest-exception-wrapping">🔹 52. Czym jest
+exception wrapping?</a></li>
+<li><a href="#-53-czym-są-suppressed-exceptions">🔹 53. Czym są
+suppressed exceptions?</a></li>
+<li><a href="#-54-czym-jest-defensive-copying">🔹 54. Czym jest
+defensive copying?</a></li>
+<li><a href="#-55-jak-projektować-dobre-api">🔹 55. Jak projektować
+dobre API?</a> <!-- TOC --></li>
+</ul></li>
+</ul></li>
+</ul>
+<h2 id="jvm-i-model-pamięci">1️⃣ JVM i Model Pamięci</h2>
+<hr />
+<h4
+id="czym-jest-jvm-i-z-jakich-głównych-obszarów-pamięci-się-składa">🔹 1.
+Czym jest JVM i z jakich głównych obszarów pamięci się składa?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>JVM (Java Virtual Machine) to środowisko uruchomieniowe, które: -
+wykonuje bytecode (.class), - zarządza pamięcią, - zarządza wątkami, -
+zapewnia izolację i bezpieczeństwo.</p>
+<p><span
+style="color:##a9b8c6;font-weight:bold;font-size:small;list-style-type:none">Główne
+obszary pamięci:</span></p>
+<p>🔸 <strong>Heap</strong> - Współdzielony między wątkami. -
+Przechowuje obiekty i ich pola. - Zarządzany przez Garbage Collector. -
+Podzielony na: - Young Generation (Eden + Survivor) - Old Generation</p>
+<p>🔸 <strong>Stack (dla każdego wątku osobny)</strong> - Przechowuje: -
+zmienne lokalne, - referencje do obiektów, - ramki metod (stack frames).
+- Zarządzany automatycznie (LIFO). - Nie podlega GC.</p>
+<p>🔸 <strong>3️⃣ Metaspace</strong> - Przechowuje metadane klas. -
+Zastąpił PermGen od Java 8. - Alokowany w pamięci natywnej (poza
+heapem).</p>
+<p>🔸 <strong>4️⃣ PC Register</strong> - Wskaźnik aktualnie wykonywanej
+instrukcji dla wątku.</p>
+<p>🔸 <strong>5️⃣ Native Method Stack</strong> - Dla metod natywnych
+(JNI).</p>
+<hr />
+<h4 id="czym-jest-java-memory-model-jmm">🔹 2. Czym jest Java Memory
+Model (JMM)?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>JMM to specyfikacja opisująca:</p>
+<ul>
+<li>jak wątki widzą zmiany w pamięci,</li>
+<li>jakie operacje mogą być reorderyzowane przez
+kompilator/JIT/CPU,</li>
+<li>kiedy zmiany są widoczne między wątkami.</li>
+</ul>
+<p>JMM definiuje: - reguły widoczności, - reguły synchronizacji, -
+relację happens-before.</p>
+<p>Bez JMM kod wielowątkowy byłby nieprzewidywalny.</p>
+<hr />
+<h4 id="co-to-jest-reordering-i-dlaczego-jest-problemem">🔹 3. Co to
+jest reordering i dlaczego jest problemem?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Reordering to zmiana kolejności instrukcji przez: - kompilator, -
+JIT, - CPU (out-of-order execution).</p>
+<p>Jeśli inny wątek odczyta zmienne między operacjami, może zobaczyć
+niespójny stan.</p>
+<p>Dlatego potrzebujemy: - synchronized, - volatile, - locków, -
+atomics.</p>
+<hr />
+<h4 id="czym-jest-relacja-happens-before">🔹 4. Czym jest relacja
+happens-before?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Happens-before to gwarancja JMM mówiąca:</p>
+<blockquote>
+<p>Jeśli operacja A happens-before operacji B, to wszystkie zmiany
+pamięci wykonane przez A są widoczne dla B.</p>
+</blockquote>
+<p>Przykłady:</p>
+<ul>
+<li>Zakończenie metody synchronized happens-before wejście do
+synchronized na tym samym monitorze.</li>
+<li>Zapis do zmiennej volatile happens-before jej odczyt.</li>
+<li>Wywołanie start() happens-before kod w nowym wątku.</li>
+<li>Zakończenie wątku happens-before join().</li>
+</ul>
+<hr />
+<h4 id="czym-różni-się-visibility-od-atomicity">🔹 5. Czym różni się
+visibility od atomicity?</h4>
+<h6 id="visibility-widoczność">✅ Visibility (widoczność)</h6>
+<p>Czy zmiana dokonana przez jeden wątek jest widoczna dla innego.</p>
+<p>Zapewniają: - volatile - synchronized - locki</p>
+<h6 id="atomicity-niepodzielność">✅ Atomicity (niepodzielność)</h6>
+<p>Czy operacja wykona się w całości, bez możliwości przerwania.</p>
+<p>Np operacja i++ nie jest atomowa, ponieważ składa się z: 1. odczytu
+2. inkrementacji 3. zapisu</p>
+<p>Atomowość zapewniają: - synchronized - Lock - klasy Atomic* - CAS
+(Compare-And-Swap)</p>
+<hr />
+<h4 id="czym-jest-escape-analysis">🔹 6. Czym jest Escape Analysis?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Escape Analysis to optymalizacja JIT.</p>
+<p>Sprawdza, czy obiekt nie “ucieka” poza metodę (nie jest zwracany ani
+przekazywany dalej).</p>
+<p>Jeśli nie ucieka: - może zostać zaalokowany na stosie zamiast na
+heapie, - może zostać wyeliminowany (scalar replacement), - może zostać
+usunięta synchronizacja (lock elision).</p>
+<hr />
+<h4 id="jak-działa-classloader">🔹 7. Jak działa ClassLoader?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>ClassLoader: - ładuje klasy do JVM, - zamienia bytecode na obiekt
+klasy.</p>
+<p>Hierarchia: 1. Bootstrap ClassLoader 2. Platform ClassLoader 3.
+Application ClassLoader</p>
+<p>Działa w modelu parent-first — najpierw pyta rodzica, jeśli rodzic
+nie znajdzie klasy, ładuje ją sam.</p>
+<hr />
+<h4 id="czym-jest-jit">🔹 8. Czym jest JIT?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>JIT (Just-In-Time compiler): - kompiluje bytecode do natywnego kodu
+maszynowego podczas działania programu, - optymalizuje “gorące”
+fragmenty kodu (hot spots).</p>
+<p>Optymalizacje obejmują: - inlining, - loop unrolling, - escape
+analysis, - dead code elimination.</p>
+<hr />
+<h4 id="jak-działa-garbage-collector-w-skrócie">🔹 9. Jak działa Garbage
+Collector w skrócie?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>GC usuwa obiekty, do których nie ma referencji.</p>
+<p>Główne etapy: 1. Mark — oznaczenie obiektów osiągalnych 2. Sweep —
+usunięcie nieosiągalnych 3. Compact — defragmentacja</p>
+<p>Nowoczesne GC: - G1 - ZGC - Shenandoah</p>
+<hr />
+<h2 id="współbieżność-concurrency">2️⃣ Współbieżność (Concurrency)</h2>
+<h4 id="jak-działa-synchronized-w-jvm">🔹 1. Jak działa
+<code>synchronized</code> w JVM?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p><code>synchronized</code> używa monitora (monitor lock) przypisanego
+do obiektu.</p>
+<p>Każdy obiekt w Javie posiada nagłówek (object header), który zawiera
+informacje o stanie blokady.</p>
+<h6 id="co-dzieje-się-przy-wejściu-do-bloku-synchronized">Co dzieje się
+przy wejściu do bloku synchronized?</h6>
+<ol type="1">
+<li>Wątek próbuje przejąć monitor.</li>
+<li>Jeśli monitor jest wolny — zostaje właścicielem.</li>
+<li>Jeśli zajęty — wątek przechodzi w stan BLOCKED.</li>
+<li>Po wyjściu z bloku monitor jest zwalniany.</li>
+</ol>
+<h6 id="gwarancje">Gwarancje:</h6>
+<ul>
+<li>Mutual exclusion (tylko jeden wątek naraz).</li>
+<li>Visibility (flush do pamięci głównej przy wyjściu).</li>
+<li>Relacja happens-before między unlock → lock.</li>
+</ul>
+<hr />
+<h4 id="czym-jest-volatile-i-co-dokładnie-gwarantuje">🔹 2. Czym jest
+<code>volatile</code> i co dokładnie gwarantuje?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p><code>volatile</code> zapewnia:</p>
+<p>1️⃣ Visibility — zapis trafia bezpośrednio do pamięci głównej, a
+odczyt zawsze pobiera aktualną wartość.</p>
+<p>2️⃣ Zakaz reordering wokół zmiennej volatile.</p>
+<p>Nie zapewnia atomicity dla operacji złożonych (np. i++).</p>
+<p>JVM generuje instrukcje z barierami pamięci (memory barriers), które
+wymuszają synchronizację cache CPU.</p>
+<hr />
+<h4 id="dlaczego-i-nie-jest-bezpieczne-wielowątkowo">🔹 3. Dlaczego
+<code>i++</code> nie jest bezpieczne wielowątkowo?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Operacja <code>i++</code> składa się z: 1. read 2. increment 3.
+write</p>
+<p>Dwa wątki mogą odczytać tę samą wartość i nadpisać się nawzajem (lost
+update).</p>
+<p>Rozwiązania: - synchronized - AtomicInteger - Lock</p>
+<hr />
+<h4 id="czym-jest-cas-compare-and-swap">🔹 4. Czym jest CAS
+(Compare-And-Swap)?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>CAS to atomowa instrukcja procesora wykonująca operację:</p>
+<p>Jeśli currentValue == expectedValue → ustaw newValue. W przeciwnym
+razie operacja się nie powiedzie.</p>
+<p>Operacja jest niepodzielna na poziomie CPU.</p>
+<p>W Javie używana przez: - AtomicInteger - ConcurrentHashMap -
+Struktury lock-free</p>
+<hr />
+<h4 id="jak-działają-klasy-atomic">🔹 5. Jak działają klasy
+Atomic*?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Np. AtomicInteger: - przechowuje wartość jako volatile, - używa CAS w
+pętli retry.</p>
+<p>Schemat działania: 1. Odczytaj aktualną wartość. 2. Oblicz nową
+wartość. 3. Spróbuj wykonać CAS. 4. Jeśli się nie uda — powtórz.</p>
+<p>To jest podejście lock-free.</p>
+<hr />
+<h4 id="czym-różni-się-reentrantlock-od-synchronized">🔹 6. Czym różni
+się ReentrantLock od synchronized?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>ReentrantLock oferuje: - tryLock() - lockInterruptibly() - możliwość
+ustawienia fairness - condition variables</p>
+<p><code>synchronized</code>: - prostszy w użyciu - automatycznie
+zwalnia lock przy wyjątku</p>
+<p>Oba zapewniają mutual exclusion i visibility.</p>
+<hr />
+<h4 id="czym-jest-deadlock">🔹 7. Czym jest deadlock?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Deadlock to sytuacja, gdy dwa lub więcej wątków czekają na zasoby
+trzymane przez siebie nawzajem.</p>
+<p>Warunki deadlocka: 1. Mutual exclusion 2. Hold and wait 3. No
+preemption 4. Circular wait</p>
+<hr />
+<h4 id="czym-jest-livelock">🔹 8. Czym jest livelock?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Wątki nie są zablokowane, ale stale reagują na siebie i nie wykonują
+postępu.</p>
+<hr />
+<h4 id="czym-jest-starvation">🔹 9. Czym jest starvation?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Wątek nigdy nie otrzymuje zasobu, ponieważ inne wątki są
+preferowane.</p>
+<hr />
+<h4 id="czym-jest-false-sharing">🔹 10. Czym jest False Sharing?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>False sharing występuje, gdy dwie zmienne modyfikowane przez różne
+wątki znajdują się w tej samej cache line CPU.</p>
+<p>Powoduje to częstą synchronizację cache między rdzeniami i spadek
+wydajności.</p>
+<p>Rozwiązania: - padding - adnotacja <span class="citation"
+data-cites="Contended">@Contended</span> (z odpowiednią flagą JVM)</p>
+<hr />
+<h4 id="jaki-jest-cykl-życia-wątku-w-javie">🔹 11. Jaki jest cykl życia
+wątku w Javie?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Stany wątku (Thread.State):</p>
+<ol type="1">
+<li>NEW — wątek utworzony, ale nieuruchomiony.</li>
+<li>RUNNABLE — gotowy do wykonania lub wykonywany przez CPU.</li>
+<li>BLOCKED — oczekuje na monitor (np. wejście do synchronized).</li>
+<li>WAITING — czeka bez limitu czasu (np. wait(), join()).</li>
+<li>TIMED_WAITING — czeka przez określony czas (sleep(),
+wait(timeout)).</li>
+<li>TERMINATED — zakończył wykonanie.</li>
+</ol>
+<p>Metoda start() powoduje przejście z NEW do RUNNABLE.</p>
+<hr />
+<h4 id="dlaczego-nie-powinniśmy-tworzyć-wątków-ręcznie-new-thread">🔹
+12. Dlaczego nie powinniśmy tworzyć wątków ręcznie (new Thread)?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Tworzenie wątków jest kosztowne: - alokacja pamięci stosu, -
+rejestracja w systemie operacyjnym, - przełączanie kontekstu (context
+switching).</p>
+<p>Tworzenie wielu krótkotrwałych wątków prowadzi do: - wysokiego
+narzutu systemowego, - spadku wydajności, - ryzyka OutOfMemoryError.</p>
+<p>Dlatego stosuje się pule wątków.</p>
+<hr />
+<h4 id="czym-jest-executorservice">🔹 13. Czym jest
+ExecutorService?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>ExecutorService to interfejs zarządzający wykonywaniem zadań
+asynchronicznych.</p>
+<p>Oddziela: - tworzenie wątków, - zarządzanie nimi, - wykonywanie
+zadań.</p>
+<p>Pozwala: - submit() — zwraca Future, - execute() — bez zwracania
+wyniku, - shutdown() — inicjuje zamknięcie, - shutdownNow() — próbuje
+przerwać wątki.</p>
+<hr />
+<h4 id="jak-działa-threadpoolexecutor">🔹 14. Jak działa
+ThreadPoolExecutor?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>ThreadPoolExecutor zarządza pulą wątków według parametrów:</p>
+<ol type="1">
+<li>corePoolSize — minimalna liczba wątków.</li>
+<li>maximumPoolSize — maksymalna liczba wątków.</li>
+<li>keepAliveTime — czas utrzymywania nadmiarowych wątków.</li>
+<li>workQueue — kolejka zadań.</li>
+</ol>
+<p>Schemat działania:</p>
+<ol type="1">
+<li>Jeśli liczba aktywnych wątków &lt; corePoolSize → tworzony nowy
+wątek.</li>
+<li>Jeśli osiągnięto corePoolSize → zadanie trafia do kolejki.</li>
+<li>Jeśli kolejka pełna i liczba wątków &lt; maximumPoolSize → tworzony
+nowy wątek.</li>
+<li>Jeśli osiągnięto maximumPoolSize i kolejka pełna → uruchamiany
+RejectedExecutionHandler.</li>
+</ol>
+<hr />
+<h4 id="jakie-są-typowe-implementacje-executorservice">🔹 15. Jakie są
+typowe implementacje ExecutorService?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<ul>
+<li>newFixedThreadPool(n) — stała liczba wątków.</li>
+<li>newCachedThreadPool() — dynamiczna liczba wątków, brak ograniczenia
+(może być niebezpieczne).</li>
+<li>newSingleThreadExecutor() — jeden wątek.</li>
+<li>newScheduledThreadPool(n) — zadania cykliczne/opóźnione.</li>
+</ul>
+<p>W środowisku produkcyjnym zaleca się jawne konfigurowanie
+ThreadPoolExecutor.</p>
+<hr />
+<h4 id="czym-jest-forkjoinpool-i-do-czego-służy">🔹 16. Czym jest
+ForkJoinPool i do czego służy?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>ForkJoinPool to specjalizowana pula wątków zaprojektowana do zadań
+dzielonych rekurencyjnie (divide-and-conquer).</p>
+<p>Kluczowe cechy: - Używa algorytmu work-stealing. - Każdy wątek
+posiada własną dwukierunkową kolejkę (deque). - Jeśli wątek kończy swoje
+zadania — “kradnie” zadania z końca kolejki innego wątku.</p>
+<p>Dzięki temu minimalizuje bezczynność wątków i poprawia wykorzystanie
+CPU.</p>
+<p>Używany przez: - Parallel Stream - CompletableFuture (domyślnie
+commonPool)</p>
+<hr />
+<h4 id="czym-jest-work-stealing">🔹 17. Czym jest work-stealing?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Work-stealing to strategia równoważenia obciążenia:</p>
+<ul>
+<li>Wątek wykonuje zadania ze swojej kolejki (LIFO — dla lepszej
+lokalności cache).</li>
+<li>Jeśli nie ma zadań — kradnie z innego wątku (FIFO — z końca
+kolejki).</li>
+</ul>
+<p>Zmniejsza contention na wspólnej kolejce i poprawia skalowalność.</p>
+<hr />
+<h4 id="czym-jest-completablefuture">🔹 18. Czym jest
+CompletableFuture?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>CompletableFuture to rozszerzenie Future pozwalające na: -
+asynchroniczne przetwarzanie, - łączenie operacji w pipeline, - obsługę
+wyjątków, - kompozycję wielu zadań.</p>
+<p>Różnice względem Future: - Future jest blokujące (get()). -
+CompletableFuture umożliwia non-blocking chaining (thenApply,
+thenCompose).</p>
+<p>Przykłady metod: - supplyAsync() - thenApply() - thenCompose() -
+thenCombine() - exceptionally()</p>
+<hr />
+<h4 id="czym-różni-się-thenapply-od-thencompose">🔹 19. Czym różni się
+thenApply od thenCompose?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>thenApply: - Przekształca wynik synchronizacyjnie. - Jeśli zwraca
+CompletableFuture — powstaje zagnieżdżenie
+(CompletableFuture&lt;CompletableFuture<T>&gt;).</p>
+<p>thenCompose: - Służy do spłaszczania zagnieżdżonych future. -
+Analogiczny do flatMap w Stream API.</p>
+<hr />
+<h4 id="co-oznacza-blocking-vs-non-blocking">🔹 20. Co oznacza blocking
+vs non-blocking?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Blocking: - Wątek czeka na zakończenie operacji. - CPU może być
+bezczynne. - Przykład: Future.get().</p>
+<p>Non-blocking: - Wątek nie czeka. - Rejestruje callback i wykonuje
+inne zadania. - Przykład: CompletableFuture.thenApply().</p>
+<p>Non-blocking poprawia skalowalność przy operacjach IO.</p>
+<hr />
+<h4 id="czym-jest-backpressure">🔹 21. Czym jest backpressure?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Backpressure to mechanizm kontroli przepływu danych między
+producentem a konsumentem.</p>
+<p>Problem: - Producent generuje dane szybciej niż konsument je
+przetwarza. - Może to prowadzić do przepełnienia pamięci.</p>
+<p>Rozwiązania: - Ograniczone kolejki (bounded queue). - Odrzucanie
+zadań. - Reactive Streams (request(n)).</p>
+<p>W kontekście ThreadPoolExecutor: - Ograniczenie workQueue zapobiega
+niekontrolowanemu wzrostowi pamięci.</p>
+<hr />
+<h2 id="kolekcje-i-struktury-danych">3️⃣ Kolekcje i Struktury Danych</h2>
+<h4 id="jak-działa-hashmap-krok-po-kroku">🔹 22. Jak działa HashMap krok
+po kroku?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<ol type="1">
+<li>Obliczany jest hashCode() klucza.</li>
+<li>Hash jest mieszany (bit spreading), aby lepiej rozłożyć bity.</li>
+<li>Na podstawie hasha wyliczany jest indeks w tablicy: (n - 1) &amp;
+hash.</li>
+<li>Jeśli bucket jest pusty → tworzony nowy Node.</li>
+<li>Jeśli kolizja:
+<ul>
+<li>porównanie equals(),</li>
+<li>jeśli klucz istnieje → nadpisanie wartości,</li>
+<li>jeśli nie → dodanie do listy lub drzewa.</li>
+</ul></li>
+</ol>
+<p>Od Java 8: - Jeśli w bucket jest ≥ 8 elementów → lista zamieniana na
+Red-Black Tree. - Jeśli liczba spadnie &lt; 6 → powrót do listy.</p>
+<p>Resize następuje po przekroczeniu threshold = capacity ×
+loadFactor.</p>
+<hr />
+<h4 id="dlaczego-equals-i-hashcode-muszą-być-spójne">🔹 23. Dlaczego
+equals() i hashCode() muszą być spójne?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Kontrakt:</p>
+<ol type="1">
+<li>Jeśli a.equals(b) == true → a.hashCode() == b.hashCode().</li>
+<li>Jeśli hashCode różne → obiekty na pewno różne.</li>
+</ol>
+<p>Jeśli złamiemy kontrakt: - HashMap może nie znaleźć klucza, - dane
+mogą zostać “zgubione”.</p>
+<p>Typowy błąd: nadpisanie equals bez hashCode.</p>
+<hr />
+<h4 id="czym-jest-loadfactor-i-dlaczego-ma-znaczenie">🔹 24. Czym jest
+loadFactor i dlaczego ma znaczenie?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>loadFactor określa, przy jakim zapełnieniu nastąpi resize.</p>
+<p>Domyślnie: 0.75.</p>
+<ul>
+<li>Niższy loadFactor → mniej kolizji, większe zużycie pamięci.</li>
+<li>Wyższy loadFactor → więcej kolizji, mniejsza pamięć.</li>
+</ul>
+<hr />
+<h4 id="czym-jest-red-black-tree">🔹 25. Czym jest Red-Black Tree?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Red-Black Tree to samobalansujące drzewo binarne.</p>
+<p>Właściwości: 1. Każdy węzeł jest czerwony lub czarny. 2. Korzeń jest
+czarny. 3. Czerwony węzeł nie może mieć czerwonego dziecka. 4. Każda
+ścieżka do liścia ma tę samą liczbę czarnych węzłów.</p>
+<p>Zapewnia operacje w czasie O(log n).</p>
+<hr />
+<h4 id="czym-różni-się-hashmap-od-concurrenthashmap">🔹 26. Czym różni
+się HashMap od ConcurrentHashMap?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>HashMap: - Nie jest thread-safe. - Może wejść w nieskończoną pętlę
+przy równoległym resize (Java &lt; 8).</p>
+<p>ConcurrentHashMap: - Thread-safe bez globalnego locka. - Używa CAS i
+synchronizacji na poziomie bucket. - Brak segmentów od Java 8 (wcześniej
+segment-based locking).</p>
+<p>Operacje odczytu są w większości bezblokujące.</p>
+<hr />
+<h4 id="co-to-jest-segment-based-locking">🔹 27. Co to jest
+segment-based locking?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>W starszych wersjach ConcurrentHashMap (Java 7): - Mapa była
+podzielona na segmenty. - Każdy segment miał własny lock. - Zmniejszało
+to contention względem jednego globalnego locka.</p>
+<p>Od Java 8 zastąpione synchronizacją na bucket.</p>
+<hr />
+<h4 id="czym-jest-copyonwritearraylist">🔹 28. Czym jest
+CopyOnWriteArrayList?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>CopyOnWriteArrayList: - Przy każdej modyfikacji tworzy nową kopię
+tablicy. - Odczyty są bezblokujące.</p>
+<p>Dobre dla: - wielu odczytów, - rzadkich zapisów.</p>
+<p>Kosztowne przy częstych modyfikacjach.</p>
+<hr />
+<h4 id="jakie-są-złożoności-czasowe-big-o-podstawowych-kolekcji">🔹 29.
+Jakie są złożoności czasowe (Big-O) podstawowych kolekcji?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>HashMap: - get/put: O(1) średnio, O(log n) przy drzewie.</p>
+<p>ArrayList: - get: O(1) - add (na końcu): O(1) amortyzowane -
+insert/remove w środku: O(n)</p>
+<p>LinkedList: - get: O(n) - add/remove na początku: O(1)</p>
+<p>TreeMap: - get/put: O(log n)</p>
+<hr />
+<h2 id="stream-api">4️⃣ Stream API</h2>
+<h4 id="czym-jest-lazy-evaluation-w-stream-api">🔹 30. Czym jest lazy
+evaluation w Stream API?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Lazy evaluation oznacza, że operacje pośrednie (intermediate
+operations) nie są wykonywane od razu.</p>
+<p>Są wykonywane dopiero, gdy pojawi się operacja terminalna (np.
+collect, forEach, reduce).</p>
+<p>Pozwala to na: - optymalizację przetwarzania, - przetwarzanie
+elementów “na żądanie”, - łączenie operacji w jeden pipeline.</p>
+<hr />
+<h4 id="czym-różnią-się-operacje-stateless-i-stateful">🔹 31. Czym
+różnią się operacje stateless i stateful?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Stateless: - Nie zależą od innych elementów. - Przykład: map, filter.
+- Łatwe do równoległego przetwarzania.</p>
+<p>Stateful: - Wymagają wiedzy o innych elementach. - Przykład: sorted,
+distinct. - Wymagają buforowania danych.</p>
+<p>Operacje stateful są droższe i trudniejsze do zrównoleglenia.</p>
+<hr />
+<h4 id="czym-różni-się-map-od-flatmap">🔹 32. Czym różni się map od
+flatMap?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>map: - Przekształca element na inny element. - 1 → 1</p>
+<p>flatMap: - Przekształca element na strumień elementów. - 1 → N -
+Spłaszcza wynik.</p>
+<p>flatMap jest odpowiednikiem flatMap z programowania funkcyjnego.</p>
+<hr />
+<h4 id="dlaczego-funkcja-w-reduce-musi-być-asocjacyjna">🔹 33. Dlaczego
+funkcja w reduce musi być asocjacyjna?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Operacja asocjacyjna spełnia warunek:</p>
+<p>(a op b) op c = a op (b op c)</p>
+<p>W parallel stream: - Dane są dzielone na części. - Wyniki częściowe
+są łączone w dowolnej kolejności.</p>
+<p>Jeśli operacja nie jest asocjacyjna — wynik może być niepoprawny.</p>
+<hr />
+<h4 id="czym-jest-spliterator">🔹 34. Czym jest Spliterator?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Spliterator to iterator zaprojektowany do przetwarzania
+równoległego.</p>
+<p>Posiada metodę trySplit(), która: - dzieli dane na części, -
+umożliwia przetwarzanie równoległe.</p>
+<p>Definiuje charakterystyki: - SIZED - ORDERED - DISTINCT - SORTED -
+IMMUTABLE</p>
+<p>Stream używa Spliterator do podziału pracy w parallel stream.</p>
+<hr />
+<h4 id="dlaczego-parallel-stream-może-być-niebezpieczny">🔹 35. Dlaczego
+parallel stream może być niebezpieczny?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Problemy:</p>
+<ol type="1">
+<li>Side effects — współdzielony mutowalny stan może powodować race
+condition.</li>
+<li>Operacje stateful są kosztowne.</li>
+<li>Małe kolekcje — narzut przewyższa zysk.</li>
+<li>Współdzielenie ForkJoinPool commonPool — może blokować inne
+zadania.</li>
+</ol>
+<p>Parallel stream jest dobry dla: - dużych, CPU-bound operacji, -
+operacji asocjacyjnych, - braku efektów ubocznych.</p>
+<hr />
+<h4 id="dlaczego-efekty-uboczne-side-effects-łamią-parallel-stream">🔹
+36. Dlaczego efekty uboczne (side effects) łamią parallel stream?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Side effect to modyfikacja współdzielonego stanu.</p>
+<p>W parallel stream: - Elementy są przetwarzane równolegle. - Brak
+synchronizacji prowadzi do race condition.</p>
+<p>Przykład niepoprawny:</p>
+<p>list.parallelStream().forEach(e -&gt; sharedList.add(e));</p>
+<p>Poprawne podejście: - collect(Collectors.toList())</p>
+<p>Stream powinien być funkcjonalny i bez efektów ubocznych.</p>
+<hr />
+<h4 id="czym-różni-się-foreach-od-foreachordered">🔹 37. Czym różni się
+forEach od forEachOrdered?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>forEach: - Nie gwarantuje kolejności w parallel stream. -
+Szybszy.</p>
+<p>forEachOrdered: - Zachowuje kolejność źródła. - Może ograniczać
+równoległość.</p>
+<p>W sequential stream działają identycznie.</p>
+<hr />
+<h2 id="typy-oop-i-generics">5️⃣ Typy, OOP i Generics</h2>
+<h4 id="czym-jest-type-erasure-w-generics">🔹 38. Czym jest type erasure
+w Generics?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Type erasure oznacza, że informacje o typach generycznych są usuwane
+w czasie kompilacji.</p>
+<p>Przykład: List<String> i List<Integer> w runtime są widziane jako
+List.</p>
+<p>Konsekwencje: - Brak informacji o typie w runtime. - Nie można
+tworzyć new T(). - Nie można tworzyć tablic generycznych (new T[]).</p>
+<p>Kompilator dodaje casty w bytecode, aby zachować bezpieczeństwo
+typów.</p>
+<hr />
+<h4 id="czym-jest-covariance-i-contravariance">🔹 39. Czym jest
+covariance i contravariance?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Covariance — pozwala używać typu bardziej szczegółowego.</p>
+<p>List&lt;? extends Number&gt; - Można czytać jako Number. - Nie można
+bezpiecznie dodawać elementów.</p>
+<p>Contravariance — pozwala używać typu bardziej ogólnego.</p>
+<p>List&lt;? super Integer&gt; - Można dodawać Integer. - Odczyt jako
+Object.</p>
+<p>Zasada PECS: - Producer → extends - Consumer → super</p>
+<hr />
+<h4 id="dlaczego-immutable-objects-są-bezpieczne-wielowątkowo">🔹 40.
+Dlaczego immutable objects są bezpieczne wielowątkowo?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Obiekt immutable: - Nie zmienia stanu po konstrukcji. - Wszystkie
+pola final. - Brak setterów.</p>
+<p>Gwarancje: - Brak race condition. - Bezpieczne publikowanie (safe
+publication), jeśli pola są final.</p>
+<p>Immutable upraszcza concurrency.</p>
+<hr />
+<h4 id="czym-różni-się-equals-od">🔹 41. Czym różni się equals od
+==?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>== porównuje referencje (czy to ten sam obiekt).</p>
+<p>equals porównuje logiczną równość (zawartość).</p>
+<p>Dla klas własnych należy nadpisać equals i hashCode.</p>
+<hr />
+<h4 id="czym-jest-record-w-javie">🔹 42. Czym jest record w Javie?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>record to skrócona forma klasy immutable.</p>
+<p>Automatycznie generuje: - konstruktor, - equals, - hashCode, -
+toString, - gettery.</p>
+<p>Record jest final i przeznaczony do przechowywania danych.</p>
+<hr />
+<h4 id="czym-są-sealed-classes">🔹 43. Czym są sealed classes?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Sealed class ogranicza, które klasy mogą ją rozszerzać.</p>
+<p>Przykład: sealed class Shape permits Circle, Square {}</p>
+<p>Pozwala: - kontrolować hierarchię dziedziczenia, - ułatwiać
+exhaustive switch.</p>
+<hr />
+<h4 id="kiedy-optional-jest-dobrym-pomysłem-a-kiedy-złym">🔹 44. Kiedy
+Optional jest dobrym pomysłem, a kiedy złym?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Dobry: - jako typ zwracany z metody. - aby uniknąć null.</p>
+<p>Zły: - jako pole w encji. - jako parametr metody. - w
+serializacji.</p>
+<p>Optional nie jest zamiennikiem każdego null.</p>
+<hr />
+<h4 id="czym-są-value-based-classes">🔹 45. Czym są value-based
+classes?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Value-based class: - Reprezentuje wartość, nie tożsamość. - Nie
+należy polegać na referencyjnej równości (==).</p>
+<p>Przykład: Integer, Optional.</p>
+<p>W przyszłości Project Valhalla wprowadzi value types bez narzutu
+obiektowego.</p>
+<hr />
+<h2 id="io-nio">6️⃣ IO / NIO</h2>
+<h4 id="czym-różni-się-io-od-nio">🔹 46. Czym różni się IO od NIO?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>IO (java.io): - Model strumieniowy (InputStream/OutputStream). -
+Operacje blokujące. - Jeden wątek na jedno połączenie.</p>
+<p>NIO (java.nio): - Kanały (Channel) i bufory (Buffer). - Możliwość
+trybu non-blocking. - Selector pozwala obsługiwać wiele połączeń jednym
+wątkiem.</p>
+<p>NIO jest bardziej skalowalne przy dużej liczbie połączeń.</p>
+<hr />
+<h4 id="czym-jest-channel">🔹 47. Czym jest Channel?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Channel to dwukierunkowe połączenie do źródła danych.</p>
+<p>Przykłady: - FileChannel - SocketChannel - ServerSocketChannel</p>
+<p>Współpracuje z Buffer.</p>
+<hr />
+<h4 id="czym-jest-buffer">🔹 48. Czym jest Buffer?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Buffer to kontener na dane z polami: - capacity — maksymalny rozmiar,
+- position — aktualna pozycja, - limit — granica odczytu/zapisu.</p>
+<p>Tryb zapisu → flip() → tryb odczytu.</p>
+<hr />
+<h4 id="czym-jest-selector">🔹 49. Czym jest Selector?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Selector pozwala jednemu wątkowi monitorować wiele kanałów.</p>
+<p>Działa poprzez: - rejestrowanie kanałów, - sprawdzanie gotowości do
+operacji (read, write, accept).</p>
+<p>Umożliwia model event-driven.</p>
+<hr />
+<h4 id="czym-jest-memory-mapped-file">🔹 50. Czym jest memory-mapped
+file?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Memory-mapped file (MappedByteBuffer): - Mapuje plik bezpośrednio do
+pamięci. - OS zarządza synchronizacją z dyskiem.</p>
+<p>Zalety: - Szybki dostęp do dużych plików. - Brak kopiowania danych
+między buforami.</p>
+<p>Wady: - Trudniejsze zarządzanie pamięcią.</p>
+<hr />
+<h2 id="wyjątki-i-api-design">7️⃣ Wyjątki i API Design</h2>
+<h4 id="czym-różnią-się-checked-i-unchecked-exceptions">🔹 51. Czym
+różnią się checked i unchecked exceptions?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Checked: - Muszą być zadeklarowane lub obsłużone. - Reprezentują
+sytuacje, które można przewidzieć.</p>
+<p>Unchecked (RuntimeException): - Nie wymagają deklaracji. -
+Reprezentują błędy programistyczne.</p>
+<p>W nowoczesnym kodzie preferuje się unchecked.</p>
+<hr />
+<h4 id="czym-jest-exception-wrapping">🔹 52. Czym jest exception
+wrapping?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Exception wrapping polega na opakowaniu niższego wyjątku w
+wyższy:</p>
+<p>throw new CustomException(“msg”, cause);</p>
+<p>Pozwala: - zachować stack trace, - oddzielić warstwy aplikacji.</p>
+<hr />
+<h4 id="czym-są-suppressed-exceptions">🔹 53. Czym są suppressed
+exceptions?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Powstają przy try-with-resources.</p>
+<p>Jeśli: - wyjątek wystąpi w bloku try, - oraz podczas zamykania
+zasobu,</p>
+<p>Wyjątek z close() jest suppressed i dostępny przez
+getSuppressed().</p>
+<hr />
+<h4 id="czym-jest-defensive-copying">🔹 54. Czym jest defensive
+copying?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Defensive copying polega na tworzeniu kopii mutowalnych obiektów
+przekazywanych do klasy.</p>
+<p>Chroni przed: - niekontrolowaną modyfikacją stanu.</p>
+<p>Stosowane w klasach immutable.</p>
+<hr />
+<h4 id="jak-projektować-dobre-api">🔹 55. Jak projektować dobre
+API?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Zasady: - Minimalna powierzchnia publiczna. - Brak null (Optional lub
+wyjątek). - Immutable gdy możliwe. - Spójne nazewnictwo. - Jasne
+kontrakty (JavaDoc). - Nie ujawniać implementacji.</p>
+<p>Dobre API jest łatwe do użycia i trudne do użycia błędnie.</p>
+<p><a href="questions.md">💡 Questions</a></p>
+<h1 id="spring-ecosystem">🌱 SPRING ECOSYSTEM</h1>
+<!-- TOC -->
+<ul>
+<li><a href="#-spring-ecosystem">🌱 SPRING ECOSYSTEM</a>
+<ul>
+<li><a href="#1-ioc-i-dependency-injection">1️⃣ IoC i Dependency
+Injection</a>
+<ul>
+<li><a href="#-1-czym-jest-ioc-inversion-of-control">🔹 1. Czym jest IoC
+(Inversion of Control)?</a></li>
+<li><a href="#-2-czym-jest-dependency-injection">🔹 2. Czym jest
+Dependency Injection?</a></li>
+<li><a href="#-3-jak-działa-kontener-springa-krok-po-kroku">🔹 3. Jak
+działa kontener Springa krok po kroku?</a></li>
+<li><a href="#-4-jakie-są-scope-beanów">🔹 4. Jakie są scope
+beanów?</a></li>
+<li><a href="#-5-czym-jest-lifecycle-beana">🔹 5. Czym jest lifecycle
+beana?</a></li>
+<li><a href="#-6-czym-jest-primary-i-qualifier">🔹 6. Czym jest <span
+class="citation" data-cites="Primary">@Primary</span> i <span
+class="citation" data-cites="Qualifier">@Qualifier</span>?</a></li>
+</ul></li>
+<li><a href="#2-transactional-mechanizm-transakcji">2️⃣ <span
+class="citation" data-cites="Transactional">@Transactional</span>
+(Mechanizm Transakcji)</a>
+<ul>
+<li><a href="#-7-jak-działa-transactional-pod-spodem">🔹 7. Jak działa
+<span class="citation" data-cites="Transactional">@Transactional</span>
+pod spodem?</a></li>
+<li><a href="#-8-kiedy-transactional-nie-działa">🔹 8. Kiedy <span
+class="citation" data-cites="Transactional">@Transactional</span> NIE
+działa?</a></li>
+<li><a href="#-9-jak-działają-propagacje-transakcji">🔹 9. Jak działają
+propagacje transakcji?</a></li>
+<li><a href="#-10-jakie-są-poziomy-izolacji">🔹 10. Jakie są poziomy
+izolacji?</a></li>
+<li><a href="#-11-kiedy-rollback-nie-nastąpi">🔹 11. Kiedy rollback NIE
+nastąpi?</a></li>
+<li><a href="#-12-czym-jest-transactionmanager">🔹 12. Czym jest
+TransactionManager?</a></li>
+</ul></li>
+<li><a href="#3-spring-aop">3️⃣ Spring AOP</a>
+<ul>
+<li><a href="#-13-czym-jest-aop-aspect-oriented-programming">🔹 13. Czym
+jest AOP (Aspect-Oriented Programming)?</a></li>
+<li><a href="#-14-jak-działa-aop-w-springu">🔹 14. Jak działa AOP w
+Springu?</a></li>
+<li><a href="#-15-czym-różni-się-jdk-dynamic-proxy-od-cglib">🔹 15. Czym
+różni się JDK Dynamic Proxy od CGLIB?</a></li>
+<li><a href="#-16-czym-jest-weaving">🔹 16. Czym jest weaving?</a></li>
+<li><a href="#-17-jakie-są-typy-advice">🔹 17. Jakie są typy
+advice?</a></li>
+<li><a href="#-18-czym-jest-pointcut">🔹 18. Czym jest
+pointcut?</a></li>
+</ul></li>
+<li><a href="#-4-spring-boot">🚀 4️⃣ Spring Boot</a>
+<ul>
+<li><a href="#-19-czym-jest-auto-configuration-w-spring-boot">🔹 19.
+Czym jest auto-configuration w Spring Boot?</a></li>
+<li><a href="#-20-czym-są-adnotacje-conditional">🔹 20. Czym są
+adnotacje <span class="citation"
+data-cites="Conditional">@Conditional</span>?</a></li>
+<li><a href="#-21-czym-jest-starter-w-spring-boot">🔹 21. Czym jest
+starter w Spring Boot?</a></li>
+<li><a
+href="#-22-czym-różni-się-applicationcontext-od-webapplicationcontext">🔹
+22. Czym różni się ApplicationContext od WebApplicationContext?</a></li>
+<li><a
+href="#-23-jak-działa-binding-właściwości-configurationproperties">🔹
+23. Jak działa binding właściwości (<span class="citation"
+data-cites="ConfigurationProperties">@ConfigurationProperties</span>)?</a></li>
+<li><a href="#-24-czym-są-profile-w-spring">🔹 24. Czym są profile w
+Spring?</a></li>
+<li><a href="#-25-czym-jest-spring-boot-actuator">🔹 25. Czym jest
+Spring Boot Actuator?</a></li>
+</ul></li>
+<li><a href="#-5-spring-security">🔐 5️⃣ Spring Security</a>
+<ul>
+<li><a href="#-26-jak-działa-spring-security-wewnętrznie">🔹 26. Jak
+działa Spring Security wewnętrznie?</a></li>
+<li><a href="#-27-czym-różni-się-authentication-od-authorization">🔹 27.
+Czym różni się Authentication od Authorization?</a></li>
+<li><a href="#-28-czym-jest-securitycontext">🔹 28. Czym jest
+SecurityContext?</a></li>
+<li><a href="#-29-jak-działa-jwt-w-spring-security">🔹 29. Jak działa
+JWT w Spring Security?</a></li>
+<li><a href="#-30-czym-jest-oauth2">🔹 30. Czym jest OAuth2?</a></li>
+<li><a href="#-31-czym-jest-csrf-i-jak-spring-go-chroni">🔹 31. Czym
+jest CSRF i jak Spring go chroni?</a></li>
+<li><a href="#-32-czym-jest-cors">🔹 32. Czym jest CORS?</a></li>
+<li><a href="#-33-jak-bezpiecznie-przechowywać-hasła">🔹 33. Jak
+bezpiecznie przechowywać hasła?</a> <!-- TOC --></li>
+</ul></li>
+</ul></li>
+</ul>
+<hr />
+<h2 id="ioc-i-dependency-injection">1️⃣ IoC i Dependency Injection</h2>
+<h4 id="czym-jest-ioc-inversion-of-control">🔹 1. Czym jest IoC
+(Inversion of Control)?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Inversion of Control oznacza odwrócenie kontroli nad tworzeniem i
+zarządzaniem zależnościami.</p>
+<p>Zamiast: - Klasa sama tworzy swoje zależności (new Service()),</p>
+<p>To: - Kontener (Spring) tworzy obiekty i wstrzykuje je do klas.</p>
+<p>Korzyści: - Luźne powiązania (loose coupling), - Łatwiejsze
+testowanie, - Możliwość podmiany implementacji.</p>
+<hr />
+<h4 id="czym-jest-dependency-injection">🔹 2. Czym jest Dependency
+Injection?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Dependency Injection to mechanizm dostarczania zależności do klasy z
+zewnątrz.</p>
+<p>Rodzaje: - Constructor injection (zalecane), - Setter injection, -
+Field injection (niezalecane).</p>
+<p>Constructor injection: - Zapewnia immutability zależności, - Ułatwia
+testowanie, - Wymusza kompletność obiektu.</p>
+<hr />
+<h4 id="jak-działa-kontener-springa-krok-po-kroku">🔹 3. Jak działa
+kontener Springa krok po kroku?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<ol type="1">
+<li>Odczyt konfiguracji (<span class="citation"
+data-cites="Configuration">@Configuration</span>, <span class="citation"
+data-cites="ComponentScan">@ComponentScan</span>).</li>
+<li>Rejestracja definicji beanów (BeanDefinition).</li>
+<li>Tworzenie instancji beanów.</li>
+<li>Wstrzykiwanie zależności.</li>
+<li>Wywołanie callbacków (np. <span class="citation"
+data-cites="PostConstruct">@PostConstruct</span>).</li>
+<li>Bean gotowy do użycia.</li>
+</ol>
+<p>Spring używa refleksji do tworzenia i łączenia obiektów.</p>
+<hr />
+<h4 id="jakie-są-scope-beanów">🔹 4. Jakie są scope beanów?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<ul>
+<li>singleton (domyślny) — jedna instancja na kontekst.</li>
+<li>prototype — nowa instancja przy każdym pobraniu.</li>
+<li>request — jedna instancja na request HTTP.</li>
+<li>session — jedna instancja na sesję.</li>
+<li>application — jedna instancja na aplikację webową.</li>
+</ul>
+<p>Singleton w Springu ≠ Singleton w sensie wzorca projektowego (jest
+per ApplicationContext).</p>
+<hr />
+<h4 id="czym-jest-lifecycle-beana">🔹 5. Czym jest lifecycle beana?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Etapy: 1. Instancja. 2. Wstrzyknięcie zależności. 3.
+BeanPostProcessor (before). 4. <span class="citation"
+data-cites="PostConstruct">@PostConstruct</span>. 5. Bean gotowy. 6.
+Przy zamknięciu kontekstu — <span class="citation"
+data-cites="PreDestroy">@PreDestroy</span>.</p>
+<p>BeanPostProcessor umożliwia modyfikację beanów (np. tworzenie
+proxy).</p>
+<hr />
+<h4 id="czym-jest-primary-i-qualifier">🔹 6. Czym jest <span
+class="citation" data-cites="Primary">@Primary</span> i <span
+class="citation" data-cites="Qualifier">@Qualifier</span>?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Jeśli istnieje wiele implementacji interfejsu:</p>
+<p><span class="citation" data-cites="Primary">@Primary</span> —
+wskazuje domyślny bean. <span class="citation"
+data-cites="Qualifier">@Qualifier</span> — pozwala wybrać konkretną
+implementację.</p>
+<p>Zapobiega NoUniqueBeanDefinitionException.</p>
+<hr />
+<h2 id="transactional-mechanizm-transakcji">2️⃣ <span class="citation"
+data-cites="Transactional">@Transactional</span> (Mechanizm
+Transakcji)</h2>
+<h4 id="jak-działa-transactional-pod-spodem">🔹 7. Jak działa <span
+class="citation" data-cites="Transactional">@Transactional</span> pod
+spodem?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p><span class="citation"
+data-cites="Transactional">@Transactional</span> działa poprzez AOP.</p>
+<p>Spring: 1. Tworzy proxy dla beana (JDK dynamic proxy lub CGLIB). 2.
+Proxy przechwytuje wywołanie metody. 3. Otwiera transakcję
+(PlatformTransactionManager). 4. Wywołuje metodę. 5. Commit lub rollback
+w zależności od wyniku.</p>
+<p>Jeśli metoda jest wywołana bezpośrednio (self-invocation) — proxy nie
+jest używane i transakcja nie zadziała.</p>
+<hr />
+<h4 id="kiedy-transactional-nie-działa">🔹 8. Kiedy <span
+class="citation" data-cites="Transactional">@Transactional</span> NIE
+działa?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<ul>
+<li>Metoda private.</li>
+<li>Metoda final (przy CGLIB ograniczenia proxy).</li>
+<li>Wywołanie self-invocation.</li>
+<li>Bean niezarządzany przez Spring.</li>
+<li>Brak skonfigurowanego TransactionManager.</li>
+</ul>
+<hr />
+<h4 id="jak-działają-propagacje-transakcji">🔹 9. Jak działają
+propagacje transakcji?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Propagation określa zachowanie przy wywołaniu metody wewnątrz
+istniejącej transakcji.</p>
+<p>REQUIRED (domyślne): - Dołącza do istniejącej lub tworzy nową.</p>
+<p>REQUIRES_NEW: - Zawsze tworzy nową transakcję. - Zawiesza obecną.</p>
+<p>MANDATORY: - Wymaga istniejącej transakcji. - Jeśli brak →
+wyjątek.</p>
+<p>SUPPORTS: - Działa w transakcji jeśli istnieje. - Jeśli nie → bez
+transakcji.</p>
+<p>NOT_SUPPORTED: - Zawiesza istniejącą transakcję.</p>
+<p>NEVER: - Jeśli istnieje transakcja → wyjątek.</p>
+<p>NESTED: - Tworzy savepoint (jeśli wspierane przez DB).</p>
+<hr />
+<h4 id="jakie-są-poziomy-izolacji">🔹 10. Jakie są poziomy
+izolacji?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>READ_UNCOMMITTED: - Możliwe dirty reads.</p>
+<p>READ_COMMITTED: - Brak dirty reads. - Możliwe non-repeatable
+reads.</p>
+<p>REPEATABLE_READ: - Brak dirty i non-repeatable reads. - Możliwe
+phantom reads.</p>
+<p>SERIALIZABLE: - Najwyższa izolacja. - Zachowuje się jak wykonanie
+sekwencyjne. - Najmniej wydajny.</p>
+<p>Dirty read — odczyt niezatwierdzonych danych. Non-repeatable read —
+ten sam rekord zwraca różne wartości. Phantom read — nowe rekordy
+pojawiają się w wyniku tego samego zapytania.</p>
+<hr />
+<h4 id="kiedy-rollback-nie-nastąpi">🔹 11. Kiedy rollback NIE
+nastąpi?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Domyślnie rollback następuje tylko dla RuntimeException i Error.</p>
+<p>Nie nastąpi dla: - Checked exception (chyba że rollbackFor
+ustawione). - Jeśli wyjątek został złapany i nie rzucony dalej.</p>
+<p>Można wymusić rollback: <span class="citation"
+data-cites="Transactional">@Transactional</span>(rollbackFor =
+Exception.class)</p>
+<hr />
+<h4 id="czym-jest-transactionmanager">🔹 12. Czym jest
+TransactionManager?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>PlatformTransactionManager zarządza cyklem życia transakcji.</p>
+<p>Implementacje: - DataSourceTransactionManager (JDBC). -
+JpaTransactionManager (JPA). - JtaTransactionManager (rozproszone
+transakcje).</p>
+<p>Odpowiada za: - begin, - commit, - rollback, - zarządzanie zasobami
+(Connection).</p>
+<hr />
+<h2 id="spring-aop">3️⃣ Spring AOP</h2>
+<h4 id="czym-jest-aop-aspect-oriented-programming">🔹 13. Czym jest AOP
+(Aspect-Oriented Programming)?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>AOP pozwala wydzielić logikę przekrojową (cross-cutting concerns),
+taką jak: - transakcje, - logowanie, - bezpieczeństwo, - cache.</p>
+<p>Zamiast umieszczać ją w każdej metodzie — definiuje się aspekt.</p>
+<hr />
+<h4 id="jak-działa-aop-w-springu">🔹 14. Jak działa AOP w Springu?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Spring AOP działa w oparciu o proxy.</p>
+<ol type="1">
+<li>Tworzony jest proxy beana.</li>
+<li>Proxy przechwytuje wywołanie metody.</li>
+<li>Wykonywana jest logika aspektu (np. <span class="citation"
+data-cites="Around">@Around</span>).</li>
+<li>Wywoływana jest metoda docelowa.</li>
+</ol>
+<p>Spring AOP działa tylko na metodach publicznych beanów zarządzanych
+przez Spring.</p>
+<hr />
+<h4 id="czym-różni-się-jdk-dynamic-proxy-od-cglib">🔹 15. Czym różni się
+JDK Dynamic Proxy od CGLIB?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>JDK Dynamic Proxy: - Tworzy proxy na podstawie interfejsu. - Wymaga,
+aby bean implementował interfejs.</p>
+<p>CGLIB: - Tworzy klasę dziedziczącą po klasie docelowej. - Może
+działać bez interfejsu. - Nie może proxy’ować metod final.</p>
+<p>Spring domyślnie używa: - JDK proxy, jeśli istnieje interfejs, -
+CGLIB w przeciwnym razie.</p>
+<hr />
+<h4 id="czym-jest-weaving">🔹 16. Czym jest weaving?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Weaving to proces wstrzykiwania aspektów do kodu.</p>
+<p>Rodzaje: - Compile-time weaving (AspectJ). - Load-time weaving. -
+Runtime weaving (Spring proxy).</p>
+<p>Spring używa runtime weaving przez proxy.</p>
+<hr />
+<h4 id="jakie-są-typy-advice">🔹 17. Jakie są typy advice?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<ul>
+<li><span class="citation" data-cites="Before">@Before</span> — przed
+metodą.</li>
+<li><span class="citation" data-cites="After">@After</span> — po
+metodzie (zawsze).</li>
+<li><span class="citation"
+data-cites="AfterReturning">@AfterReturning</span> — po sukcesie.</li>
+<li><span class="citation"
+data-cites="AfterThrowing">@AfterThrowing</span> — po wyjątku.</li>
+<li><span class="citation" data-cites="Around">@Around</span> — otacza
+metodę (najbardziej elastyczne).</li>
+</ul>
+<p><span class="citation" data-cites="Around">@Around</span> pozwala
+kontrolować wywołanie proceed().</p>
+<hr />
+<h4 id="czym-jest-pointcut">🔹 18. Czym jest pointcut?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Pointcut definiuje, które metody mają być objęte aspektem.</p>
+<p>Przykład: execution(* com.example.service.<em>.</em>(..))</p>
+<p>Może bazować na: - pakiecie, - nazwie metody, - adnotacji.</p>
+<p>Pointcut + Advice = Aspect.</p>
+<hr />
+<h2 id="spring-boot">🚀 4️⃣ Spring Boot</h2>
+<h4 id="czym-jest-auto-configuration-w-spring-boot">🔹 19. Czym jest
+auto-configuration w Spring Boot?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Auto-configuration to mechanizm automatycznego konfigurowania beanów
+na podstawie: - obecności klas w classpath, - właściwości
+konfiguracyjnych, - istniejących beanów.</p>
+<p>Spring Boot: 1. Skanuje plik
+META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports.
+2. Rejestruje klasy konfiguracyjne. 3. Warunkowo tworzy beany.</p>
+<p>Pozwala to uruchomić aplikację bez ręcznej konfiguracji
+infrastruktury.</p>
+<hr />
+<h4 id="czym-są-adnotacje-conditional">🔹 20. Czym są adnotacje <span
+class="citation" data-cites="Conditional">@Conditional</span>?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p><span class="citation" data-cites="Conditional">@Conditional</span>
+pozwala tworzyć bean tylko jeśli spełniony jest warunek.</p>
+<p>Najczęstsze warianty: - <span class="citation"
+data-cites="ConditionalOnClass">@ConditionalOnClass</span> - <span
+class="citation"
+data-cites="ConditionalOnMissingBean">@ConditionalOnMissingBean</span> -
+<span class="citation"
+data-cites="ConditionalOnProperty">@ConditionalOnProperty</span> - <span
+class="citation"
+data-cites="ConditionalOnWebApplication">@ConditionalOnWebApplication</span></p>
+<p>Mechanizm ten jest fundamentem auto-config.</p>
+<hr />
+<h4 id="czym-jest-starter-w-spring-boot">🔹 21. Czym jest starter w
+Spring Boot?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Starter to zestaw zależności (dependency descriptor), który: -
+agreguje biblioteki, - dodaje odpowiednie auto-config.</p>
+<p>Przykład: - spring-boot-starter-web -
+spring-boot-starter-data-jpa</p>
+<p>Ułatwia konfigurację poprzez konwencję zamiast konfiguracji.</p>
+<hr />
+<h4 id="czym-różni-się-applicationcontext-od-webapplicationcontext">🔹
+22. Czym różni się ApplicationContext od WebApplicationContext?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>ApplicationContext: - Ogólny kontener beanów.</p>
+<p>WebApplicationContext: - Rozszerza ApplicationContext. - Dodaje
+wsparcie dla środowiska web (ServletContext).</p>
+<p>W aplikacjach web tworzony jest kontekst webowy.</p>
+<hr />
+<h4 id="jak-działa-binding-właściwości-configurationproperties">🔹 23.
+Jak działa binding właściwości (<span class="citation"
+data-cites="ConfigurationProperties">@ConfigurationProperties</span>)?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p><span class="citation"
+data-cites="ConfigurationProperties">@ConfigurationProperties</span>
+pozwala mapować właściwości z application.yml na obiekt.</p>
+<p>Mechanizm: - Spring odczytuje konfigurację. - Tworzy bean. -
+Wstrzykuje wartości przez setter lub konstruktor.</p>
+<p>Zalety: - Typowanie. - Walidacja. - Lepsza organizacja
+konfiguracji.</p>
+<hr />
+<h4 id="czym-są-profile-w-spring">🔹 24. Czym są profile w Spring?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Profile pozwalają aktywować różne konfiguracje zależnie od
+środowiska.</p>
+<p>Aktywacja: - spring.profiles.active - <span class="citation"
+data-cites="Profile">@Profile</span>(“dev”)</p>
+<p>Umożliwiają separację konfiguracji dev/test/prod.</p>
+<hr />
+<h4 id="czym-jest-spring-boot-actuator">🔹 25. Czym jest Spring Boot
+Actuator?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Actuator dostarcza endpointy monitorujące aplikację.</p>
+<p>Przykłady: - /actuator/health - /actuator/metrics - /actuator/env -
+/actuator/info</p>
+<p>Pozwala monitorować: - stan aplikacji, - metryki, - konfigurację.</p>
+<p>Często używany z Prometheus.</p>
+<hr />
+<h2 id="spring-security">🔐 5️⃣ Spring Security</h2>
+<h4 id="jak-działa-spring-security-wewnętrznie">🔹 26. Jak działa Spring
+Security wewnętrznie?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Spring Security działa jako łańcuch filtrów (Security Filter
+Chain).</p>
+<ol type="1">
+<li>Żądanie HTTP trafia do serwera.</li>
+<li>Przechodzi przez kolejne filtry (np. authentication,
+authorization).</li>
+<li>Jeśli uwierzytelnienie się powiedzie — tworzony jest
+Authentication.</li>
+<li>Obiekt Authentication trafia do SecurityContext.</li>
+</ol>
+<p>SecurityContext przechowywany jest w ThreadLocal
+(SecurityContextHolder).</p>
+<hr />
+<h4 id="czym-różni-się-authentication-od-authorization">🔹 27. Czym
+różni się Authentication od Authorization?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Authentication (uwierzytelnienie): - Kim jesteś? - Weryfikacja
+tożsamości (login/hasło, token).</p>
+<p>Authorization (autoryzacja): - Co możesz zrobić? - Sprawdzenie
+uprawnień (role, authorities).</p>
+<p>Authentication poprzedza Authorization.</p>
+<hr />
+<h4 id="czym-jest-securitycontext">🔹 28. Czym jest
+SecurityContext?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>SecurityContext przechowuje informacje o aktualnie uwierzytelnionym
+użytkowniku.</p>
+<p>Zawiera: - principal (użytkownik), - credentials, - authorities.</p>
+<p>Domyślnie przechowywany w ThreadLocal.</p>
+<hr />
+<h4 id="jak-działa-jwt-w-spring-security">🔹 29. Jak działa JWT w Spring
+Security?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>JWT (JSON Web Token): - Token zawiera zakodowane dane użytkownika. -
+Składa się z header.payload.signature.</p>
+<p>Proces: 1. Użytkownik się loguje. 2. Serwer generuje podpisany token.
+3. Klient wysyła token w nagłówku Authorization. 4. Serwer weryfikuje
+podpis i tworzy Authentication.</p>
+<p>JWT jest stateless — serwer nie przechowuje sesji.</p>
+<hr />
+<h4 id="czym-jest-oauth2">🔹 30. Czym jest OAuth2?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>OAuth2 to protokół autoryzacji.</p>
+<p>Role: - Resource Owner - Client - Authorization Server - Resource
+Server</p>
+<p>Flow (np. Authorization Code): 1. Przekierowanie do Authorization
+Server. 2. Użytkownik się loguje. 3. Client otrzymuje authorization
+code. 4. Wymienia go na access token.</p>
+<p>Spring Security może działać jako Resource Server lub OAuth2
+Client.</p>
+<hr />
+<h4 id="czym-jest-csrf-i-jak-spring-go-chroni">🔹 31. Czym jest CSRF i
+jak Spring go chroni?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>CSRF (Cross-Site Request Forgery): - Atak polegający na wysłaniu
+żądania w imieniu użytkownika bez jego wiedzy.</p>
+<p>Spring generuje CSRF token: - Musi być dołączony do żądań
+modyfikujących (POST/PUT/DELETE). - Weryfikowany po stronie serwera.</p>
+<p>W aplikacjach stateless (JWT) często wyłączany.</p>
+<hr />
+<h4 id="czym-jest-cors">🔹 32. Czym jest CORS?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>CORS (Cross-Origin Resource Sharing): - Mechanizm przeglądarki
+kontrolujący dostęp między domenami.</p>
+<p>Serwer musi zwrócić odpowiednie nagłówki: -
+Access-Control-Allow-Origin - Access-Control-Allow-Methods</p>
+<p>Spring pozwala konfigurować CORS globalnie lub per endpoint.</p>
+<hr />
+<h4 id="jak-bezpiecznie-przechowywać-hasła">🔹 33. Jak bezpiecznie
+przechowywać hasła?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Hasła nie powinny być szyfrowane, lecz haszowane.</p>
+<p>Algorytmy: - bcrypt - argon2 - scrypt</p>
+<p>Cechy: - Salt (losowa wartość). - Koszt obliczeniowy (work
+factor).</p>
+<p>Spring Security dostarcza PasswordEncoder.</p>
+<p><a href="questions.md">💡 Questions</a></p>
+<h1 id="bazy-danych-i-persistencja">🗄 BAZY DANYCH I PERSISTENCJA</h1>
+<!-- TOC -->
+<ul>
+<li><a href="#-bazy-danych-i-persistencja">🗄 BAZY DANYCH I
+PERSISTENCJA</a>
+<ul>
+<li><a href="#1-podstawy-teorii-transakcji">1️⃣ Podstawy Teorii
+Transakcji</a>
+<ul>
+<li><a href="#-1-czym-jest-acid">🔹 1. Czym jest ACID?</a></li>
+<li><a href="#-2-czym-są-poziomy-izolacji-i-jakie-anomalie-eliminują">🔹
+2. Czym są poziomy izolacji i jakie anomalie eliminują?</a></li>
+<li><a href="#-3-czym-jest-optimistic-locking">🔹 3. Czym jest
+optimistic locking?</a></li>
+<li><a href="#-4-czym-jest-pessimistic-locking">🔹 4. Czym jest
+pessimistic locking?</a></li>
+<li><a href="#-5-czym-jest-indeks-i-jak-działa-b-tree">🔹 5. Czym jest
+indeks i jak działa B-Tree?</a></li>
+<li><a href="#-6-czym-jest-execution-plan">🔹 6. Czym jest execution
+plan?</a></li>
+<li><a href="#-7-czym-jest-connection-pool">🔹 7. Czym jest connection
+pool?</a></li>
+</ul></li>
+<li><a href="#2-jpa-internals">2️⃣ JPA Internals</a>
+<ul>
+<li><a href="#-8-czym-jest-persistence-context">🔹 8. Czym jest
+Persistence Context?</a></li>
+<li><a href="#-9-jakie-są-stany-encji-w-jpa">🔹 9. Jakie są stany encji
+w JPA?</a></li>
+<li><a href="#-10-czym-jest-1st-level-cache">🔹 10. Czym jest 1st level
+cache?</a></li>
+<li><a href="#-11-czym-jest-dirty-checking">🔹 11. Czym jest dirty
+checking?</a></li>
+<li><a href="#-12-czym-jest-flush">🔹 12. Czym jest flush?</a></li>
+<li><a href="#-13-czym-jest-n1-problem">🔹 13. Czym jest N+1
+problem?</a></li>
+<li><a href="#-14-czym-różni-się-fetchtypelazy-od-eager">🔹 14. Czym
+różni się FetchType.LAZY od EAGER?</a></li>
+<li><a href="#-15-czym-jest-lazyinitializationexception">🔹 15. Czym
+jest LazyInitializationException?</a></li>
+</ul></li>
+<li><a href="#3-sql-vs-nosql-i-architektoniczne-aspekty-danych">3️⃣ SQL
+vs NoSQL i Architektoniczne Aspekty Danych</a>
+<ul>
+<li><a href="#-16-czym-jest-normalizacja-i-denormalizacja">🔹 16. Czym
+jest normalizacja i denormalizacja?</a></li>
+<li><a href="#-17-czym-jest-twierdzenie-cap">🔹 17. Czym jest
+twierdzenie CAP?</a></li>
+<li><a href="#-18-czym-różni-się-sql-od-nosql">🔹 18. Czym różni się SQL
+od NoSQL?</a></li>
+<li><a href="#-19-czym-jest-eventual-consistency">🔹 19. Czym jest
+eventual consistency?</a></li>
+<li><a href="#-20-czym-jest-replikacja">🔹 20. Czym jest
+replikacja?</a></li>
+<li><a href="#-21-czym-jest-sharding">🔹 21. Czym jest
+sharding?</a></li>
+<li><a href="#-22-jak-skalować-bazę-danych">🔹 22. Jak skalować bazę
+danych?</a> <!-- TOC --></li>
+</ul></li>
+</ul></li>
+</ul>
+<hr />
+<h2 id="podstawy-teorii-transakcji">1️⃣ Podstawy Teorii Transakcji</h2>
+<h4 id="czym-jest-acid">🔹 1. Czym jest ACID?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>ACID to cztery właściwości transakcji:</p>
+<p>Atomicity (Atomowość) - Transakcja wykonuje się w całości albo wcale.
+- W przypadku błędu następuje rollback.</p>
+<p>Consistency (Spójność) - Po zakończeniu transakcji dane spełniają
+wszystkie ograniczenia (constraints, reguły biznesowe).</p>
+<p>Isolation (Izolacja) - Równoległe transakcje nie powinny wpływać na
+siebie w sposób łamiący spójność.</p>
+<p>Durability (Trwałość) - Po commit dane są zapisane trwale (np. w WAL
+— Write-Ahead Log).</p>
+<hr />
+<h4 id="czym-są-poziomy-izolacji-i-jakie-anomalie-eliminują">🔹 2. Czym
+są poziomy izolacji i jakie anomalie eliminują?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>READ_UNCOMMITTED - Pozwala na dirty reads (odczyt niezatwierdzonych
+danych).</p>
+<p>READ_COMMITTED - Brak dirty reads. - Możliwe non-repeatable
+reads.</p>
+<p>REPEATABLE_READ - Brak dirty reads. - Brak non-repeatable reads. -
+Możliwe phantom reads.</p>
+<p>SERIALIZABLE - Najwyższa izolacja. - Eliminuje wszystkie powyższe
+anomalie. - Najmniej wydajny.</p>
+<p>Anomalie: - Dirty read — odczyt danych, które mogą zostać wycofane. -
+Non-repeatable read — ten sam rekord zwraca różne wartości. - Phantom
+read — nowe rekordy pojawiają się w zakresie zapytania.</p>
+<hr />
+<h4 id="czym-jest-optimistic-locking">🔹 3. Czym jest optimistic
+locking?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Optimistic locking zakłada, że konflikt jest rzadki.</p>
+<p>Mechanizm: - Wiersz posiada pole version. - Przy update sprawdzana
+jest wersja. - Jeśli zmieniła się — wyjątek
+(OptimisticLockException).</p>
+<p>Brak blokad na poziomie bazy.</p>
+<hr />
+<h4 id="czym-jest-pessimistic-locking">🔹 4. Czym jest pessimistic
+locking?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Pessimistic locking zakłada, że konflikt jest prawdopodobny.</p>
+<p>Mechanizm: - SELECT … FOR UPDATE - Wiersz jest blokowany. - Inne
+transakcje czekają.</p>
+<p>Większe bezpieczeństwo, mniejsza skalowalność.</p>
+<hr />
+<h4 id="czym-jest-indeks-i-jak-działa-b-tree">🔹 5. Czym jest indeks i
+jak działa B-Tree?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Indeks to struktura danych przyspieszająca wyszukiwanie.</p>
+<p>B-Tree: - Samobalansujące drzewo. - Każdy węzeł zawiera wiele kluczy.
+- Wyszukiwanie w czasie O(log n).</p>
+<p>Indeks przyspiesza SELECT, ale spowalnia INSERT/UPDATE.</p>
+<hr />
+<h4 id="czym-jest-execution-plan">🔹 6. Czym jest execution plan?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Execution plan to plan wykonania zapytania generowany przez
+optimizer.</p>
+<p>Zawiera: - sposób użycia indeksów, - join strategy (nested loop, hash
+join), - koszt operacji.</p>
+<p>Analizowany przez EXPLAIN.</p>
+<hr />
+<h4 id="czym-jest-connection-pool">🔹 7. Czym jest connection pool?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Connection pool zarządza pulą połączeń do bazy.</p>
+<p>Zamiast tworzyć połączenie przy każdym zapytaniu: - połączenia są
+utrzymywane i ponownie wykorzystywane.</p>
+<p>Najpopularniejszy: HikariCP.</p>
+<p>Parametry: - maximumPoolSize - connectionTimeout - idleTimeout</p>
+<p>Zmniejsza koszt tworzenia połączeń.</p>
+<hr />
+<h2 id="jpa-internals">2️⃣ JPA Internals</h2>
+<h4 id="czym-jest-persistence-context">🔹 8. Czym jest Persistence
+Context?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Persistence Context to kontekst zarządzania encjami przez
+EntityManager.</p>
+<p>Zawiera: - zarządzane encje (managed entities), - mechanizm śledzenia
+zmian, - cache pierwszego poziomu.</p>
+<p>Każda encja w kontekście ma tylko jedną reprezentację (identity
+guarantee).</p>
+<hr />
+<h4 id="jakie-są-stany-encji-w-jpa">🔹 9. Jakie są stany encji w
+JPA?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<ol type="1">
+<li>Transient — nowa encja, niezarządzana.</li>
+<li>Managed — zarządzana przez Persistence Context.</li>
+<li>Detached — była zarządzana, ale kontekst został zamknięty.</li>
+<li>Removed — oznaczona do usunięcia.</li>
+</ol>
+<p>Tylko encje Managed podlegają dirty checking.</p>
+<hr />
+<h4 id="czym-jest-1st-level-cache">🔹 10. Czym jest 1st level
+cache?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>1st level cache to cache w ramach Persistence Context.</p>
+<p>Cechy: - Domyślnie włączony. - Unikalna instancja encji na klucz. -
+Zapobiega wielokrotnym zapytaniom do DB w jednej transakcji.</p>
+<p>Jest powiązany z EntityManager.</p>
+<hr />
+<h4 id="czym-jest-dirty-checking">🔹 11. Czym jest dirty checking?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Dirty checking to mechanizm automatycznego wykrywania zmian w
+encjach.</p>
+<p>Proces: 1. Przy załadowaniu encji tworzony jest snapshot. 2. Przy
+flush porównywany jest aktualny stan z snapshotem. 3. Jeśli są różnice —
+generowany jest UPDATE.</p>
+<p>Działa tylko dla encji Managed.</p>
+<hr />
+<h4 id="czym-jest-flush">🔹 12. Czym jest flush?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Flush synchronizuje stan Persistence Context z bazą danych.</p>
+<p>Nie oznacza commit.</p>
+<p>Może nastąpić: - automatycznie przed zapytaniem JPQL, - przy commit,
+- ręcznie (entityManager.flush()).</p>
+<hr />
+<h4 id="czym-jest-n1-problem">🔹 13. Czym jest N+1 problem?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>N+1 występuje gdy: - Pobieramy listę encji (1 zapytanie), - Dla
+każdej wykonywane jest osobne zapytanie (N zapytań).</p>
+<p>Powód: - Lazy loading relacji.</p>
+<p>Rozwiązania: - JOIN FETCH - EntityGraph - Batch fetching</p>
+<hr />
+<h4 id="czym-różni-się-fetchtype.lazy-od-eager">🔹 14. Czym różni się
+FetchType.LAZY od EAGER?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>LAZY: - Relacja ładowana przy pierwszym użyciu. - Domyślne dla <span
+class="citation" data-cites="OneToMany">@OneToMany</span>.</p>
+<p>EAGER: - Relacja ładowana od razu. - Może powodować nadmiarowe
+zapytania.</p>
+<p>EAGER często prowadzi do problemów wydajnościowych.</p>
+<hr />
+<h4 id="czym-jest-lazyinitializationexception">🔹 15. Czym jest
+LazyInitializationException?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Występuje gdy: - Próbujemy odczytać relację LAZY, - Po zamknięciu
+Persistence Context.</p>
+<p>Typowy przypadek: - Dostęp do relacji poza transakcją.</p>
+<p>Rozwiązania: - DTO projection, - JOIN FETCH, - OpenSessionInView
+(niezalecane w architekturze czystej).</p>
+<hr />
+<h2 id="sql-vs-nosql-i-architektoniczne-aspekty-danych">3️⃣ SQL vs NoSQL
+i Architektoniczne Aspekty Danych</h2>
+<h4 id="czym-jest-normalizacja-i-denormalizacja">🔹 16. Czym jest
+normalizacja i denormalizacja?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Normalizacja: - Proces organizowania danych w celu eliminacji
+redundancji. - Dane podzielone na wiele tabel. - Spójność i mniejsze
+ryzyko anomalii aktualizacji.</p>
+<p>Denormalizacja: - Celowe wprowadzanie redundancji. - Mniej joinów. -
+Lepsza wydajność odczytu kosztem spójności i większej złożoności
+zapisu.</p>
+<p>Systemy OLTP → zwykle normalizacja. Systemy analityczne / read-heavy
+→ często denormalizacja.</p>
+<hr />
+<h4 id="czym-jest-twierdzenie-cap">🔹 17. Czym jest twierdzenie
+CAP?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>CAP mówi, że w systemie rozproszonym można mieć maksymalnie dwie z
+trzech cech:</p>
+<p>Consistency — wszystkie węzły widzą te same dane w tym samym czasie.
+Availability — każdy request otrzymuje odpowiedź. Partition Tolerance —
+system działa mimo podziałów sieci.</p>
+<p>W praktyce w systemach rozproszonych zawsze zakładamy Partition
+Tolerance.</p>
+<p>Wybór jest więc między: - CP (Consistency + Partition Tolerance) - AP
+(Availability + Partition Tolerance)</p>
+<hr />
+<h4 id="czym-różni-się-sql-od-nosql">🔹 18. Czym różni się SQL od
+NoSQL?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>SQL: - Relacyjny model danych. - Silna spójność. - Transakcje ACID. -
+Schemat zdefiniowany z góry.</p>
+<p>NoSQL: - Dokumentowe, klucz-wartość, kolumnowe, grafowe. - Często
+eventual consistency. - Elastyczny schemat. - Łatwiejsze skalowanie
+poziome.</p>
+<p>SQL lepszy dla: - złożonych relacji, - transakcji finansowych.</p>
+<p>NoSQL lepszy dla: - dużej skali, - dynamicznych struktur danych, -
+systemów event-driven.</p>
+<hr />
+<h4 id="czym-jest-eventual-consistency">🔹 19. Czym jest eventual
+consistency?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Eventual consistency oznacza, że: - System może chwilowo zwracać
+niespójne dane, - Ale ostatecznie wszystkie repliki się
+zsynchronizują.</p>
+<p>Typowe w systemach AP.</p>
+<p>Wymaga projektowania systemu z myślą o: - idempotency, - retry, -
+mechanizmach kompensacji.</p>
+<hr />
+<h4 id="czym-jest-replikacja">🔹 20. Czym jest replikacja?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Replikacja to kopiowanie danych na wiele węzłów.</p>
+<p>Rodzaje: - Master-Slave (Primary-Replica). - Multi-Master.</p>
+<p>Zalety: - Większa dostępność. - Skalowanie odczytu.</p>
+<p>Wady: - Opóźnienia synchronizacji.</p>
+<hr />
+<h4 id="czym-jest-sharding">🔹 21. Czym jest sharding?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Sharding to podział danych między wiele węzłów według klucza (shard
+key).</p>
+<p>Cel: - Skalowanie zapisu. - Skalowanie pojemności.</p>
+<p>Wyzwania: - Wybór shard key. - Migracja shardów. - Zapytania
+cross-shard.</p>
+<hr />
+<h4 id="jak-skalować-bazę-danych">🔹 22. Jak skalować bazę danych?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Vertical scaling: - Więcej CPU/RAM. - Ograniczony przez sprzęt.</p>
+<p>Horizontal scaling: - Replikacja (read scaling). - Sharding (write
+scaling).</p>
+<p>W systemach o dużej skali często łączy się oba podejścia.</p>
+<p><a href="questions.md">💡 Questions</a></p>
+<h1 id="architektura-aplikacji">🏗 ARCHITEKTURA APLIKACJI</h1>
+<!-- TOC -->
+<ul>
+<li><a href="#-architektura-aplikacji">🏗 ARCHITEKTURA APLIKACJI</a>
+<ul>
+<li><a href="#1-fundamenty-architektoniczne">1️⃣ Fundamenty
+Architektoniczne</a>
+<ul>
+<li><a href="#-1-czym-jest-separation-of-concerns">🔹 1. Czym jest
+Separation of Concerns?</a></li>
+<li><a href="#-2-czym-jest-dependency-inversion-principle">🔹 2. Czym
+jest Dependency Inversion Principle?</a></li>
+</ul></li>
+<li><a href="#2-clean--hexagonal--onion">2️⃣ Clean / Hexagonal /
+Onion</a>
+<ul>
+<li><a href="#-3-czym-jest-clean-architecture">🔹 3. Czym jest Clean
+Architecture?</a></li>
+<li><a href="#-4-czym-jest-hexagonal-architecture">🔹 4. Czym jest
+Hexagonal Architecture?</a></li>
+<li><a href="#-5-czym-jest-onion-architecture">🔹 5. Czym jest Onion
+Architecture?</a></li>
+</ul></li>
+<li><a href="#3-domain-driven-design-ddd">3️⃣ Domain-Driven Design
+(DDD)</a>
+<ul>
+<li><a href="#-6-czym-jest-bounded-context">🔹 6. Czym jest Bounded
+Context?</a></li>
+<li><a href="#-7-czym-jest-aggregate">🔹 7. Czym jest
+Aggregate?</a></li>
+<li><a href="#-8-czym-jest-cqrs">🔹 8. Czym jest CQRS?</a></li>
+<li><a href="#-9-czym-jest-event-sourcing">🔹 9. Czym jest Event
+Sourcing?</a></li>
+</ul></li>
+<li><a href="#4-modularność-i-skalowanie">4️⃣ Modularność i
+Skalowanie</a>
+<ul>
+<li><a href="#-10-czym-jest-modular-monolith">🔹 10. Czym jest Modular
+Monolith?</a></li>
+<li><a href="#-11-jak-podejmować-decyzje-architektoniczne">🔹 11. Jak
+podejmować decyzje architektoniczne?</a> <!-- TOC --></li>
+</ul></li>
+</ul></li>
+</ul>
+<hr />
+<h2 id="fundamenty-architektoniczne">1️⃣ Fundamenty Architektoniczne</h2>
+<h4 id="czym-jest-separation-of-concerns">🔹 1. Czym jest Separation of
+Concerns?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Separation of Concerns (SoC) oznacza rozdzielenie systemu na części
+odpowiedzialne za różne aspekty.</p>
+<p>Przykłady warstw: - Warstwa prezentacji - Warstwa aplikacyjna -
+Warstwa domenowa - Warstwa infrastruktury</p>
+<p>Celem jest: - mniejsza złożoność, - większa testowalność, -
+łatwiejsza wymiana technologii.</p>
+<hr />
+<h4 id="czym-jest-dependency-inversion-principle">🔹 2. Czym jest
+Dependency Inversion Principle?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Dependency Inversion Principle (DIP):</p>
+<ul>
+<li>Moduły wysokiego poziomu nie powinny zależeć od modułów niskiego
+poziomu.</li>
+<li>Oba powinny zależeć od abstrakcji.</li>
+</ul>
+<p>Przykład: - Serwis biznesowy zależy od interfejsu Repozytorium. -
+Implementacja repozytorium zależy od bazy danych.</p>
+<p>Zmniejsza sprzężenie i ułatwia testowanie.</p>
+<hr />
+<h2 id="clean-hexagonal-onion">2️⃣ Clean / Hexagonal / Onion</h2>
+<h4 id="czym-jest-clean-architecture">🔹 3. Czym jest Clean
+Architecture?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Clean Architecture dzieli system na warstwy koncentryczne:</p>
+<ul>
+<li>Entities (logika biznesowa)</li>
+<li>Use Cases</li>
+<li>Interface Adapters</li>
+<li>Frameworks &amp; Drivers</li>
+</ul>
+<p>Zasada: - Zależności skierowane do środka. - Rdzeń domeny nie zna
+frameworków.</p>
+<hr />
+<h4 id="czym-jest-hexagonal-architecture">🔹 4. Czym jest Hexagonal
+Architecture?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Hexagonal (Ports &amp; Adapters):</p>
+<ul>
+<li>Domena w centrum.</li>
+<li>Porty (interfejsy) definiują komunikację.</li>
+<li>Adaptery implementują porty.</li>
+</ul>
+<p>Pozwala oddzielić: - logikę biznesową, - technologię (DB, HTTP,
+messaging).</p>
+<hr />
+<h4 id="czym-jest-onion-architecture">🔹 5. Czym jest Onion
+Architecture?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Onion Architecture: - Warstwy koncentryczne. - Rdzeń domenowy w
+środku. - Zależności skierowane do środka.</p>
+<p>Podobna do Clean i Hexagonal — różni się nazewnictwem i akcentem.</p>
+<hr />
+<h2 id="domain-driven-design-ddd">3️⃣ Domain-Driven Design (DDD)</h2>
+<h4 id="czym-jest-bounded-context">🔹 6. Czym jest Bounded Context?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Bounded Context to granica modelu domenowego.</p>
+<p>W obrębie kontekstu: - Model ma jednoznaczne znaczenie.</p>
+<p>Między kontekstami: - Możliwe różne definicje tego samego
+pojęcia.</p>
+<p>Ułatwia modularność i skalowanie organizacyjne.</p>
+<hr />
+<h4 id="czym-jest-aggregate">🔹 7. Czym jest Aggregate?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Aggregate to klaster encji traktowany jako jedna jednostka
+spójności.</p>
+<p>Cechy: - Ma Aggregate Root. - Tylko Root jest dostępny z zewnątrz. -
+Spójność utrzymywana w obrębie agregatu.</p>
+<p>Transakcje powinny obejmować jeden agregat.</p>
+<hr />
+<h4 id="czym-jest-cqrs">🔹 8. Czym jest CQRS?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>CQRS (Command Query Responsibility Segregation):</p>
+<ul>
+<li>Oddziela operacje zapisu (Command) od odczytu (Query).</li>
+</ul>
+<p>Zalety: - Możliwość optymalizacji odczytu i zapisu niezależnie. -
+Lepsza skalowalność.</p>
+<p>Wady: - Większa złożoność.</p>
+<hr />
+<h4 id="czym-jest-event-sourcing">🔹 9. Czym jest Event Sourcing?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Event Sourcing: - Stan systemu przechowywany jako sekwencja zdarzeń.
+- Aktualny stan rekonstruowany przez odtworzenie zdarzeń.</p>
+<p>Zalety: - Pełna historia. - Audytowalność.</p>
+<p>Wyzwania: - Migracje eventów. - Złożoność.</p>
+<hr />
+<h2 id="modularność-i-skalowanie">4️⃣ Modularność i Skalowanie</h2>
+<h4 id="czym-jest-modular-monolith">🔹 10. Czym jest Modular
+Monolith?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Modular Monolith: - Jedna aplikacja. - Silna modularność wewnętrzna.
+- Wyraźne granice między modułami.</p>
+<p>Zalety: - Prostota wdrożenia. - Brak kosztów sieciowych.</p>
+<p>Może być etapem przed mikroserwisami.</p>
+<hr />
+<h4 id="jak-podejmować-decyzje-architektoniczne">🔹 11. Jak podejmować
+decyzje architektoniczne?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Architektura to kompromisy.</p>
+<p>Należy analizować: - Skalowalność - Złożoność - Koszt utrzymania -
+Wymagania niefunkcjonalne</p>
+<p>Nie istnieje jedna “najlepsza” architektura — zależy od
+kontekstu.</p>
+<p><a href="questions.md">💡 Questions</a></p>
+<h1 id="mikroserwisy">🌐 MIKROSERWISY</h1>
+<!-- TOC -->
+<ul>
+<li><a href="#-mikroserwisy">🌐 MIKROSERWISY</a>
+<ul>
+<li><a href="#1-fundamenty-mikroserwisów">1️⃣ Fundamenty
+Mikroserwisów</a>
+<ul>
+<li><a href="#-1-jak-wyznaczać-granice-mikroserwisów">🔹 1. Jak
+wyznaczać granice mikroserwisów?</a></li>
+<li><a
+href="#-2-synchroniczna-vs-asynchroniczna-komunikacja--kiedy-co">🔹 2.
+Synchroniczna vs asynchroniczna komunikacja — kiedy co?</a></li>
+<li><a href="#-3-czym-jest-api-gateway">🔹 3. Czym jest API
+Gateway?</a></li>
+</ul></li>
+<li><a href="#2-odporność-i-stabilność">2️⃣ Odporność i Stabilność</a>
+<ul>
+<li><a href="#-4-czym-jest-circuit-breaker">🔹 4. Czym jest Circuit
+Breaker?</a></li>
+<li><a href="#-5-czym-jest-retry-i-jakie-są-ryzyka">🔹 5. Czym jest
+retry i jakie są ryzyka?</a></li>
+<li><a href="#-6-czym-jest-idempotency-i-jak-ją-osiągnąć">🔹 6. Czym
+jest idempotency i jak ją osiągnąć?</a></li>
+</ul></li>
+<li><a href="#3-spójność-w-systemie-rozproszonym">3️⃣ Spójność w systemie
+rozproszonym</a>
+<ul>
+<li><a href="#-7-czym-jest-saga">🔹 7. Czym jest Saga?</a></li>
+<li><a href="#-8-czym-jest-outbox-pattern">🔹 8. Czym jest Outbox
+Pattern?</a></li>
+<li><a
+href="#-9-dlaczego-współdzielona-baza-danych-między-mikroserwisami-jest-problemem">🔹
+9. Dlaczego współdzielona baza danych między mikroserwisami jest
+problemem?</a></li>
+</ul></li>
+<li><a href="#4-obserwowalność">4️⃣ Obserwowalność</a>
+<ul>
+<li><a href="#-10-czym-jest-observability-w-mikroserwisach">🔹 10. Czym
+jest observability w mikroserwisach?</a> <!-- TOC --></li>
+</ul></li>
+</ul></li>
+</ul>
+<hr />
+<h2 id="fundamenty-mikroserwisów">1️⃣ Fundamenty Mikroserwisów</h2>
+<h4 id="jak-wyznaczać-granice-mikroserwisów">🔹 1. Jak wyznaczać granice
+mikroserwisów?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Granice mikroserwisów powinny wynikać z domeny biznesowej, nie z
+podziału technicznego.</p>
+<p>Typowe podejścia: - Bounded Context (DDD) jako granica serwisu. -
+Wysoka spójność wewnątrz serwisu, niskie sprzężenie między
+serwisami.</p>
+<p>Zły znak: - Silne transakcje rozproszone. - Wspólna baza danych
+między serwisami.</p>
+<hr />
+<h4 id="synchroniczna-vs-asynchroniczna-komunikacja-kiedy-co">🔹 2.
+Synchroniczna vs asynchroniczna komunikacja — kiedy co?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Synchroniczna (HTTP/gRPC): - Prostota. - Natychmiastowa odpowiedź. -
+Ryzyko propagacji awarii i większa latencja.</p>
+<p>Asynchroniczna (Kafka/RabbitMQ): - Luźniejsze powiązania. - Lepsza
+odporność. - Eventual consistency. - Większa złożoność (idempotency,
+retry, ordering).</p>
+<p>W praktyce często miesza się oba podejścia.</p>
+<hr />
+<h4 id="czym-jest-api-gateway">🔹 3. Czym jest API Gateway?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>API Gateway to punkt wejścia do systemu mikroserwisów.</p>
+<p>Funkcje: - routing, - auth, - rate limiting, - agregacja danych, -
+observability.</p>
+<p>Zaleta: - klient nie musi znać topologii mikroserwisów.</p>
+<p>Ryzyko: - single point of failure (trzeba skalować i
+zabezpieczać).</p>
+<hr />
+<h2 id="odporność-i-stabilność">2️⃣ Odporność i Stabilność</h2>
+<h4 id="czym-jest-circuit-breaker">🔹 4. Czym jest Circuit Breaker?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Circuit Breaker chroni system przed kaskadową awarią.</p>
+<p>Stany: - Closed — ruch przechodzi. - Open — ruch blokowany, szybka
+porażka (fail fast). - Half-open — testowe requesty.</p>
+<p>Stosowany przy komunikacji synchronicznej.</p>
+<hr />
+<h4 id="czym-jest-retry-i-jakie-są-ryzyka">🔹 5. Czym jest retry i jakie
+są ryzyka?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Retry to ponawianie żądania po błędzie.</p>
+<p>Ryzyka: - powielanie operacji (brak idempotency), - retry storm
+(wiele usług retry jednocześnie), - wzrost obciążenia i pogorszenie
+awarii.</p>
+<p>Dobre praktyki: - exponential backoff, - jitter, - limit prób, -
+idempotency key.</p>
+<hr />
+<h4 id="czym-jest-idempotency-i-jak-ją-osiągnąć">🔹 6. Czym jest
+idempotency i jak ją osiągnąć?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Idempotency oznacza, że wielokrotne wykonanie tej samej operacji daje
+ten sam efekt.</p>
+<p>Przykład: - PUT jest idempotentny, - POST zwykle nie.</p>
+<p>Techniki: - Idempotency-Key przechowywany po stronie serwera, -
+deduplikacja komunikatów, - naturalny klucz biznesowy.</p>
+<hr />
+<h2 id="spójność-w-systemie-rozproszonym">3️⃣ Spójność w systemie
+rozproszonym</h2>
+<h4 id="czym-jest-saga">🔹 7. Czym jest Saga?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Saga to wzorzec realizacji transakcji rozproszonej przez sekwencję
+lokalnych transakcji.</p>
+<p>Każdy krok ma akcję kompensacyjną.</p>
+<p>Rodzaje: - Orchestrated saga — centralny orchestrator. -
+Choreographed saga — serwisy reagują na eventy.</p>
+<hr />
+<h4 id="czym-jest-outbox-pattern">🔹 8. Czym jest Outbox Pattern?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Outbox Pattern rozwiązuje problem atomowości między: - zapisem do
+bazy, - publikacją eventu.</p>
+<p>Mechanizm: 1. Zapis danych i eventu w tej samej transakcji w DB
+(tabela outbox). 2. Osobny proces publikuje eventy do brokera. 3. Eventy
+są oznaczane jako wysłane.</p>
+<p>Zapobiega utracie eventów.</p>
+<hr />
+<h4
+id="dlaczego-współdzielona-baza-danych-między-mikroserwisami-jest-problemem">🔹
+9. Dlaczego współdzielona baza danych między mikroserwisami jest
+problemem?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Współdzielona baza: - zwiększa sprzężenie, - wymusza wspólne
+wdrożenia, - utrudnia niezależną ewolucję schematu, - zwiększa ryzyko
+blokad i konfliktów.</p>
+<p>Zasada: Database per service.</p>
+<hr />
+<h2 id="obserwowalność">4️⃣ Obserwowalność</h2>
+<h4 id="czym-jest-observability-w-mikroserwisach">🔹 10. Czym jest
+observability w mikroserwisach?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Observability to zdolność zrozumienia stanu systemu na podstawie
+sygnałów.</p>
+<p>Trzy filary: - Logs (najlepiej structured) - Metrics (np. Prometheus)
+- Traces (distributed tracing)</p>
+<p>Bez observability mikroserwisy są trudne w utrzymaniu.</p>
+<p><a href="questions.md">💡 Questions</a></p>
+<h1 id="komunikacja-i-integracja">🔌 KOMUNIKACJA I INTEGRACJA</h1>
+<!-- TOC -->
+<ul>
+<li><a href="#-komunikacja-i-integracja">🔌 KOMUNIKACJA I INTEGRACJA</a>
+<ul>
+<li><a href="#1-rest-i-semantyka-http">1️⃣ REST i Semantyka HTTP</a>
+<ul>
+<li><a
+href="#-1-co-oznacza-idempotency-w-http-i-które-metody-są-idempotentne">🔹
+1. Co oznacza idempotency w HTTP i które metody są
+idempotentne?</a></li>
+<li><a
+href="#-2-jakie-są-najważniejsze-klasy-kodów-http-i-jak-ich-używać">🔹
+2. Jakie są najważniejsze klasy kodów HTTP i jak ich używać?</a></li>
+<li><a href="#-3-czym-jest-caching-w-http">🔹 3. Czym jest caching w
+HTTP?</a></li>
+</ul></li>
+<li><a href="#2-grpc">2️⃣ gRPC</a>
+<ul>
+<li><a href="#-4-czym-jest-grpc-i-kiedy-jest-lepsze-od-rest">🔹 4. Czym
+jest gRPC i kiedy jest lepsze od REST?</a></li>
+</ul></li>
+<li><a href="#3-messaging-kafka-vs-rabbitmq">3️⃣ Messaging: Kafka vs
+RabbitMQ</a>
+<ul>
+<li><a href="#-5-kafka-vs-rabbitmq--kluczowe-różnice">🔹 5. Kafka vs
+RabbitMQ — kluczowe różnice</a></li>
+<li><a
+href="#-6-co-oznacza-at-least-once-at-most-once-exactly-once-delivery">🔹
+6. Co oznacza at-least-once, at-most-once, exactly-once
+delivery?</a></li>
+<li><a href="#-7-jak-radzić-sobie-z-duplikatami-wiadomości">🔹 7. Jak
+radzić sobie z duplikatami wiadomości?</a></li>
+<li><a href="#-8-czym-jest-ordering-i-dlaczego-jest-trudny">🔹 8. Czym
+jest ordering i dlaczego jest trudny?</a></li>
+</ul></li>
+<li><a href="#4-schema-evolution">4️⃣ Schema Evolution</a>
+<ul>
+<li><a href="#-9-czym-jest-schema-evolution">🔹 9. Czym jest schema
+evolution?</a> <!-- TOC --></li>
+</ul></li>
+</ul></li>
+</ul>
+<hr />
+<h2 id="rest-i-semantyka-http">1️⃣ REST i Semantyka HTTP</h2>
+<h4 id="co-oznacza-idempotency-w-http-i-które-metody-są-idempotentne">🔹
+1. Co oznacza idempotency w HTTP i które metody są idempotentne?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Idempotency oznacza, że wielokrotne wykonanie tego samego requestu
+daje ten sam efekt końcowy.</p>
+<p>Metody idempotentne: - GET - PUT - DELETE (efekt końcowy ten sam:
+zasób usunięty) - HEAD - OPTIONS</p>
+<p>Metody nie-idempotentne: - POST (zwykle tworzy nowy zasób przy każdym
+wywołaniu).</p>
+<p>Idempotency jest kluczowa dla retry.</p>
+<hr />
+<h4 id="jakie-są-najważniejsze-klasy-kodów-http-i-jak-ich-używać">🔹 2.
+Jakie są najważniejsze klasy kodów HTTP i jak ich używać?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>2xx — sukces - 200 OK - 201 Created - 204 No Content</p>
+<p>3xx — przekierowania - 301/302</p>
+<p>4xx — błąd klienta - 400 Bad Request - 401 Unauthorized (brak
+uwierzytelnienia) - 403 Forbidden (brak uprawnień) - 404 Not Found - 409
+Conflict</p>
+<p>5xx — błąd serwera - 500 Internal Server Error - 503 Service
+Unavailable</p>
+<p>Poprawne statusy zwiększają czytelność API i ułatwiają
+integracje.</p>
+<hr />
+<h4 id="czym-jest-caching-w-http">🔹 3. Czym jest caching w HTTP?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Caching pozwala ograniczyć liczbę requestów i poprawić wydajność.</p>
+<p>Mechanizmy: - Cache-Control - ETag + If-None-Match - Last-Modified +
+If-Modified-Since</p>
+<p>ETag pozwala na walidację wersji zasobu (304 Not Modified).</p>
+<hr />
+<h2 id="grpc">2️⃣ gRPC</h2>
+<h4 id="czym-jest-grpc-i-kiedy-jest-lepsze-od-rest">🔹 4. Czym jest gRPC
+i kiedy jest lepsze od REST?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>gRPC: - Protokół RPC oparty o HTTP/2. - Używa Protobuf. - Wspiera
+streaming.</p>
+<p>Lepsze niż REST gdy: - potrzebujemy niskiej latencji, - komunikacja
+serwis-serwis, - silne kontrakty typów, - streaming.</p>
+<p>REST częściej dla komunikacji z frontendem (łatwiejsze debugowanie i
+kompatybilność).</p>
+<hr />
+<h2 id="messaging-kafka-vs-rabbitmq">3️⃣ Messaging: Kafka vs
+RabbitMQ</h2>
+<h4 id="kafka-vs-rabbitmq-kluczowe-różnice">🔹 5. Kafka vs RabbitMQ —
+kluczowe różnice</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Kafka: - Log zdarzeń (append-only). - Konsumenci trzymają offset. -
+Bardzo dobre do streamingu i dużej skali.</p>
+<p>RabbitMQ: - Klasyczna kolejka. - Broker zarządza dostarczaniem. -
+Dobre do task queue i routing.</p>
+<p>Kafka świetna do event-driven i audytu. RabbitMQ świetny do work
+distribution.</p>
+<hr />
+<h4 id="co-oznacza-at-least-once-at-most-once-exactly-once-delivery">🔹
+6. Co oznacza at-least-once, at-most-once, exactly-once delivery?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>At-most-once: - Wiadomość może zginąć. - Nigdy nie będzie
+duplikatu.</p>
+<p>At-least-once: - Wiadomość nie zginie. - Mogą pojawić się
+duplikaty.</p>
+<p>Exactly-once: - Brak utraty i brak duplikatów.</p>
+<p>W praktyce exactly-once jest trudne i zwykle osiąga się je przez: -
+idempotency, - deduplikację, - transakcyjność brokera/producenta.</p>
+<hr />
+<h4 id="jak-radzić-sobie-z-duplikatami-wiadomości">🔹 7. Jak radzić
+sobie z duplikatami wiadomości?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Ponieważ at-least-once jest częste, system powinien tolerować
+duplikaty.</p>
+<p>Techniki: - deduplikacja po messageId / idempotency key, - “upsert”
+zamiast “insert”, - przechowywanie historii przetworzonych eventów.</p>
+<hr />
+<h4 id="czym-jest-ordering-i-dlaczego-jest-trudny">🔹 8. Czym jest
+ordering i dlaczego jest trudny?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Ordering oznacza zachowanie kolejności zdarzeń.</p>
+<p>Wyzwania: - partycje w Kafka — ordering jest gwarantowany tylko w
+obrębie partycji. - równoległe konsumpcje.</p>
+<p>Rozwiązanie: - klucz partycji oparty o agregat (np. aggregateId).</p>
+<hr />
+<h2 id="schema-evolution">4️⃣ Schema Evolution</h2>
+<h4 id="czym-jest-schema-evolution">🔹 9. Czym jest schema
+evolution?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Schema evolution to zmiana formatu danych bez psucia
+kompatybilności.</p>
+<p>Dobre praktyki: - dodawanie pól jako opcjonalne, - unikanie zmiany
+znaczenia pól, - wersjonowanie kontraktów.</p>
+<p>Protobuf/Avro wspierają kompatybilne zmiany lepiej niż “goły”
+JSON.</p>
+<p><a href="questions.md">💡 Questions</a></p>
+<h1 id="devops-runtime-produkcja">🧰 DEVOPS / RUNTIME / PRODUKCJA</h1>
+<!-- TOC -->
+<ul>
+<li><a href="#-devops--runtime--produkcja">🧰 DEVOPS / RUNTIME /
+PRODUKCJA</a>
+<ul>
+<li><a href="#1-kontenery-i-artefakty">1️⃣ Kontenery i Artefakty</a>
+<ul>
+<li><a href="#-1-czym-jest-kontener-docker-i-czym-różni-się-od-vm">🔹 1.
+Czym jest kontener (Docker) i czym różni się od VM?</a></li>
+<li><a
+href="#-2-co-powinno-znaleźć-się-w-dobrym-dockerfile-dla-aplikacji-java">🔹
+2. Co powinno znaleźć się w dobrym Dockerfile dla aplikacji
+Java?</a></li>
+</ul></li>
+<li><a href="#2-cicd">2️⃣ CI/CD</a>
+<ul>
+<li><a href="#-3-czym-jest-cicd-i-jakie-są-typowe-etapy-pipeline">🔹 3.
+Czym jest CI/CD i jakie są typowe etapy pipeline?</a></li>
+</ul></li>
+<li><a href="#3-monitoring-i-observability">3️⃣ Monitoring i
+Observability</a>
+<ul>
+<li><a href="#-4-czym-różni-się-monitoring-od-observability">🔹 4. Czym
+różni się monitoring od observability?</a></li>
+<li><a href="#-5-co-to-jest-structured-logging-i-dlaczego-jest-ważny">🔹
+5. Co to jest structured logging i dlaczego jest ważny?</a></li>
+<li><a href="#-6-czym-jest-distributed-tracing">🔹 6. Czym jest
+distributed tracing?</a></li>
+</ul></li>
+<li><a href="#4-health-checks-i-deploy">4️⃣ Health Checks i Deploy</a>
+<ul>
+<li><a href="#-7-czym-różni-się-liveness-od-readiness">🔹 7. Czym różni
+się liveness od readiness?</a></li>
+<li><a href="#-8-bluegreen-vs-canary--czym-się-różnią">🔹 8. Blue/Green
+vs Canary — czym się różnią?</a></li>
+</ul></li>
+<li><a href="#5-skalowanie">5️⃣ Skalowanie</a>
+<ul>
+<li><a
+href="#-9-horizontal-vs-vertical-scaling--różnice-i-konsekwencje">🔹 9.
+Horizontal vs Vertical scaling — różnice i konsekwencje</a>
+<!-- TOC --></li>
+</ul></li>
+</ul></li>
+</ul>
+<hr />
+<h2 id="kontenery-i-artefakty">1️⃣ Kontenery i Artefakty</h2>
+<h4 id="czym-jest-kontener-docker-i-czym-różni-się-od-vm">🔹 1. Czym
+jest kontener (Docker) i czym różni się od VM?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Kontener: - Izoluje procesy na poziomie systemu operacyjnego
+(namespaces, cgroups). - Współdzieli kernel z hostem. - Jest lekki i
+szybko startuje.</p>
+<p>VM: - Wirtualizuje sprzęt. - Każda VM ma własny system operacyjny. -
+Jest cięższa i wolniej startuje.</p>
+<p>Kontenery są lepsze do skalowania aplikacji, VM częściej do silnej
+izolacji.</p>
+<hr />
+<h4
+id="co-powinno-znaleźć-się-w-dobrym-dockerfile-dla-aplikacji-java">🔹 2.
+Co powinno znaleźć się w dobrym Dockerfile dla aplikacji Java?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Dobre praktyki: - Multi-stage build (osobno build i runtime). -
+Użycie lekkiego obrazu runtime (np. JRE zamiast JDK). - Uruchamianie
+jako non-root. - Stabilne warstwy (kopiuj najpierw pliki zależności,
+potem kod). - Parametry JVM dostosowane do kontenera (pamięć, GC).</p>
+<p>Cel: mały obraz, szybki build, bezpieczeństwo.</p>
+<hr />
+<h2 id="cicd">2️⃣ CI/CD</h2>
+<h4 id="czym-jest-cicd-i-jakie-są-typowe-etapy-pipeline">🔹 3. Czym jest
+CI/CD i jakie są typowe etapy pipeline?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>CI (Continuous Integration): - Częste integrowanie zmian. -
+Automatyczne budowanie i testy.</p>
+<p>CD (Continuous Delivery/Deployment): - Automatyczne dostarczanie na
+środowiska. - Deployment — automatyczne wdrożenie na produkcję.</p>
+<p>Typowe etapy: - build - unit tests - static analysis (np. Sonar) -
+integration tests (np. Testcontainers) - package (jar/docker) -
+deploy</p>
+<hr />
+<h2 id="monitoring-i-observability">3️⃣ Monitoring i Observability</h2>
+<h4 id="czym-różni-się-monitoring-od-observability">🔹 4. Czym różni się
+monitoring od observability?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Monitoring: - Sprawdza znane metryki i alertuje na znane
+problemy.</p>
+<p>Observability: - Umożliwia diagnozę nieznanych problemów na podstawie
+sygnałów.</p>
+<p>Trzy filary observability: - Logs - Metrics - Traces</p>
+<hr />
+<h4 id="co-to-jest-structured-logging-i-dlaczego-jest-ważny">🔹 5. Co to
+jest structured logging i dlaczego jest ważny?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Structured logging to logowanie w formacie maszynowo czytelnym (np.
+JSON), z polami: - timestamp - level - message - traceId - spanId -
+userId / requestId</p>
+<p>Ułatwia: - filtrowanie, - agregację, - korelację logów w systemach
+rozproszonych.</p>
+<hr />
+<h4 id="czym-jest-distributed-tracing">🔹 6. Czym jest distributed
+tracing?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Distributed tracing śledzi przebieg jednego requestu przez wiele
+usług.</p>
+<p>Pojęcia: - Trace — całe żądanie end-to-end. - Span — pojedynczy krok
+(np. HTTP call, DB query).</p>
+<p>Wymaga propagacji: - traceId - spanId</p>
+<p>Pozwala diagnozować: - wąskie gardła, - opóźnienia, - błędy w
+komunikacji.</p>
+<hr />
+<h2 id="health-checks-i-deploy">4️⃣ Health Checks i Deploy</h2>
+<h4 id="czym-różni-się-liveness-od-readiness">🔹 7. Czym różni się
+liveness od readiness?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Liveness: - Czy aplikacja żyje (nie zawiesiła się)? - Jeśli nie —
+restart.</p>
+<p>Readiness: - Czy aplikacja jest gotowa przyjmować ruch? - Jeśli nie —
+wyłączenie z load balancera (bez restartu).</p>
+<p>W Kubernetes są to osobne probe.</p>
+<hr />
+<h4 id="bluegreen-vs-canary-czym-się-różnią">🔹 8. Blue/Green vs Canary
+— czym się różnią?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Blue/Green: - Dwa środowiska: stare (blue) i nowe (green). -
+Przełączenie ruchu na green. - Szybki rollback przez powrót na blue.</p>
+<p>Canary: - Nowa wersja dostaje mały procent ruchu. - Stopniowe
+zwiększanie. - Pozwala wykryć problemy zanim dotkną wszystkich.</p>
+<hr />
+<h2 id="skalowanie">5️⃣ Skalowanie</h2>
+<h4 id="horizontal-vs-vertical-scaling-różnice-i-konsekwencje">🔹 9.
+Horizontal vs Vertical scaling — różnice i konsekwencje</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Vertical scaling: - Większa maszyna (CPU/RAM). - Proste, ale ma limit
+sprzętowy.</p>
+<p>Horizontal scaling: - Więcej instancji. - Wymaga stateless aplikacji
+lub zewnętrznego stanu. - Lepsza dostępność i skalowalność.</p>
+<p>W praktyce preferuje się horizontal scaling.</p>
+<p><a href="questions.md">💡 Questions</a></p>
+<h1 id="bezpieczeństwo">🛡 BEZPIECZEŃSTWO</h1>
+<!-- TOC -->
+<ul>
+<li><a href="#-bezpieczeństwo">🛡 BEZPIECZEŃSTWO</a>
+<ul>
+<li><a href="#1-podstawy-kryptografii">1️⃣ Podstawy Kryptografii</a>
+<ul>
+<li><a href="#-1-czym-różni-się-szyfrowanie-od-haszowania">🔹 1. Czym
+różni się szyfrowanie od haszowania?</a></li>
+<li><a href="#-2-czym-jest-salt-i-dlaczego-jest-ważny">🔹 2. Czym jest
+salt i dlaczego jest ważny?</a></li>
+</ul></li>
+<li><a href="#2-tls-i-transport">2️⃣ TLS i Transport</a>
+<ul>
+<li><a href="#-3-jak-działa-tls-w-skrócie">🔹 3. Jak działa TLS w
+skrócie?</a></li>
+</ul></li>
+<li><a href="#3-owasp-i-najczęstsze-ataki">3️⃣ OWASP i Najczęstsze
+Ataki</a>
+<ul>
+<li><a href="#-4-czym-jest-sql-injection">🔹 4. Czym jest SQL
+Injection?</a></li>
+<li><a href="#-5-czym-jest-xss">🔹 5. Czym jest XSS?</a></li>
+<li><a href="#-6-czym-jest-csrf">🔹 6. Czym jest CSRF?</a></li>
+</ul></li>
+<li><a href="#4-autoryzacja-i-dostęp">4️⃣ Autoryzacja i Dostęp</a>
+<ul>
+<li><a href="#-7-czym-jest-rbac-vs-abac">🔹 7. Czym jest RBAC vs
+ABAC?</a></li>
+<li><a href="#-8-jak-zabezpieczać-sekrety-w-systemie">🔹 8. Jak
+zabezpieczać sekrety w systemie?</a> <!-- TOC --></li>
+</ul></li>
+</ul></li>
+</ul>
+<hr />
+<h2 id="podstawy-kryptografii">1️⃣ Podstawy Kryptografii</h2>
+<h4 id="czym-różni-się-szyfrowanie-od-haszowania">🔹 1. Czym różni się
+szyfrowanie od haszowania?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Szyfrowanie: - Proces odwracalny. - Używa klucza do zaszyfrowania i
+odszyfrowania danych. - Stosowane do ochrony poufności (np. TLS).</p>
+<p>Haszowanie: - Proces nieodwracalny. - Generuje skrót o stałej
+długości. - Stosowane do przechowywania haseł.</p>
+<p>Hasło nie powinno być szyfrowane — powinno być haszowane.</p>
+<hr />
+<h4 id="czym-jest-salt-i-dlaczego-jest-ważny">🔹 2. Czym jest salt i
+dlaczego jest ważny?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Salt to losowa wartość dodawana do hasła przed haszowaniem.</p>
+<p>Zapobiega: - atakom rainbow table, - identycznym hashom dla tych
+samych haseł.</p>
+<p>Każde hasło powinno mieć unikalny salt.</p>
+<hr />
+<h2 id="tls-i-transport">2️⃣ TLS i Transport</h2>
+<h4 id="jak-działa-tls-w-skrócie">🔹 3. Jak działa TLS w skrócie?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>TLS zapewnia poufność i integralność komunikacji.</p>
+<p>Proces: 1. Handshake. 2. Wymiana kluczy (asymetryczna kryptografia).
+3. Ustalenie klucza symetrycznego. 4. Szyfrowana komunikacja.</p>
+<p>Chroni przed: - podsłuchem, - modyfikacją danych.</p>
+<hr />
+<h2 id="owasp-i-najczęstsze-ataki">3️⃣ OWASP i Najczęstsze Ataki</h2>
+<h4 id="czym-jest-sql-injection">🔹 4. Czym jest SQL Injection?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>SQL Injection to wstrzyknięcie złośliwego kodu SQL do zapytania.</p>
+<p>Przyczyna: - Konkatenacja stringów zamiast parametrów.</p>
+<p>Zapobieganie: - PreparedStatement, - ORM, - walidacja danych.</p>
+<hr />
+<h4 id="czym-jest-xss">🔹 5. Czym jest XSS?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>XSS (Cross-Site Scripting): - Wstrzyknięcie złośliwego skryptu do
+strony.</p>
+<p>Rodzaje: - Stored - Reflected - DOM-based</p>
+<p>Zapobieganie: - Escaping danych, - CSP (Content Security Policy).</p>
+<hr />
+<h4 id="czym-jest-csrf">🔹 6. Czym jest CSRF?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>CSRF (Cross-Site Request Forgery): - Wysłanie żądania w imieniu
+zalogowanego użytkownika bez jego wiedzy.</p>
+<p>Ochrona: - CSRF token, - SameSite cookies.</p>
+<hr />
+<h2 id="autoryzacja-i-dostęp">4️⃣ Autoryzacja i Dostęp</h2>
+<h4 id="czym-jest-rbac-vs-abac">🔹 7. Czym jest RBAC vs ABAC?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>RBAC (Role-Based Access Control): - Uprawnienia przypisane do
+ról.</p>
+<p>ABAC (Attribute-Based Access Control): - Decyzja na podstawie
+atrybutów (rola, czas, lokalizacja).</p>
+<p>ABAC daje większą elastyczność kosztem złożoności.</p>
+<hr />
+<h4 id="jak-zabezpieczać-sekrety-w-systemie">🔹 8. Jak zabezpieczać
+sekrety w systemie?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Nie powinny być: - w kodzie, - w repozytorium, - w obrazach
+Docker.</p>
+<p>Powinny być: - w Secret Manager (Vault, AWS Secrets Manager), - w
+zmiennych środowiskowych, - rotowane cyklicznie.</p>
+<p>Zasada: najmniejsze możliwe uprawnienia (least privilege).</p>
+<p><a href="questions.md">💡 Questions</a></p>
+<h1 id="testowanie">🧪 TESTOWANIE</h1>
+<!-- TOC -->
+<ul>
+<li><a href="#-testowanie">🧪 TESTOWANIE</a>
+<ul>
+<li><a href="#1-fundamenty-testowania">1️⃣ Fundamenty Testowania</a>
+<ul>
+<li><a href="#-1-czym-różni-się-test-jednostkowy-od-integracyjnego">🔹
+1. Czym różni się test jednostkowy od integracyjnego?</a></li>
+<li><a href="#-2-czym-jest-test-end-to-end-e2e">🔹 2. Czym jest test
+end-to-end (E2E)?</a></li>
+</ul></li>
+<li><a href="#2-mockowanie-i-izolacja">2️⃣ Mockowanie i Izolacja</a>
+<ul>
+<li><a href="#-3-czym-jest-mock-stub-i-spy">🔹 3. Czym jest mock, stub i
+spy?</a></li>
+<li><a href="#-4-kiedy-mockowanie-jest-złym-pomysłem">🔹 4. Kiedy
+mockowanie jest złym pomysłem?</a></li>
+</ul></li>
+<li><a href="#3-testy-integracyjne-i-środowisko">3️⃣ Testy Integracyjne i
+Środowisko</a>
+<ul>
+<li><a href="#-5-czym-jest-testcontainers-i-dlaczego-jest-użyteczny">🔹
+5. Czym jest Testcontainers i dlaczego jest użyteczny?</a></li>
+<li><a href="#-6-czym-jest-contract-testing">🔹 6. Czym jest Contract
+Testing?</a></li>
+</ul></li>
+<li><a href="#4-zaawansowane-techniki">4️⃣ Zaawansowane Techniki</a>
+<ul>
+<li><a href="#-7-czym-jest-tdd">🔹 7. Czym jest TDD?</a></li>
+<li><a href="#-8-czym-jest-property-based-testing">🔹 8. Czym jest
+property-based testing?</a></li>
+<li><a href="#-9-czym-jest-mutation-testing">🔹 9. Czym jest mutation
+testing?</a> <!-- TOC --></li>
+</ul></li>
+</ul></li>
+</ul>
+<hr />
+<h2 id="fundamenty-testowania">1️⃣ Fundamenty Testowania</h2>
+<h4 id="czym-różni-się-test-jednostkowy-od-integracyjnego">🔹 1. Czym
+różni się test jednostkowy od integracyjnego?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Test jednostkowy (unit test): - Testuje pojedynczą klasę lub metodę.
+- Izoluje zależności (mocki, stuby). - Szybki i deterministyczny.</p>
+<p>Test integracyjny: - Testuje współpracę komponentów. - Może używać
+prawdziwej bazy, brokera, kontekstu Spring. - Wolniejszy, ale bliższy
+rzeczywistości.</p>
+<hr />
+<h4 id="czym-jest-test-end-to-end-e2e">🔹 2. Czym jest test end-to-end
+(E2E)?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Test E2E testuje cały system jako całość.</p>
+<ul>
+<li>Obejmuje warstwę HTTP, bazę danych, integracje.</li>
+<li>Symuluje zachowanie użytkownika.</li>
+<li>Najbardziej realistyczny, ale najwolniejszy i najbardziej
+kruchy.</li>
+</ul>
+<hr />
+<h2 id="mockowanie-i-izolacja">2️⃣ Mockowanie i Izolacja</h2>
+<h4 id="czym-jest-mock-stub-i-spy">🔹 3. Czym jest mock, stub i
+spy?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Mock: - Obiekt symulujący zachowanie zależności. - Pozwala
+weryfikować interakcje.</p>
+<p>Stub: - Zwraca z góry ustalone dane. - Nie weryfikuje interakcji.</p>
+<p>Spy: - Częściowo prawdziwy obiekt. - Pozwala nadpisać wybrane
+metody.</p>
+<hr />
+<h4 id="kiedy-mockowanie-jest-złym-pomysłem">🔹 4. Kiedy mockowanie jest
+złym pomysłem?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<ul>
+<li>Gdy test staje się testem implementacji zamiast zachowania.</li>
+<li>Gdy mockujemy zbyt wiele zależności.</li>
+<li>Gdy test jest kruchy przy refaktorze.</li>
+</ul>
+<p>Preferować testowanie zachowania, nie implementacji.</p>
+<hr />
+<h2 id="testy-integracyjne-i-środowisko">3️⃣ Testy Integracyjne i
+Środowisko</h2>
+<h4 id="czym-jest-testcontainers-i-dlaczego-jest-użyteczny">🔹 5. Czym
+jest Testcontainers i dlaczego jest użyteczny?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Testcontainers pozwala uruchomić prawdziwe zależności (DB, Kafka) w
+Dockerze podczas testów.</p>
+<p>Zalety: - Realne środowisko. - Brak zależności od lokalnej
+konfiguracji. - Reproducibility.</p>
+<hr />
+<h4 id="czym-jest-contract-testing">🔹 6. Czym jest Contract
+Testing?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Contract Testing weryfikuje zgodność między serwisami.</p>
+<ul>
+<li>Consumer definiuje kontrakt.</li>
+<li>Provider musi go spełniać.</li>
+</ul>
+<p>Zapobiega breaking changes w mikroserwisach.</p>
+<hr />
+<h2 id="zaawansowane-techniki">4️⃣ Zaawansowane Techniki</h2>
+<h4 id="czym-jest-tdd">🔹 7. Czym jest TDD?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>TDD (Test-Driven Development):</p>
+<ol type="1">
+<li>Napisz test.</li>
+<li>Napisz minimalny kod, by test przeszedł.</li>
+<li>Refaktor.</li>
+</ol>
+<p>Cel: - Lepszy design. - Większa pewność zmian.</p>
+<hr />
+<h4 id="czym-jest-property-based-testing">🔹 8. Czym jest property-based
+testing?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Property-based testing polega na testowaniu ogólnych właściwości
+funkcji zamiast konkretnych przypadków.</p>
+<p>Przykład: - Funkcja sortująca powinna zwracać listę uporządkowaną
+rosnąco.</p>
+<p>Generowane są losowe dane wejściowe.</p>
+<hr />
+<h4 id="czym-jest-mutation-testing">🔹 9. Czym jest mutation
+testing?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Mutation testing sprawdza jakość testów poprzez wprowadzanie małych
+zmian w kodzie (mutacje).</p>
+<p>Jeśli testy nie wykryją zmiany — są niewystarczające.</p>
+<p>Pozwala ocenić skuteczność testów, nie tylko ich pokrycie.</p>
+<p><a href="questions.md">💡 Questions</a></p>
+<h1 id="wydajność-i-diagnostyka">📈 WYDAJNOŚĆ I DIAGNOSTYKA</h1>
+<!-- TOC -->
+<ul>
+<li><a href="#-wydajność-i-diagnostyka">📈 WYDAJNOŚĆ I DIAGNOSTYKA</a>
+<ul>
+<li><a href="#1-zrozumienie-wydajności">1️⃣ Zrozumienie Wydajności</a>
+<ul>
+<li><a href="#-1-czym-różni-się-latency-od-throughput">🔹 1. Czym różni
+się latency od throughput?</a></li>
+<li><a href="#-2-czym-jest-bottleneck-i-jak-go-znaleźć">🔹 2. Czym jest
+bottleneck i jak go znaleźć?</a></li>
+</ul></li>
+<li><a href="#2-jvm-profilowanie">2️⃣ JVM Profilowanie</a>
+<ul>
+<li><a href="#-3-czym-jest-heap-dump-i-kiedy-go-używać">🔹 3. Czym jest
+heap dump i kiedy go używać?</a></li>
+<li><a href="#-4-czym-jest-thread-dump">🔹 4. Czym jest thread
+dump?</a></li>
+<li><a
+href="#-5-jak-działa-garbage-collection-i-kiedy-może-być-problemem">🔹
+5. Jak działa Garbage Collection i kiedy może być problemem?</a></li>
+</ul></li>
+<li><a href="#3-analiza-algorytmiczna">3️⃣ Analiza Algorytmiczna</a>
+<ul>
+<li><a href="#-6-dlaczego-big-o-jest-ważne-w-systemach-backendowych">🔹
+6. Dlaczego Big-O jest ważne w systemach backendowych?</a></li>
+</ul></li>
+<li><a href="#4-load-testing">4️⃣ Load Testing</a>
+<ul>
+<li><a
+href="#-7-czym-jest-load-testing-i-czym-różni-się-od-stress-testing">🔹
+7. Czym jest load testing i czym różni się od stress testing?</a>
+<!-- TOC --></li>
+</ul></li>
+</ul></li>
+</ul>
+<hr />
+<h2 id="zrozumienie-wydajności">1️⃣ Zrozumienie Wydajności</h2>
+<h4 id="czym-różni-się-latency-od-throughput">🔹 1. Czym różni się
+latency od throughput?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Latency: - Czas obsługi pojedynczego żądania. - Mierzona np. w
+milisekundach.</p>
+<p>Throughput: - Liczba obsłużonych żądań w jednostce czasu. - Mierzona
+np. w requests/second.</p>
+<p>System może mieć: - niską latency i niski throughput, - wysoką
+latency i wysoki throughput.</p>
+<p>Optymalizacja zależy od wymagań biznesowych.</p>
+<hr />
+<h4 id="czym-jest-bottleneck-i-jak-go-znaleźć">🔹 2. Czym jest
+bottleneck i jak go znaleźć?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Bottleneck to element systemu ograniczający wydajność całości.</p>
+<p>Może to być: - CPU, - baza danych, - I/O, - lock contention, -
+sieć.</p>
+<p>Identyfikacja: - Profilowanie CPU, - analiza metryk, - distributed
+tracing, - analiza GC.</p>
+<p>Optymalizuje się wąskie gardło, nie wszystko naraz.</p>
+<hr />
+<h2 id="jvm-profilowanie">2️⃣ JVM Profilowanie</h2>
+<h4 id="czym-jest-heap-dump-i-kiedy-go-używać">🔹 3. Czym jest heap dump
+i kiedy go używać?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Heap dump to zrzut pamięci heap w danym momencie.</p>
+<p>Używany do: - analizy wycieków pamięci, - identyfikacji dużych
+obiektów, - analizy referencji.</p>
+<p>Narzędzia: - VisualVM - Eclipse MAT</p>
+<hr />
+<h4 id="czym-jest-thread-dump">🔹 4. Czym jest thread dump?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Thread dump pokazuje stan wszystkich wątków.</p>
+<p>Używany do: - analizy deadlock, - blokad, - wysokiego zużycia
+CPU.</p>
+<p>Zawiera stack trace każdego wątku.</p>
+<hr />
+<h4 id="jak-działa-garbage-collection-i-kiedy-może-być-problemem">🔹 5.
+Jak działa Garbage Collection i kiedy może być problemem?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>GC usuwa nieosiągalne obiekty.</p>
+<p>Problem gdy: - długie pauzy (Stop-The-World), - zbyt częste kolekcje,
+- wysokie allocation rate.</p>
+<p>Rozwiązania: - zmiana GC (G1, ZGC), - tuning heap size, -
+zmniejszenie tworzenia obiektów.</p>
+<hr />
+<h2 id="analiza-algorytmiczna">3️⃣ Analiza Algorytmiczna</h2>
+<h4 id="dlaczego-big-o-jest-ważne-w-systemach-backendowych">🔹 6.
+Dlaczego Big-O jest ważne w systemach backendowych?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Big-O opisuje złożoność algorytmu względem rozmiaru danych.</p>
+<p>Przykład: - O(1) — stały czas, - O(log n) — logarytmiczny, - O(n) —
+liniowy, - O(n²) — kwadratowy.</p>
+<p>Przy dużej skali różnice stają się krytyczne.</p>
+<hr />
+<h2 id="load-testing">4️⃣ Load Testing</h2>
+<h4 id="czym-jest-load-testing-i-czym-różni-się-od-stress-testing">🔹 7.
+Czym jest load testing i czym różni się od stress testing?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Load testing: - Test przy oczekiwanym obciążeniu. - Sprawdza czy
+system spełnia SLA.</p>
+<p>Stress testing: - Test powyżej zakładanego obciążenia. - Sprawdza jak
+system zachowuje się przy przeciążeniu.</p>
+<p>Celem jest poznanie granic systemu i jego zachowania w awarii.</p>
+<p><a href="questions.md">💡 Questions</a></p>
+<h1 id="system-design-thinking">🧠 SYSTEM DESIGN / THINKING</h1>
+<!-- TOC -->
+<ul>
+<li><a href="#-system-design--thinking">🧠 SYSTEM DESIGN / THINKING</a>
+<ul>
+<li><a href="#1-myślenie-architektoniczne">1️⃣ Myślenie
+Architektoniczne</a>
+<ul>
+<li><a href="#-1-czym-są-trade-offs-w-architekturze">🔹 1. Czym są
+trade-offs w architekturze?</a></li>
+<li><a href="#-2-jak-rozumieć-cap-w-praktyce-projektowej">🔹 2. Jak
+rozumieć CAP w praktyce projektowej?</a></li>
+</ul></li>
+<li><a href="#2-projektowanie-pod-skalę">2️⃣ Projektowanie pod Skalę</a>
+<ul>
+<li><a href="#-3-czym-jest-skalowalność-funkcjonalna-vs-techniczna">🔹
+3. Czym jest skalowalność funkcjonalna vs techniczna?</a></li>
+<li><a href="#-4-czym-jest-latency-budget">🔹 4. Czym jest latency
+budget?</a></li>
+</ul></li>
+<li><a href="#3-projektowanie-na-awarię">3️⃣ Projektowanie na Awarię</a>
+<ul>
+<li><a href="#-5-co-oznacza-design-for-failure">🔹 5. Co oznacza “design
+for failure”?</a></li>
+<li><a href="#-6-czym-jest-graceful-degradation">🔹 6. Czym jest
+graceful degradation?</a></li>
+</ul></li>
+<li><a href="#4-backpressure-i-przepływ-danych">4️⃣ Backpressure i
+Przepływ Danych</a>
+<ul>
+<li><a href="#-7-czym-jest-backpressure-na-poziomie-systemowym">🔹 7.
+Czym jest backpressure na poziomie systemowym?</a></li>
+</ul></li>
+<li><a href="#5-failure-modes-i-analiza-ryzyka">5️⃣ Failure Modes i
+Analiza Ryzyka</a>
+<ul>
+<li><a href="#-8-jak-analizować-failure-modes-systemu">🔹 8. Jak
+analizować failure modes systemu?</a></li>
+</ul></li>
+<li><a href="#6-myślenie-długoterminowe">6️⃣ Myślenie Długoterminowe</a>
+<ul>
+<li><a
+href="#-9-jak-podejmować-decyzje-technologiczne-długoterminowo">🔹 9.
+Jak podejmować decyzje technologiczne długoterminowo?</a>
+<!-- TOC --></li>
+</ul></li>
+</ul></li>
+</ul>
+<hr />
+<h2 id="myślenie-architektoniczne">1️⃣ Myślenie Architektoniczne</h2>
+<h4 id="czym-są-trade-offs-w-architekturze">🔹 1. Czym są trade-offs w
+architekturze?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Każda decyzja architektoniczna to kompromis między: - wydajnością, -
+skalowalnością, - złożonością, - kosztem utrzymania, - czasem
+dostarczenia.</p>
+<p>Nie istnieje rozwiązanie idealne — istnieje rozwiązanie najlepsze w
+danym kontekście.</p>
+<p>Architekt powinien jasno rozumieć konsekwencje wyborów.</p>
+<hr />
+<h4 id="jak-rozumieć-cap-w-praktyce-projektowej">🔹 2. Jak rozumieć CAP
+w praktyce projektowej?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>W systemach rozproszonych Partition Tolerance jest obowiązkowe.</p>
+<p>Pozostaje wybór między: - Consistency (CP) - Availability (AP)</p>
+<p>System finansowy → preferuje CP. System social media → często AP.</p>
+<p>Projekt musi uwzględniać konsekwencje chwilowej niespójności.</p>
+<hr />
+<h2 id="projektowanie-pod-skalę">2️⃣ Projektowanie pod Skalę</h2>
+<h4 id="czym-jest-skalowalność-funkcjonalna-vs-techniczna">🔹 3. Czym
+jest skalowalność funkcjonalna vs techniczna?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Skalowalność techniczna: - Więcej instancji, więcej zasobów.</p>
+<p>Skalowalność funkcjonalna: - Możliwość rozwijania systemu bez
+eksplozji złożoności. - Modularność, bounded contexts.</p>
+<p>Obie są kluczowe dla systemów długowiecznych.</p>
+<hr />
+<h4 id="czym-jest-latency-budget">🔹 4. Czym jest latency budget?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Latency budget to maksymalny czas odpowiedzi systemu rozłożony na
+komponenty.</p>
+<p>Przykład: - API ma 300ms SLA. - DB może użyć 100ms. - Zewnętrzny
+serwis 80ms. - Reszta to logika.</p>
+<p>Pomaga kontrolować zależności i unikać kaskadowych opóźnień.</p>
+<hr />
+<h2 id="projektowanie-na-awarię">3️⃣ Projektowanie na Awarię</h2>
+<h4 id="co-oznacza-design-for-failure">🔹 5. Co oznacza “design for
+failure”?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>W systemach rozproszonych zakładamy, że: - sieć zawiedzie, - serwis
+zawiedzie, - baza zawiedzie.</p>
+<p>System powinien: - degradować się łagodnie (graceful degradation), -
+mieć timeouty, - mieć retry z ograniczeniami, - stosować circuit
+breaker.</p>
+<hr />
+<h4 id="czym-jest-graceful-degradation">🔹 6. Czym jest graceful
+degradation?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Graceful degradation oznacza, że przy awarii części systemu: - system
+nadal działa, - ale z ograniczoną funkcjonalnością.</p>
+<p>Przykład: - brak rekomendacji, ale działa koszyk zakupowy.</p>
+<hr />
+<h2 id="backpressure-i-przepływ-danych">4️⃣ Backpressure i Przepływ
+Danych</h2>
+<h4 id="czym-jest-backpressure-na-poziomie-systemowym">🔹 7. Czym jest
+backpressure na poziomie systemowym?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Backpressure to kontrola przepływu danych między komponentami.</p>
+<p>Bez backpressure: - kolejki rosną, - pamięć się wyczerpuje, - system
+się zapada.</p>
+<p>Mechanizmy: - bounded queues, - rate limiting, - reactive streams
+(request(n)).</p>
+<hr />
+<h2 id="failure-modes-i-analiza-ryzyka">5️⃣ Failure Modes i Analiza
+Ryzyka</h2>
+<h4 id="jak-analizować-failure-modes-systemu">🔹 8. Jak analizować
+failure modes systemu?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Należy zidentyfikować: - pojedyncze punkty awarii (SPOF), -
+zależności zewnętrzne, - operacje długotrwałe, - miejsca blokad.</p>
+<p>Stosowane techniki: - Chaos engineering, - testy awarii, - analiza
+scenariuszy (“what if”).</p>
+<p>Celem jest zwiększenie odporności systemu.</p>
+<hr />
+<h2 id="myślenie-długoterminowe">6️⃣ Myślenie Długoterminowe</h2>
+<h4 id="jak-podejmować-decyzje-technologiczne-długoterminowo">🔹 9. Jak
+podejmować decyzje technologiczne długoterminowo?</h4>
+<p>✅ <span
+style="color:##a9b8c6;font-weight:bold;font-size:small">Odpowiedź</span></p>
+<p>Należy brać pod uwagę: - dojrzałość technologii, - wsparcie
+społeczności, - koszt utrzymania, - łatwość rekrutacji, - vendor
+lock-in.</p>
+<p>Najlepsza technologia to taka, którą zespół potrafi utrzymać przez
+lata.</p>
+</body>
+</html>
