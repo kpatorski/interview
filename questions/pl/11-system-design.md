@@ -27,7 +27,7 @@
 
 #### 🔹 1. Czym są trade-offs w architekturze?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Każda decyzja architektoniczna to kompromis między:
 - wydajnością,
@@ -44,7 +44,7 @@ Architekt powinien jasno rozumieć konsekwencje wyborów.
 
 #### 🔹 2. Jak rozumieć CAP w praktyce projektowej?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 W systemach rozproszonych Partition Tolerance jest obowiązkowe.
 
@@ -63,7 +63,7 @@ Projekt musi uwzględniać konsekwencje chwilowej niespójności.
 
 #### 🔹 3. Czym jest skalowalność funkcjonalna vs techniczna?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Skalowalność techniczna:
 - Więcej instancji, więcej zasobów.
@@ -78,7 +78,7 @@ Obie są kluczowe dla systemów długowiecznych.
 
 #### 🔹 4. Czym jest latency budget?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Latency budget to maksymalny czas odpowiedzi systemu rozłożony na komponenty.
 
@@ -96,7 +96,7 @@ Pomaga kontrolować zależności i unikać kaskadowych opóźnień.
 
 #### 🔹 5. Co oznacza "design for failure"?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 W systemach rozproszonych zakładamy, że:
 - sieć zawiedzie,
@@ -113,7 +113,7 @@ System powinien:
 
 #### 🔹 6. Czym jest graceful degradation?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Graceful degradation oznacza, że przy awarii części systemu:
 - system nadal działa,
@@ -128,7 +128,7 @@ Przykład:
 
 #### 🔹 7. Czym jest backpressure na poziomie systemowym?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Backpressure to kontrola przepływu danych między komponentami.
 
@@ -148,7 +148,7 @@ Mechanizmy:
 
 #### 🔹 8. Jak analizować failure modes systemu?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Należy zidentyfikować:
 - pojedyncze punkty awarii (SPOF),
@@ -169,7 +169,7 @@ Celem jest zwiększenie odporności systemu.
 
 #### 🔹 9. Jak podejmować decyzje technologiczne długoterminowo?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Należy brać pod uwagę:
 - dojrzałość technologii,

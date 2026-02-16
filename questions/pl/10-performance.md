@@ -23,7 +23,7 @@
 
 #### 🔹 1. Czym różni się latency od throughput?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Latency:
 - Czas obsługi pojedynczego żądania.
@@ -43,7 +43,7 @@ Optymalizacja zależy od wymagań biznesowych.
 
 #### 🔹 2. Czym jest bottleneck i jak go znaleźć?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Bottleneck to element systemu ograniczający wydajność całości.
 
@@ -68,7 +68,7 @@ Optymalizuje się wąskie gardło, nie wszystko naraz.
 
 #### 🔹 3. Czym jest heap dump i kiedy go używać?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Heap dump to zrzut pamięci heap w danym momencie.
 
@@ -85,7 +85,7 @@ Narzędzia:
 
 #### 🔹 4. Czym jest thread dump?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Thread dump pokazuje stan wszystkich wątków.
 
@@ -100,7 +100,7 @@ Zawiera stack trace każdego wątku.
 
 #### 🔹 5. Jak działa Garbage Collection i kiedy może być problemem?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 GC usuwa nieosiągalne obiekty.
 
@@ -120,7 +120,7 @@ Rozwiązania:
 
 #### 🔹 6. Dlaczego Big-O jest ważne w systemach backendowych?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Big-O opisuje złożoność algorytmu względem rozmiaru danych.
 
@@ -138,7 +138,7 @@ Przy dużej skali różnice stają się krytyczne.
 
 #### 🔹 7. Czym jest load testing i czym różni się od stress testing?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Load testing:
 - Test przy oczekiwanym obciążeniu.

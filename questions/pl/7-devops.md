@@ -26,7 +26,7 @@
 
 #### 🔹 1. Czym jest kontener (Docker) i czym różni się od VM?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Kontener:
 - Izoluje procesy na poziomie systemu operacyjnego (namespaces, cgroups).
@@ -44,7 +44,7 @@ Kontenery są lepsze do skalowania aplikacji, VM częściej do silnej izolacji.
 
 #### 🔹 2. Co powinno znaleźć się w dobrym Dockerfile dla aplikacji Java?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Dobre praktyki:
 - Multi-stage build (osobno build i runtime).
@@ -61,7 +61,7 @@ Cel: mały obraz, szybki build, bezpieczeństwo.
 
 #### 🔹 3. Czym jest CI/CD i jakie są typowe etapy pipeline?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 CI (Continuous Integration):
 - Częste integrowanie zmian.
@@ -85,7 +85,7 @@ Typowe etapy:
 
 #### 🔹 4. Czym różni się monitoring od observability?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Monitoring:
 - Sprawdza znane metryki i alertuje na znane problemy.
@@ -102,7 +102,7 @@ Trzy filary observability:
 
 #### 🔹 5. Co to jest structured logging i dlaczego jest ważny?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Structured logging to logowanie w formacie maszynowo czytelnym (np. JSON), z polami:
 - timestamp
@@ -121,7 +121,7 @@ Ułatwia:
 
 #### 🔹 6. Czym jest distributed tracing?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Distributed tracing śledzi przebieg jednego requestu przez wiele usług.
 
@@ -144,7 +144,7 @@ Pozwala diagnozować:
 
 #### 🔹 7. Czym różni się liveness od readiness?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Liveness:
 - Czy aplikacja żyje (nie zawiesiła się)?
@@ -160,7 +160,7 @@ W Kubernetes są to osobne probe.
 
 #### 🔹 8. Blue/Green vs Canary — czym się różnią?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Blue/Green:
 - Dwa środowiska: stare (blue) i nowe (green).
@@ -178,7 +178,7 @@ Canary:
 
 #### 🔹 9. Horizontal vs Vertical scaling — różnice i konsekwencje
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Vertical scaling:
 - Większa maszyna (CPU/RAM).

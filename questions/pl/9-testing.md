@@ -25,7 +25,7 @@
 
 #### 🔹 1. Czym różni się test jednostkowy od integracyjnego?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Test jednostkowy (unit test):
 - Testuje pojedynczą klasę lub metodę.
@@ -41,7 +41,7 @@ Test integracyjny:
 
 #### 🔹 2. Czym jest test end-to-end (E2E)?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Test E2E testuje cały system jako całość.
 
@@ -55,7 +55,7 @@ Test E2E testuje cały system jako całość.
 
 #### 🔹 3. Czym jest mock, stub i spy?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Mock:
 - Obiekt symulujący zachowanie zależności.
@@ -73,7 +73,7 @@ Spy:
 
 #### 🔹 4. Kiedy mockowanie jest złym pomysłem?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 - Gdy test staje się testem implementacji zamiast zachowania.
 - Gdy mockujemy zbyt wiele zależności.
@@ -87,7 +87,7 @@ Preferować testowanie zachowania, nie implementacji.
 
 #### 🔹 5. Czym jest Testcontainers i dlaczego jest użyteczny?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Testcontainers pozwala uruchomić prawdziwe zależności (DB, Kafka) w Dockerze podczas testów.
 
@@ -100,7 +100,7 @@ Zalety:
 
 #### 🔹 6. Czym jest Contract Testing?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Contract Testing weryfikuje zgodność między serwisami.
 
@@ -115,7 +115,7 @@ Zapobiega breaking changes w mikroserwisach.
 
 #### 🔹 7. Czym jest TDD?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 TDD (Test-Driven Development):
 
@@ -131,7 +131,7 @@ Cel:
 
 #### 🔹 8. Czym jest property-based testing?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Property-based testing polega na testowaniu ogólnych właściwości funkcji zamiast konkretnych przypadków.
 
@@ -144,7 +144,7 @@ Generowane są losowe dane wejściowe.
 
 #### 🔹 9. Czym jest mutation testing?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Mutation testing sprawdza jakość testów poprzez wprowadzanie małych zmian w kodzie (mutacje).
 

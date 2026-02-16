@@ -50,7 +50,7 @@
 
 #### 🔹 1. Czym jest IoC (Inversion of Control)?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Inversion of Control oznacza odwrócenie kontroli nad tworzeniem i zarządzaniem zależnościami.
 
@@ -69,7 +69,7 @@ Korzyści:
 
 #### 🔹 2. Czym jest Dependency Injection?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Dependency Injection to mechanizm dostarczania zależności do klasy z zewnątrz.
 
@@ -87,7 +87,7 @@ Constructor injection:
 
 #### 🔹 3. Jak działa kontener Springa krok po kroku?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 1. Odczyt konfiguracji (@Configuration, @ComponentScan).
 2. Rejestracja definicji beanów (BeanDefinition).
@@ -102,7 +102,7 @@ Spring używa refleksji do tworzenia i łączenia obiektów.
 
 #### 🔹 4. Jakie są scope beanów?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 - singleton (domyślny) — jedna instancja na kontekst.
 - prototype — nowa instancja przy każdym pobraniu.
@@ -116,7 +116,7 @@ Singleton w Springu ≠ Singleton w sensie wzorca projektowego (jest per Applica
 
 #### 🔹 5. Czym jest lifecycle beana?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Etapy:
 1. Instancja.
@@ -132,7 +132,7 @@ BeanPostProcessor umożliwia modyfikację beanów (np. tworzenie proxy).
 
 #### 🔹 6. Czym jest @Primary i @Qualifier?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Jeśli istnieje wiele implementacji interfejsu:
 
@@ -148,7 +148,7 @@ Zapobiega NoUniqueBeanDefinitionException.
 
 #### 🔹 7. Jak działa @Transactional pod spodem?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 @Transactional działa poprzez AOP.
 
@@ -165,7 +165,7 @@ Jeśli metoda jest wywołana bezpośrednio (self-invocation) — proxy nie jest 
 
 #### 🔹 8. Kiedy @Transactional NIE działa?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 - Metoda private.
 - Metoda final (przy CGLIB ograniczenia proxy).
@@ -177,7 +177,7 @@ Jeśli metoda jest wywołana bezpośrednio (self-invocation) — proxy nie jest 
 
 #### 🔹 9. Jak działają propagacje transakcji?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Propagation określa zachowanie przy wywołaniu metody wewnątrz istniejącej transakcji.
 
@@ -209,7 +209,7 @@ NESTED:
 
 #### 🔹 10. Jakie są poziomy izolacji?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 READ_UNCOMMITTED:
 - Możliwe dirty reads.
@@ -235,7 +235,7 @@ Phantom read — nowe rekordy pojawiają się w wyniku tego samego zapytania.
 
 #### 🔹 11. Kiedy rollback NIE nastąpi?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Domyślnie rollback następuje tylko dla RuntimeException i Error.
 
@@ -250,7 +250,7 @@ Można wymusić rollback:
 
 #### 🔹 12. Czym jest TransactionManager?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 PlatformTransactionManager zarządza cyklem życia transakcji.
 
@@ -272,7 +272,7 @@ Odpowiada za:
 
 #### 🔹 13. Czym jest AOP (Aspect-Oriented Programming)?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 AOP pozwala wydzielić logikę przekrojową (cross-cutting concerns), taką jak:
 - transakcje,
@@ -286,7 +286,7 @@ Zamiast umieszczać ją w każdej metodzie — definiuje się aspekt.
 
 #### 🔹 14. Jak działa AOP w Springu?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Spring AOP działa w oparciu o proxy.
 
@@ -301,7 +301,7 @@ Spring AOP działa tylko na metodach publicznych beanów zarządzanych przez Spr
 
 #### 🔹 15. Czym różni się JDK Dynamic Proxy od CGLIB?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 JDK Dynamic Proxy:
 - Tworzy proxy na podstawie interfejsu.
@@ -320,7 +320,7 @@ Spring domyślnie używa:
 
 #### 🔹 16. Czym jest weaving?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Weaving to proces wstrzykiwania aspektów do kodu.
 
@@ -335,7 +335,7 @@ Spring używa runtime weaving przez proxy.
 
 #### 🔹 17. Jakie są typy advice?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 - @Before — przed metodą.
 - @After — po metodzie (zawsze).
@@ -349,7 +349,7 @@ Spring używa runtime weaving przez proxy.
 
 #### 🔹 18. Czym jest pointcut?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Pointcut definiuje, które metody mają być objęte aspektem.
 
@@ -370,7 +370,7 @@ Pointcut + Advice = Aspect.
 
 #### 🔹 19. Czym jest auto-configuration w Spring Boot?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Auto-configuration to mechanizm automatycznego konfigurowania beanów na podstawie:
 - obecności klas w classpath,
@@ -388,7 +388,7 @@ Pozwala to uruchomić aplikację bez ręcznej konfiguracji infrastruktury.
 
 #### 🔹 20. Czym są adnotacje @Conditional?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 @Conditional pozwala tworzyć bean tylko jeśli spełniony jest warunek.
 
@@ -404,7 +404,7 @@ Mechanizm ten jest fundamentem auto-config.
 
 #### 🔹 21. Czym jest starter w Spring Boot?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Starter to zestaw zależności (dependency descriptor), który:
 - agreguje biblioteki,
@@ -420,7 +420,7 @@ Ułatwia konfigurację poprzez konwencję zamiast konfiguracji.
 
 #### 🔹 22. Czym różni się ApplicationContext od WebApplicationContext?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 ApplicationContext:
 - Ogólny kontener beanów.
@@ -435,7 +435,7 @@ W aplikacjach web tworzony jest kontekst webowy.
 
 #### 🔹 23. Jak działa binding właściwości (@ConfigurationProperties)?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 @ConfigurationProperties pozwala mapować właściwości z application.yml na obiekt.
 
@@ -453,7 +453,7 @@ Zalety:
 
 #### 🔹 24. Czym są profile w Spring?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Profile pozwalają aktywować różne konfiguracje zależnie od środowiska.
 
@@ -467,7 +467,7 @@ Umożliwiają separację konfiguracji dev/test/prod.
 
 #### 🔹 25. Czym jest Spring Boot Actuator?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Actuator dostarcza endpointy monitorujące aplikację.
 
@@ -491,7 +491,7 @@ Często używany z Prometheus.
 
 #### 🔹 26. Jak działa Spring Security wewnętrznie?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Spring Security działa jako łańcuch filtrów (Security Filter Chain).
 
@@ -506,7 +506,7 @@ SecurityContext przechowywany jest w ThreadLocal (SecurityContextHolder).
 
 #### 🔹 27. Czym różni się Authentication od Authorization?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Authentication (uwierzytelnienie):
 - Kim jesteś?
@@ -522,7 +522,7 @@ Authentication poprzedza Authorization.
 
 #### 🔹 28. Czym jest SecurityContext?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 SecurityContext przechowuje informacje o aktualnie uwierzytelnionym użytkowniku.
 
@@ -537,7 +537,7 @@ Domyślnie przechowywany w ThreadLocal.
 
 #### 🔹 29. Jak działa JWT w Spring Security?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 JWT (JSON Web Token):
 - Token zawiera zakodowane dane użytkownika.
@@ -555,7 +555,7 @@ JWT jest stateless — serwer nie przechowuje sesji.
 
 #### 🔹 30. Czym jest OAuth2?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 OAuth2 to protokół autoryzacji.
 
@@ -577,7 +577,7 @@ Spring Security może działać jako Resource Server lub OAuth2 Client.
 
 #### 🔹 31. Czym jest CSRF i jak Spring go chroni?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 CSRF (Cross-Site Request Forgery):
 - Atak polegający na wysłaniu żądania w imieniu użytkownika bez jego wiedzy.
@@ -592,7 +592,7 @@ W aplikacjach stateless (JWT) często wyłączany.
 
 #### 🔹 32. Czym jest CORS?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 CORS (Cross-Origin Resource Sharing):
 - Mechanizm przeglądarki kontrolujący dostęp między domenami.
@@ -607,7 +607,7 @@ Spring pozwala konfigurować CORS globalnie lub per endpoint.
 
 #### 🔹 33. Jak bezpiecznie przechowywać hasła?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Hasła nie powinny być szyfrowane, lecz haszowane.
 

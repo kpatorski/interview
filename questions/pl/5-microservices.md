@@ -26,7 +26,7 @@
 
 #### 🔹 1. Jak wyznaczać granice mikroserwisów?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Granice mikroserwisów powinny wynikać z domeny biznesowej, nie z podziału technicznego.
 
@@ -42,7 +42,7 @@ Zły znak:
 
 #### 🔹 2. Synchroniczna vs asynchroniczna komunikacja — kiedy co?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Synchroniczna (HTTP/gRPC):
 - Prostota.
@@ -61,7 +61,7 @@ W praktyce często miesza się oba podejścia.
 
 #### 🔹 3. Czym jest API Gateway?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 API Gateway to punkt wejścia do systemu mikroserwisów.
 
@@ -84,7 +84,7 @@ Ryzyko:
 
 #### 🔹 4. Czym jest Circuit Breaker?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Circuit Breaker chroni system przed kaskadową awarią.
 
@@ -99,7 +99,7 @@ Stosowany przy komunikacji synchronicznej.
 
 #### 🔹 5. Czym jest retry i jakie są ryzyka?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Retry to ponawianie żądania po błędzie.
 
@@ -118,7 +118,7 @@ Dobre praktyki:
 
 #### 🔹 6. Czym jest idempotency i jak ją osiągnąć?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Idempotency oznacza, że wielokrotne wykonanie tej samej operacji daje ten sam efekt.
 
@@ -137,7 +137,7 @@ Techniki:
 
 #### 🔹 7. Czym jest Saga?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Saga to wzorzec realizacji transakcji rozproszonej przez sekwencję lokalnych transakcji.
 
@@ -151,7 +151,7 @@ Rodzaje:
 
 #### 🔹 8. Czym jest Outbox Pattern?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Outbox Pattern rozwiązuje problem atomowości między:
 - zapisem do bazy,
@@ -168,7 +168,7 @@ Zapobiega utracie eventów.
 
 #### 🔹 9. Dlaczego współdzielona baza danych między mikroserwisami jest problemem?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Współdzielona baza:
 - zwiększa sprzężenie,
@@ -184,7 +184,7 @@ Zasada: Database per service.
 
 #### 🔹 10. Czym jest observability w mikroserwisach?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Observability to zdolność zrozumienia stanu systemu na podstawie sygnałów.
 

@@ -24,7 +24,7 @@
 
 #### 🔹 1. Czym różni się szyfrowanie od haszowania?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Szyfrowanie:
 - Proces odwracalny.
@@ -42,7 +42,7 @@ Hasło nie powinno być szyfrowane — powinno być haszowane.
 
 #### 🔹 2. Czym jest salt i dlaczego jest ważny?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Salt to losowa wartość dodawana do hasła przed haszowaniem.
 
@@ -58,7 +58,7 @@ Każde hasło powinno mieć unikalny salt.
 
 #### 🔹 3. Jak działa TLS w skrócie?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 TLS zapewnia poufność i integralność komunikacji.
 
@@ -78,7 +78,7 @@ Chroni przed:
 
 #### 🔹 4. Czym jest SQL Injection?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 SQL Injection to wstrzyknięcie złośliwego kodu SQL do zapytania.
 
@@ -94,7 +94,7 @@ Zapobieganie:
 
 #### 🔹 5. Czym jest XSS?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 XSS (Cross-Site Scripting):
 - Wstrzyknięcie złośliwego skryptu do strony.
@@ -112,7 +112,7 @@ Zapobieganie:
 
 #### 🔹 6. Czym jest CSRF?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 CSRF (Cross-Site Request Forgery):
 - Wysłanie żądania w imieniu zalogowanego użytkownika bez jego wiedzy.
@@ -127,7 +127,7 @@ Ochrona:
 
 #### 🔹 7. Czym jest RBAC vs ABAC?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 RBAC (Role-Based Access Control):
 - Uprawnienia przypisane do ról.
@@ -141,7 +141,7 @@ ABAC daje większą elastyczność kosztem złożoności.
 
 #### 🔹 8. Jak zabezpieczać sekrety w systemie?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Nie powinny być:
 - w kodzie,

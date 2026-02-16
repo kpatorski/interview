@@ -27,7 +27,7 @@
 
 #### 🔹 1. Czym jest Separation of Concerns?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Separation of Concerns (SoC) oznacza rozdzielenie systemu na części odpowiedzialne za różne aspekty.
 
@@ -46,7 +46,7 @@ Celem jest:
 
 #### 🔹 2. Czym jest Dependency Inversion Principle?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Dependency Inversion Principle (DIP):
 
@@ -65,7 +65,7 @@ Zmniejsza sprzężenie i ułatwia testowanie.
 
 #### 🔹 3. Czym jest Clean Architecture?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Clean Architecture dzieli system na warstwy koncentryczne:
 
@@ -82,7 +82,7 @@ Zasada:
 
 #### 🔹 4. Czym jest Hexagonal Architecture?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Hexagonal (Ports & Adapters):
 
@@ -98,7 +98,7 @@ Pozwala oddzielić:
 
 #### 🔹 5. Czym jest Onion Architecture?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Onion Architecture:
 - Warstwy koncentryczne.
@@ -113,7 +113,7 @@ Podobna do Clean i Hexagonal — różni się nazewnictwem i akcentem.
 
 #### 🔹 6. Czym jest Bounded Context?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Bounded Context to granica modelu domenowego.
 
@@ -129,7 +129,7 @@ Ułatwia modularność i skalowanie organizacyjne.
 
 #### 🔹 7. Czym jest Aggregate?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Aggregate to klaster encji traktowany jako jedna jednostka spójności.
 
@@ -144,7 +144,7 @@ Transakcje powinny obejmować jeden agregat.
 
 #### 🔹 8. Czym jest CQRS?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 CQRS (Command Query Responsibility Segregation):
 
@@ -161,7 +161,7 @@ Wady:
 
 #### 🔹 9. Czym jest Event Sourcing?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Event Sourcing:
 - Stan systemu przechowywany jako sekwencja zdarzeń.
@@ -181,7 +181,7 @@ Wyzwania:
 
 #### 🔹 10. Czym jest Modular Monolith?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Modular Monolith:
 - Jedna aplikacja.
@@ -198,7 +198,7 @@ Może być etapem przed mikroserwisami.
 
 #### 🔹 11. Jak podejmować decyzje architektoniczne?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Architektura to kompromisy.
 

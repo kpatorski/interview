@@ -25,7 +25,7 @@
 
 #### 🔹 1. Co oznacza idempotency w HTTP i które metody są idempotentne?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Idempotency oznacza, że wielokrotne wykonanie tego samego requestu daje ten sam efekt końcowy.
 
@@ -45,7 +45,7 @@ Idempotency jest kluczowa dla retry.
 
 #### 🔹 2. Jakie są najważniejsze klasy kodów HTTP i jak ich używać?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 2xx — sukces
 - 200 OK
@@ -72,7 +72,7 @@ Poprawne statusy zwiększają czytelność API i ułatwiają integracje.
 
 #### 🔹 3. Czym jest caching w HTTP?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Caching pozwala ograniczyć liczbę requestów i poprawić wydajność.
 
@@ -89,7 +89,7 @@ ETag pozwala na walidację wersji zasobu (304 Not Modified).
 
 #### 🔹 4. Czym jest gRPC i kiedy jest lepsze od REST?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 gRPC:
 - Protokół RPC oparty o HTTP/2.
@@ -110,7 +110,7 @@ REST częściej dla komunikacji z frontendem (łatwiejsze debugowanie i kompatyb
 
 #### 🔹 5. Kafka vs RabbitMQ — kluczowe różnice
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Kafka:
 - Log zdarzeń (append-only).
@@ -129,7 +129,7 @@ RabbitMQ świetny do work distribution.
 
 #### 🔹 6. Co oznacza at-least-once, at-most-once, exactly-once delivery?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 At-most-once:
 - Wiadomość może zginąć.
@@ -151,7 +151,7 @@ W praktyce exactly-once jest trudne i zwykle osiąga się je przez:
 
 #### 🔹 7. Jak radzić sobie z duplikatami wiadomości?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Ponieważ at-least-once jest częste, system powinien tolerować duplikaty.
 
@@ -164,7 +164,7 @@ Techniki:
 
 #### 🔹 8. Czym jest ordering i dlaczego jest trudny?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Ordering oznacza zachowanie kolejności zdarzeń.
 
@@ -181,7 +181,7 @@ Rozwiązanie:
 
 #### 🔹 9. Czym jest schema evolution?
 
-✅ <span style='color:##a9b8c6;font-weight:bold;font-size:medium;list-style-type:none'>Odpowiedź</span>
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
 Schema evolution to zmiana formatu danych bez psucia kompatybilności.
 
