@@ -91,7 +91,7 @@
     * [ArchUnit]()
     * [Chicago vs London school]()
     * [Three pillars]()
-* [Docker & Kubernetes](#docker--kubernetes)
+* [🚀 Kubernetes](kubernetes/kubernetes.md#-kubernetes)
 * [Microservices]()
   * [Load balancing]()
   * [Caching]()
