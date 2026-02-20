@@ -21,7 +21,7 @@
     * [Public vs private key](security/security.md#public-vs-private-key)
     * [CORS - Cross-Origin Resource Sharing](security/security.md#-cors--cross-origin-resource-sharing)
     * [🔐 Authentication, Authorization, LDAP, OAuth — core identity concepts](security/security.md#-authentication-authorization-ldap-oauth--core-identity-concepts)
-* [Communication](communication#communication.md)
+* [Communication](communication/communication.md#communication)
     * [REST](communication/communication.md#-rest-api)
         * [Http Methods](communication/communication.md#ℹ-http-methods)
         * [API versioning](communication/communication.md#ℹ-api-versioning)
