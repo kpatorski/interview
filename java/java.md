@@ -1711,6 +1711,8 @@ Benefits:
 
 🔸 **FixedThreadPool**
 
+> It creates a set number of threads and keeps them active. If all threads are busy, new tasks wait in a queue.
+
 ```java
 Executors.newFixedThreadPool(n);
 ```
@@ -1726,6 +1728,8 @@ Executors.newFixedThreadPool(n);
 ---
 
 🔸 **CachedThreadPool**
+
+> It creates new threads as needed. It uses a SynchronousQueue, which means it doesn't "hold" tasks—it immediately hands them to a thread. If no thread is available, it spawns a new one.
 
 ```java
 Executors.newCachedThreadPool();
@@ -1757,7 +1761,7 @@ Tasks executed sequentially.
 
 🔸 **ScheduledThreadPool**
 
-A ScheduledThreadPool runs tasks:
+A `ScheduledThreadPool` runs tasks:
 
 - after a delay (schedule)
 - periodically (scheduleAtFixedRate, scheduleWithFixedDelay)
