@@ -1486,7 +1486,7 @@ Java uses:
 
 GC algorithm:
 
-1. Start from GC roots
+1. Start from [GC roots](#gc-roots)
 2. Traverse object graph
 3. Mark reachable objects
 4. Everything else is garbage
