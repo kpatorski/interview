@@ -867,6 +867,38 @@ Example mental model:
 - attempt update
 - if conflict, retry
 
+🔸 **Example scenario**
+
+- Initial State: The shared variable `V=10`
+- **<span style='color:darkseagreen'>Thread A’s</span>** Goal: Increment `V=10` by `10` to `20`
+- <span style='color:dodgerblue'>**Thread B’s**</span> Interference: Successfully updates `V=10` to `15` while **<span style='color:darkseagreen'>Thread A</span>** is still calculating.
+
+🔸 **Step-by-Step Execution Table**
+
+| Step              | **<span style='color:darkseagreen'>Thread A</span> (The "Worker")** | **<span style='color:dodgerblue'>Thread B</span> (The "Interrupter")** | Memory Value (`V` | Result for **<span style='color:darkseagreen'>Thread A</span>** |
+|-------------------|---------------------------------------------------------------------|------------------------------------------------------------------------|-------------------|-----------------------------------------------------------------|
+| 1.   Read         | Reads `10`. Stores it as "Expected Value".                          | -                                                                      | 10                | Success                                                         |
+| 2.   Local Work   | Prepares the new value (`20`).                                      | -                                                                      | 10                | Success                                                         |
+| 3.   Interference | Busy calculating...                                                 | Performs `CAS(10, 15)`.                                                | 15                | Thread B succeed                                                |
+| 4.   The Attempt  | Tries `CAS(10, 20)`.                                                | Done.                                                                  | 15                | FAIL                                                            |
+| 5.   Outcome      | Sees that.                                                          | -                                                                      | 15                | No change made                                                  |
+
+🔸 **Behavior Analysis**
+
+1. **Why did it fail?**
+   The hardware execution of CAS(Expected, New) is: "Only write New if the current value in memory is exactly Expected."  
+   Since <span style='color:dodgerblue'>**Thread B**</span> changed the value to 15, **<span style='color:darkseagreen'>Thread A’s</span>** expected value (10) is now stale. The CPU rejects the write to prevent **<span style='color:darkseagreen'>Thread A</span>** from accidentally deleting the work <span style='color:dodgerblue'>**Thread B**</span> just did.  
+
+2. **Does Thread A repeat the step?**
+   Not automatically. CAS is a low-level instruction, not a high-level loop.  
+   - If you just call compareAndSet once, it returns false, and the program moves to the next line of code.  
+   - To make it "repeat," you must wrap it in a Retry Loop (also called a spin-lock pattern).  
+
+3. **What is the final value?**
+   - Without a loop: The value stays `15`. **<span style='color:darkseagreen'>Thread A</span>** fails and gives up.  
+   - With a loop (Constant target): **<span style='color:darkseagreen'>Thread A</span>** retries, sees the 15, and finally sets it to `20`.  
+   - With a loop (Relative target, e.g. `X+10`): **<span style='color:darkseagreen'>Thread A</span>** retries, sees the `15`, calculates , and sets the final value to `25`.
+
 📌 This avoids global locks for many operations.
 
 🔸 **“Synchronized blocks at bucket level”**
