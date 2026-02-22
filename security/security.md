@@ -513,13 +513,68 @@ Each approach solves a different problem:
 
 #### 🔶 Typical real-world flow (example: TLS)
 
-1. Client connects to server
-2. Server presents its public key (certificate)
-3. Asymmetric cryptography is used to:
-   1. authenticate the server
-   2. securely exchange a secret
-4. Both sides derive a shared session key
-5. All further communication uses symmetric encryption (AES / ChaCha20)
+🔐 **The Core Idea of TLS**
+
+TLS uses:
+
+1. Asymmetric cryptography → only during the handshake
+2. Symmetric cryptography → for all actual data (request and response)
+
+Asymmetric crypto is used to:
+
+- authenticate the server
+- securely agree on a shared session key
+
+Symmetric crypto is used to:
+
+- encrypt all HTTP traffic in both directions
+
+🧠 **What Actually Happens (TLS 1.3 – simplified)**
+
+1️⃣ **ClientHello**
+
+The client (browser):
+
+- says it wants TLS
+- sends supported cipher suites
+- sends key exchange data (ECDHE parameters)
+
+2️⃣ **ServerHello**
+
+The server responds with:
+
+- chosen cipher suite
+- its certificate (contains public key)
+- its own key exchange data
+- a digital signature created with its private key
+
+Important:
+
+👉 **The private key is used only for signing (authentication), not for encrypting the response.**
+
+3️⃣ **Key Agreement (ECDHE)**
+
+Both sides:
+
+- use Diffie-Hellman (usually ECDHE)
+- compute the same shared secret independently
+
+**From that, they derive:**
+
+🔑 **A symmetric session key**
+
+🔐 **From This Point On**
+
+Everything is encrypted symmetrically:
+
+- HTTP request → encrypted
+- HTTP response → encrypted
+
+Usually with:
+
+`AES-GCM`  or `ChaCha20-Poly1305`
+
+📌 **A network sniffer sees only encrypted blobs.**
 
 #### 🔶 Key takeaway
 
