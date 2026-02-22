@@ -687,13 +687,18 @@ It works by establishing an encrypted connection using certificates, preventing 
 ### Questions
 
 **Question 1**: What is the difference between symmetric and asymmetric encryption?  
+
+The primary difference between symmetric and asymmetric encryption is the number of keys used to protect data.  
+Symmetric encryption relies on a single shared key, while asymmetric encryption uses a mathematically linked pair of public and private keys.
+
 **Question 2**: What is TLS?
-**Question 3**: What is mTLS?
 
 ℹ️ **TLS (Transport Layer Security)**  
 - **Authentication**: One-way (Server to Client). The client verifies the server's identity using a server certificate issued by a public Certificate Authority (CA).
 - **Purpose**: Secures public-facing websites and general internet traffic (e.g., HTTPS).
 - **Process**: Client connects, server presents its certificate, client validates it, and a secure connection is established.
+
+**Question 3**: What is mTLS?  
 
 ℹ️ **mTLS (Mutual Transport Layer Security)**  
 
