@@ -637,6 +637,7 @@ If not:
 ➡️ Messages are lost
 
 --- 
+
 🔹 **Poison messages**
 
 RabbitMQ has first-class DLQ support.

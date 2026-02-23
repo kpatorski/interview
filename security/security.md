@@ -353,6 +353,7 @@ In web systems, encryption is a foundation of:
 - data exchange between services
 
 ---
+
 ### ℹ️ What types of encryption exist?
 
 There are two basic types:
