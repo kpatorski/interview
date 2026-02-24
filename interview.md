@@ -7,7 +7,7 @@
     * [Onion architecture](architecture/architecture.md#onion-architecture)
     * [Microservices](architecture/architecture.md#microservices)
     * [CQRS](architecture/architecture.md#cqrs)
-    * [Event sourcing](architecture/architecture.md#event-sourcing)
+    * [✉️ Event sourcing](architecture/architecture.md#-event-sourcing)
 * [Patterns](patterns/patterns.md)
     * [Inbox pattern](patterns/patterns.md#-inbox-pattern)
     * [Outbox pattern](patterns/patterns.md#-outbox-pattern)

@@ -15,6 +15,22 @@
   * [Hexagonal vs Clean vs Onion architectures](#hexagonal-vs-clean-vs-onion-architectures)
   * [Microservices](#microservices)
     * [Questions](#questions-4)
+  * [CQRS](#cqrs)
+  * [✉️ Event Sourcing](#-event-sourcing)
+    * [What Is Event Sourcing?](#what-is-event-sourcing)
+    * [How It Works](#how-it-works)
+    * [Aggregates](#aggregates)
+    * [Event Store](#event-store)
+    * [🏗️ Rebuilding State](#-rebuilding-state)
+    * [Snapshots](#snapshots)
+    * [Event Sourcing & CQRS](#event-sourcing--cqrs)
+    * [Advantages](#advantages)
+    * [Trade-Offs](#trade-offs)
+    * [Event Schema Evolution](#event-schema-evolution)
+    * [Optimistic Locking](#optimistic-locking)
+    * [Eventual Consistency](#eventual-consistency)
+    * [When NOT to Use Event Sourcing](#when-not-to-use-event-sourcing)
+    * [Production Concerns](#production-concerns)
 <!-- TOC -->
 
 ## Monolith
@@ -206,5 +222,271 @@ Evolving style where applications are built as a collection of small, independen
 ⚠️ **Data Consistency**: Distributed transactions are difficult; maintaining data integrity across separate databases often requires complex patterns like the Saga Pattern.  
 ⚠️ **High Network Latency**: Inter-service calls over a network are slower than in-process calls in a monolith, potentially impacting performance.  
 ⚠️ **Observability Hurdles**: Debugging becomes significantly harder as requests move through multiple services.
+
+---
+
+## CQRS
+
+---
+
+## ✉️ Event Sourcing
+
+### What Is Event Sourcing?
+
+Traditional systems store:
+
+> Current state
+
+Example:
+
+```java
+Account:
+id=1
+balance=500
+```
+
+Event Sourcing stores:
+
+> All changes (events) that led to current state. It stores history of state transitions.
+
+Example:
+
+```java
+AccountCreated(1)
+MoneyDeposited(1000)
+MoneyWithdrawn(500)
+```
+
+📌 Current balance is **derived** by **replaying** **events**.
+
+---
+
+### How It Works
+
+Let’s say user places an order.
+
+1. Command arrives:
+    ```java
+    PlaceOrderCommand
+    ```
+2. Aggregate loads events from store.
+3. Replays events ➡️ builds current state.
+4. Validates business rules.
+5. Emits new event:
+    ```java
+    OrderPlaced
+    ```
+6. Event appended to event store.
+7. Projections update read models.
+
+📌 **State is derived, not stored directly.**
+
+---
+
+### Aggregates
+
+Aggregate:
+
+> Consistency boundary that enforces invariants.
+
+Example:
+
+```java
+BankAccount aggregate
+```
+
+It **<span style='color:darkseagreen'>does</span>**:
+
+✅ loads its events  
+✅ validates command  
+✅ produces new events  
+
+It does **<span style='color:hotpink'>NOT</span>**:
+
+❌ directly modify DB tables  
+
+🔸 **Invariants Example**
+
+```java
+MoneyWithdrawn(amount)
+```
+
+Aggregate checks:
+
+- `balance >= amount`
+
+If valid:
+
+- emit event
+
+---
+
+### Event Store
+
+**Event store is:**
+
+> Append-only log of domain events.
+
+**Characteristics:**
+
+✅ Immutable  
+✅ Ordered per aggregate  
+✅ Versioned  
+✅ Optimistic locking  
+
+🛢 **Example DB schema:**
+
+```java
+aggregate_id
+version
+event_type
+payload
+timestamp
+```
+
+--- 
+
+### 🏗️ Rebuilding State
+
+**When aggregate loads:**
+
+1. Load events by `aggregate_id`
+2. Replay them in order
+3. Apply to state
+
+Example:
+
+```java
+for (Event e : events) {
+apply(e);
+}
+```
+
+📌 **This rebuilds state in memory.**
+
+---
+
+### Snapshots
+
+🔸 **Problem:**
+
+> If aggregate has 100,000 events ➡️ replay <span style='color:hotpink'>**slow**</span>.
+
+🔸 **Solution:**
+
+> Snapshot.
+
+🔸 **Every N events:**
+
+- store full state snapshot
+- replay only events after snapshot
+
+---
+
+### Event Sourcing & CQRS
+
+> Often used together.
+
+🔸 **CQRS:**
+
+- Command side (write model)
+- Query side (read model)
+
+🔸 **Event flow:**
+
+`Command → Aggregate → Event Store → Projection → Read DB`
+
+🔸 **Read model:**
+
+- denormalized
+- optimized for queries
+
+---
+
+### Advantages
+
+✅ Full audit log  
+✅ Time travel (rebuild state at any point)  
+✅ Event replay  
+✅ Easy integration (events as messages)  
+✅ Debugging easier  
+
+---
+
+### Trade-Offs
+
+❌ Complexity  
+❌ Harder debugging (async projections)  
+❌ Event schema evolution problems  
+❌ Eventual consistency  
+❌ More infrastructure  
+
+---
+
+### Event Schema Evolution
+
+> Events are immutable.
+
+🔸 **If schema changes:**
+
+- version events
+- add upcasters
+- transform old event versions
+
+📌⚠️ **<span style='color:goldenrod'>This is non-trivial.</span>**
+
+---
+
+### Optimistic Locking
+
+> Each aggregate has version.
+
+When appending event:
+
+`expected_version == current_version`
+
+If mismatch:
+
+- <span style='color:hotpink'>concurrency conflict</span>
+
+---
+
+### Eventual Consistency
+
+Because read model updated asynchronously:
+
+- Write succeeds
+- Read model may lag
+
+⚠️ **Client must tolerate.**
+
+---
+
+### When NOT to Use Event Sourcing
+
+Don’t use it when:
+
+❌ CRUD app  
+❌ Simple admin panel  
+❌ No audit requirements  
+❌ Team not experienced  
+
+Use it when:
+
+✅ Complex domain logic  
+✅ Strong audit needs  
+✅ High traceability  
+✅ Business wants historical replay  
+
+---
+
+### Production Concerns
+
+- Event store scaling
+- Partitioning by aggregate id
+- Snapshot frequency
+- Projection rebuild strategy
+- Idempotent event handling
+- Exactly-once vs at-least-once processing
 
 ---
