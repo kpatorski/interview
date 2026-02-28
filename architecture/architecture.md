@@ -16,6 +16,17 @@
   * [Microservices](#microservices)
     * [Questions](#questions-4)
   * [CQRS](#cqrs)
+    * [What is CQRS?](#what-is-cqrs)
+    * [The Core Idea](#the-core-idea)
+    * [Commands vs Queries](#commands-vs-queries)
+    * [Simple CQRS (Same Database)](#simple-cqrs-same-database)
+    * [Full CQRS (Separate Read & Write Models)](#full-cqrs-separate-read--write-models)
+    * [Why Use CQRS?](#why-use-cqrs)
+    * [CQRS + Event Sourcing Relationship](#cqrs--event-sourcing-relationship)
+    * [Benefits](#benefits)
+    * [Trade-Offs](#trade-offs)
+    * [Eventual Consistency](#eventual-consistency)
+    * [When to Use CQRS?](#when-to-use-cqrs)
   * [✉️ Event Sourcing](#-event-sourcing)
     * [What Is Event Sourcing?](#what-is-event-sourcing)
     * [How It Works](#how-it-works)
@@ -25,10 +36,10 @@
     * [Snapshots](#snapshots)
     * [Event Sourcing & CQRS](#event-sourcing--cqrs)
     * [Advantages](#advantages)
-    * [Trade-Offs](#trade-offs)
+    * [Trade-Offs](#trade-offs-1)
     * [Event Schema Evolution](#event-schema-evolution)
     * [Optimistic Locking](#optimistic-locking)
-    * [Eventual Consistency](#eventual-consistency)
+    * [Eventual Consistency](#eventual-consistency-1)
     * [When NOT to Use Event Sourcing](#when-not-to-use-event-sourcing)
     * [Production Concerns](#production-concerns)
 <!-- TOC -->
@@ -226,6 +237,201 @@ Evolving style where applications are built as a collection of small, independen
 ---
 
 ## CQRS
+
+### What is CQRS?
+
+**CQRS = Command Query Responsibility Segregation**
+
+It means:
+
+> Separate the model used for writing (commands) from the model used for reading (queries).
+
+📌 Not just separate methods. Separate models.
+
+### The Core Idea
+
+🔸 **Traditional CRUD**:
+
+```java
+Same model handles:
+- reads
+- writes
+- business logic
+- persistence
+```
+
+🔸 **CQRS**:
+
+```java
+Command model → modifies state
+Query model   → returns data
+```
+
+- Different responsibilities.
+- Different representations.
+
+### Commands vs Queries
+
+🔸 **Command**
+
+- Changes system state
+- Has side effects
+- Returns little or nothing
+- Validates business rules
+
+Example:
+
+```java
+CreateOrder
+CancelOrder
+WithdrawMoney
+```
+
+🔸 **Query**
+
+- Reads data
+- No side effects
+- Returns data
+- No domain logic
+
+Example:
+
+```java
+GetOrderDetails
+SearchOrders
+GetBalance
+```
+
+### Simple CQRS (Same Database)
+
+You can apply CQRS without distributed systems.
+
+Example:
+
+Command side:
+
+```java
+@Transactional
+public void withdraw(Long accountId, BigDecimal amount)
+```
+
+
+Query side:
+
+```java
+public AccountBalanceDto getBalance(Long accountId)
+```
+
+
+You use:
+
+- Entities for commands
+- Projections / DTOs for reads
+
+Same DB, **<span style='color:darkseagreen'>different</span>** models.  
+This is often called **lightweight CQRS**.
+
+### Full CQRS (Separate Read & Write Models)
+
+In advanced setups:
+
+> Command DB → Event → Projection → Read DB
+
+🔸 ✍️ **Write model**:
+
+- normalized
+- domain-driven
+- enforces invariants
+
+🔸 📖 **Read model**:
+
+- denormalized
+- optimized for queries
+- sometimes different database
+
+Example:
+
+```java
+Write side: PostgreSQL
+Read side: ElasticSearch
+```
+
+### Why Use CQRS?
+
+Because:
+
+> The shape of data for writes is different from shape of data for reads.
+
+🔸 ✍️ **Write model**:
+
+- consistency
+- validation
+- business rules
+
+🔸 📖 **Read model**:
+
+- speed
+- denormalization
+- complex joins avoided
+
+### CQRS + Event Sourcing Relationship
+
+📌 CQRS **<span style='color:hotpink'>does NOT</span>** **require** [Event Sourcing](#-event-sourcing).
+
+But:
+
+> Event Sourcing almost always implies CQRS.
+
+🔸 **Why?**
+
+Because:
+
+- events are perfect for building projections
+- read model can be rebuilt anytime
+
+### Benefits
+
+✅ Better scalability  
+✅ Optimized read performance  
+✅ Clear separation of concerns  
+✅ Complex domains easier to model  
+✅ Independent scaling of read/write  
+
+### Trade-Offs
+
+❌ Increased complexity  
+❌ Eventual consistency  
+❌ More infrastructure  
+❌ Harder debugging  
+❌ Requires mature team  
+
+### Eventual Consistency
+
+In full CQRS:
+
+1. Command succeeds
+2. Event stored
+3. Projection updates read model asynchronously
+
+User immediately queries ➡️ may see **<span style='color:hotpink'>stale data</span>**.  
+⚠️ S**ystem must tolerate.**
+
+### When to Use CQRS?
+
+🔸 👍 **Good fit:**
+
+✅ Complex domain  
+✅ High read-to-write ratio  
+✅ Scaling reads separately  
+✅ Heavy reporting queries  
+✅ Event-driven architecture  
+
+🔸 👎 **Not good fit:**
+
+❌ Simple CRUD app  
+❌ Admin panel  
+❌ Small team  
+❌ No performance bottlenecks  
 
 ---
 
