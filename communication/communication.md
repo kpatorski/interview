@@ -19,7 +19,16 @@
   * [📩 Messaging — Kafka vs RabbitMQ](#-messaging--kafka-vs-rabbitmq)
     * [ℹ️ Apache Kafka](#ℹ-apache-kafka)
       * [🔶 Three absolute Kafka basics](#-three-absolute-kafka-basics)
-      * [🔶 What is a partition?](#-what-is-a-partition)
+      * [🔶 Topic & Partitions](#-topic--partitions)
+        * [Topic](#topic)
+        * [Partition](#partition)
+        * [Key → Partition Mapping](#key--partition-mapping)
+        * [Partitions and Scalability](#partitions-and-scalability)
+        * [Consumer Groups](#consumer-groups)
+        * [Offsets](#offsets)
+          * [What Happens When a Pod Restarts?](#what-happens-when-a-pod-restarts)
+          * [Offset Commit Modes](#offset-commit-modes)
+          * [Why Offsets Belong to the Group (Not the Instance)](#why-offsets-belong-to-the-group-not-the-instance)
       * [🔶 Delivery guarantees in Kafka](#-delivery-guarantees-in-kafka)
       * [🔶 Ordering guarantees in Kafka](#-ordering-guarantees-in-kafka)
       * [🔶 How Kafka chooses a partition](#-how-kafka-chooses-a-partition)
@@ -288,7 +297,25 @@ This explains ordering, scaling, and failures.
 
 ---
 
-#### 🔶 What is a partition?
+#### 🔶 Topic & Partitions
+
+##### Topic
+
+A **topic** is a logical stream of events (e.g., `orders`, `payments`).
+
+##### Partition
+
+A **partition** is a physical shard of a topic.
+
+A topic consists of **N partitions**
+
+Each partition is:
+- Ordered
+- Append-only
+- Independent
+- Has its own offsets (0,1,2,3…)
+  
+❗ **Kafka guarantees ordering only within ONE partition**
 
 Think of a topic as parallel logs:
 
@@ -300,12 +327,208 @@ Partition 1: [e5][e6][e7]
 Partition 2: [e8][e9]
 ```
 
-Each partition:
+##### Key → Partition Mapping
 
-- is strictly ordered
-- has its own offsets (0,1,2,3…)
+Kafka does **<span style='color:hotpink'>not</span>** create one partition per key.
 
-❗ **Kafka guarantees ordering only within ONE partition**
+Instead, it uses a deterministic function:
+
+> partition = hash(key) % numberOfPartitions
+
+🔸 **This means:**
+
+- The same key always goes to the same partition
+- Many different keys share one partition
+- Partitions are a fixed resource (not dynamically created per key)
+
+🔸 **Why this matters**
+
+- All events for the same `orderId` (if used as key) go to the same partition
+- Therefore, order is preserved per aggregate/entity
+- Different keys can be processed in parallel (if they land in
+  different partitions)
+
+##### Partitions and Scalability
+
+> Partitions define **maximum parallelism** in consumption.
+
+If:
+- Topic has 12 partitions - Consumer group has 10 instances
+
+Then:
+- Up to 10 partitions are processed in parallel - 2 partitions are additionally assigned to some instances
+
+If scaled to 15 instances: 
+- Only 12 instances will receive partitions 
+- 3 instances will remain idle
+
+> Maximum concurrency = number of partitions
+
+Partitions can be increased (but not safely decreased).
+
+##### Consumer Groups
+
+> A consumer group allows multiple instances of the same application to cooperate and share the workload.
+
+Key rule:
+
+> One partition is assigned to at most one consumer within a group.
+
+🔸 **What Would Happen Without Consumer Groups?**
+
+Imagine:
+
+- Topic orders
+- 6 partitions
+- 3 instances of billing-service
+
+If those 3 instances were not in the same consumer group:
+
+- Each instance would read the entire topic
+- Each event would be processed 3 times
+- You would get broadcast semantics
+
+📌 That’s **<span style='color:hotpink'>not scaling</span>** — that’s **<span style='color:hotpink'>duplication</span>**.
+
+🔸 **What Does a Consumer Group Actually Do?**
+
+If all instances use:
+```java
+group.id = billing-service
+```
+
+Kafka treats them as **<span style='color:darkseagreen'>one logical consumer</span>**.
+
+Kafka will:
+
+- Distribute partitions across instances
+- Ensure one partition is assigned to only one consumer within the group
+- Automatically rebalance if instances join or leave
+
+Example:
+
+| Partition | Assigned To |
+|-----------|-------------|
+| P0        | Instance A  |
+| P1        | Instance B  |
+| P2        | Instance C  |
+| P3        | Instance A  |
+| P4        | Instance B  |
+| P5        | Instance C  |
+
+Result:
+
+- Each message is processed once
+- Work is split
+- Processing is parallel
+
+🔸 **Consumer Group = Horizontal Scalability**
+
+This fits perfectly with Kubernetes scaling:
+
+- You scale deployment from `3 → 8` pods
+- All pods use the same `group.id`
+- Kafka performs a rebalance
+- Partitions are reassigned automatically
+
+✅ No code changes  
+✅ No offset copying  
+✅ No manual coordination  
+
+🧠 Mental Model
+
+- Topic = event log
+- Consumer group = logical application
+- Consumer instance = worker
+
+##### Offsets
+
+🔸 **What is an offset?**
+
+An offset is: 
+- A sequential number inside a partition
+- A pointer to a specific message
+
+Each partition maintains its own offsets:
+
+```java
+    Partition 0:
+    offset 0
+    offset 1
+    offset 2
+    ...
+```
+
+Offsets are:  
+✅ Stored per **consumer group**  
+✅ Saved inside Kafka in the `__consumer_offsets` topic  
+❌ Not stored in your application  
+❌ Not stored in Kubernetes  
+
+###### What Happens When a Pod Restarts?
+
+If: 
+1. A consumer processed messages 
+2. It committed offset **150** 
+3. The pod crashes
+
+After restart:
+
+- New instance joins the same `group.id`
+- Kafka assigns partitions
+- Consumption resumes from offset **150**
+
+📌 **No manual offset transfer is required.**
+
+###### Offset Commit Modes
+
+🔸 **Auto Commit (Default)**
+
+```java
+enable.auto.commit = true
+```
+
+Kafka commits offsets periodically (e.g., **every 5 seconds**).
+
+⚠️ Risk: 
+- If crash happens after processing but before commit 
+- Message may be reprocessed
+
+This gives:
+
+> At-least-once delivery
+
+🔸 **Manual Commit (Recommended for Microservices)**
+
+``` properties
+enable.auto.commit = false
+```
+
+Commit offset **only** after: 
+- Business logic completed 
+- Database write finished 
+- Event published
+
+This provides:  
+✅ Control  
+✅ Safety  
+✅ Better reliability  
+
+###### Why Offsets Belong to the Group (Not the Instance)
+
+> Because instances are ephemeral (especially in Kubernetes).
+
+The offset represents:
+
+> The progress of the logical application, not a single pod.
+
+If a pod crashes:
+
+- A new pod joins the same group
+- Kafka assigns partitions
+- It resumes from the last committed offset
+
+📌 **The system <span style='color:darkseagreen'>continues smoothly</span>.**
 
 ---
 
