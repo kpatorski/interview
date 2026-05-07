@@ -5,22 +5,22 @@
 <!-- TOC -->
 * [Security](#security)
   * [JWT - JSON Web Token](#jwt---json-web-token)
-    * [💡 What does a JWT consist of?](#-what-does-a-jwt-consist-of)
-    * [💡 How does encryption relate to this?](#-how-does-encryption-relate-to-this)
-    * [💡 Who creates JWTs?](#-who-creates-jwts)
-    * [💡 Why is JWT used?](#-why-is-jwt-used)
-    * [💡 JWT vs JWS vs JWE — how they relate](#-jwt-vs-jws-vs-jwe--how-they-relate)
+    * [What does a JWT consist of?](#what-does-a-jwt-consist-of)
+    * [How does encryption relate to this?](#how-does-encryption-relate-to-this)
+    * [Who creates JWTs?](#who-creates-jwts)
+    * [Why is JWT used?](#why-is-jwt-used)
+    * [JWT vs JWS vs JWE — how they relate](#jwt-vs-jws-vs-jwe--how-they-relate)
       * [🔶 JWT — the umbrella concept](#-jwt--the-umbrella-concept)
       * [🔶 JWS — Signed JWT (most common case)](#-jws--signed-jwt-most-common-case)
       * [🔶 JWE — Encrypted JWT](#-jwe--encrypted-jwt)
     * [🧨 Most common mistakes a senior should catch immediately](#-most-common-mistakes-a-senior-should-catch-immediately)
     * [Questions](#questions)
   * [Encryption](#encryption)
-    * [💡 What is encryption?](#-what-is-encryption)
-    * [💡 What types of encryption exist?](#-what-types-of-encryption-exist)
+    * [What is encryption?](#what-is-encryption)
+    * [What types of encryption exist?](#what-types-of-encryption-exist)
       * [🔶 Symmetric encryption](#-symmetric-encryption)
       * [🔶 Asymmetric encryption](#-asymmetric-encryption)
-    * [💡 How does it work in practice?](#-how-does-it-work-in-practice)
+    * [How does it work in practice?](#how-does-it-work-in-practice)
       * [🔶 Asymmetric encryption (public / private keys)](#-asymmetric-encryption-public--private-keys)
         * [🔹 Encryption](#-encryption)
         * [🔹 Digital signature (not the same as encryption)](#-digital-signature-not-the-same-as-encryption)
@@ -31,60 +31,60 @@
       * [🔶 Why both are used together](#-why-both-are-used-together)
       * [🔶 Typical real-world flow (example: TLS)](#-typical-real-world-flow-example-tls)
       * [🔶 Key takeaway](#-key-takeaway)
-    * [💡 🔐 Encryption vs ✍️ Digital Signature](#--encryption-vs--digital-signature)
+    * [🔐 Encryption vs ✍️ Digital Signature](#-encryption-vs--digital-signature)
       * [🔶 Encryption](#-encryption-1)
       * [🔶 Digital Signature](#-digital-signature)
       * [🔶 Examples](#-examples)
-    * [💡 Why all this? (Goals of encryption)](#-why-all-this-goals-of-encryption)
-    * [💡 Who creates the keys?](#-who-creates-the-keys)
+    * [Why all this? (Goals of encryption)](#why-all-this-goals-of-encryption)
+    * [Who creates the keys?](#who-creates-the-keys)
     * [SSL / TLS](#ssl--tls)
-      * [💡 What is it?](#-what-is-it)
-      * [💡 How it works (Simplified)](#-how-it-works-simplified)
-      * [💡 Key Functions](#-key-functions)
-      * [💡 SSL vs. TLS](#-ssl-vs-tls)
+      * [What is it?](#what-is-it)
+      * [How it works (Simplified)](#how-it-works-simplified)
+      * [Key Functions](#key-functions)
+      * [SSL vs. TLS](#ssl-vs-tls)
     * [Questions](#questions-1)
   * [Keystore vs Truststore](#keystore-vs-truststore)
-    * [💡 What is a keystore?](#-what-is-a-keystore)
-    * [💡 What is a truststore?](#-what-is-a-truststore)
-    * [💡 How do keystore and truststore relate to encryption and signatures?](#-how-do-keystore-and-truststore-relate-to-encryption-and-signatures)
-    * [💡 Examples](#-examples-1)
+    * [What is a keystore?](#what-is-a-keystore)
+    * [What is a truststore?](#what-is-a-truststore)
+    * [How do keystore and truststore relate to encryption and signatures?](#how-do-keystore-and-truststore-relate-to-encryption-and-signatures)
+    * [Examples](#examples)
       * [🔶 Example 1 – User visits an HTTPS website (TLS handshake)](#-example-1--user-visits-an-https-website-tls-handshake-)
       * [🔶 Example 2 – Microservice (A) → Microservice (B) in a private network (HTTPS)](#-example-2--microservice-a--microservice-b-in-a-private-network-https)
       * [🔶 Example 3 – mTLS (mutual TLS)](#-example-3--mtls-mutual-tls)
   * [Public vs private key](#public-vs-private-key)
-    * [💡 What is a key pair?](#-what-is-a-key-pair)
-    * [💡 Two uses of the same key pair](#-two-uses-of-the-same-key-pair)
+    * [What is a key pair?](#what-is-a-key-pair)
+    * [Two uses of the same key pair](#two-uses-of-the-same-key-pair)
       * [🔶 Use case A — Data encryption](#-use-case-a--data-encryption)
       * [🔶 Use case B — Data signing (digital signature)](#-use-case-b--data-signing-digital-signature)
-    * [💡 Why does this work?](#-why-does-this-work)
-    * [💡 How does this look in practice?](#-how-does-this-look-in-practice)
+    * [Why does this work?](#why-does-this-work)
+    * [How does this look in practice?](#how-does-this-look-in-practice)
       * [🔶 TLS / HTTPS](#-tls--https)
       * [🔶 Signed JWT (JWS)](#-signed-jwt-jws)
       * [🔶 SSH](#-ssh)
-    * [💡 Most important rules](#-most-important-rules)
-    * [💡 The simplest possible metaphor](#-the-simplest-possible-metaphor)
-    * [💡 Three-sentence summary](#-three-sentence-summary)
+    * [Most important rules](#most-important-rules)
+    * [The simplest possible metaphor](#the-simplest-possible-metaphor)
+    * [Three-sentence summary](#three-sentence-summary)
   * [🌐 CORS — Cross-Origin Resource Sharing](#-cors--cross-origin-resource-sharing)
-    * [💡 What is CORS?](#-what-is-cors)
-    * [💡 Why does CORS exist?](#-why-does-cors-exist)
-    * [💡 What exactly does CORS block?](#-what-exactly-does-cors-block)
-    * [💡 When does a CORS problem occur?](#-when-does-a-cors-problem-occur)
-    * [💡 How does CORS work technically?](#-how-does-cors-work-technically)
-    * [💡 Most important CORS headers](#-most-important-cors-headers)
-    * [💡 Credentials and CORS (very important)](#-credentials-and-cors-very-important)
-    * [💡 CORS and JWT](#-cors-and-jwt)
-    * [💡 CORS ≠ backend security](#-cors--backend-security)
-    * [💡 Three-sentence summary](#-three-sentence-summary-1)
+    * [What is CORS?](#what-is-cors)
+    * [Why does CORS exist?](#why-does-cors-exist)
+    * [What exactly does CORS block?](#what-exactly-does-cors-block)
+    * [When does a CORS problem occur?](#when-does-a-cors-problem-occur)
+    * [How does CORS work technically?](#how-does-cors-work-technically)
+    * [Most important CORS headers](#most-important-cors-headers)
+    * [Credentials and CORS (very important)](#credentials-and-cors-very-important)
+    * [CORS and JWT](#cors-and-jwt)
+    * [CORS ≠ backend security](#cors--backend-security)
+    * [Three-sentence summary](#three-sentence-summary-1)
   * [🔐 Authentication, Authorization, LDAP, OAuth — core identity concepts](#-authentication-authorization-ldap-oauth--core-identity-concepts)
-    * [💡 Authentication (AuthN)](#-authentication-authn)
-    * [💡 Authorization (AuthZ)](#-authorization-authz)
-    * [💡 LDAP](#-ldap)
-    * [💡 OAuth 2.0](#-oauth-20)
-    * [💡 OAuth vs Authentication](#-oauth-vs-authentication)
-    * [💡 How these concepts work together](#-how-these-concepts-work-together)
-    * [💡 LDAP vs OAuth vs JWT](#-ldap-vs-oauth-vs-jwt)
-    * [💡 Mental models (remember this)](#-mental-models-remember-this)
-    * [💡 Three-sentence summary](#-three-sentence-summary-2)
+    * [Authentication (AuthN)](#authentication-authn)
+    * [Authorization (AuthZ)](#authorization-authz)
+    * [LDAP](#ldap)
+    * [OAuth 2.0](#oauth-20)
+    * [OAuth vs Authentication](#oauth-vs-authentication)
+    * [How these concepts work together](#how-these-concepts-work-together)
+    * [LDAP vs OAuth vs JWT](#ldap-vs-oauth-vs-jwt)
+    * [Mental models (remember this)](#mental-models-remember-this)
+    * [Three-sentence summary](#three-sentence-summary-2)
 <!-- TOC -->
 
 ## JWT - JSON Web Token
@@ -103,7 +103,7 @@ It is a lightweight alternative to sessions — **no state is stored on the serv
 
 ---
 
-### 💡 What does a JWT consist of?
+### What does a JWT consist of?
 
 `header.payload.signature`
 
@@ -145,7 +145,7 @@ HMACSHA256(
 
 ---
 
-### 💡 How does encryption relate to this?
+### How does encryption relate to this?
 
 JWT is **<span style='color:hotpink'>NOT</span>** encrypted.  
 It is **<span style='color:forestgreen'>only</span>** signed.
@@ -159,7 +159,7 @@ If you want to encrypt the token → use **JWE** (JSON Web Encryption).
 In that case, the payload element is encrypted and unreadable.
 ---
 
-### 💡 Who creates JWTs?
+### Who creates JWTs?
 
 JWTs are created by an Authorization Server, for example:
 - Keycloak
@@ -179,7 +179,7 @@ This is the responsibility of the Authorization Server.
 
 ---
 
-### 💡 Why is JWT used?
+### Why is JWT used?
 
 ✅ User authentication
 
@@ -211,7 +211,7 @@ Each service can verify the JWT signature and trust its claims.
 
 ---
 
-### 💡 JWT vs JWS vs JWE — how they relate
+### JWT vs JWS vs JWE — how they relate
 
 #### 🔶 JWT — the umbrella concept
 
@@ -337,7 +337,7 @@ They act like a digital ⭕️"**wristband**"⭕️, **verifying identity** and 
 
 ## Encryption
 
-### 💡 What is encryption?
+### What is encryption?
 
 Encryption is the process of transforming readable data (plaintext) into unreadable data (ciphertext) using a cryptographic key.
 
@@ -354,7 +354,7 @@ In web systems, encryption is a foundation of:
 
 ---
 
-### 💡 What types of encryption exist?
+### What types of encryption exist?
 
 There are two basic types:
 
@@ -405,7 +405,7 @@ Use cases:
 
 ---
 
-### 💡 How does it work in practice?
+### How does it work in practice?
 
 #### 🔶 Asymmetric encryption (public / private keys)
 ##### 🔹 Encryption
@@ -588,7 +588,7 @@ Usually with:
 ---
 
 
-### 💡 🔐 Encryption vs ✍️ Digital Signature
+### 🔐 Encryption vs ✍️ Digital Signature
 
 #### 🔶 Encryption
 
@@ -648,7 +648,7 @@ What does it provide?
 ---
 
 
-### 💡 Why all this? (Goals of encryption)
+### Why all this? (Goals of encryption)
 
 ✅ Confidentiality  
 
@@ -672,7 +672,7 @@ The sender cannot deny having signed the data with their private key.
 ---
 
 
-### 💡 Who creates the keys?
+### Who creates the keys?
 
 It depends on the context.
 
@@ -706,7 +706,7 @@ Keys are generated by the user (ssh-keygen).
 
 ### SSL / TLS
 
-#### 💡 What is it?
+#### What is it?
 
 **SSL/TLS (Secure Sockets Layer/Transport Layer Security)** are cryptographic protocols that secure internet communication, providing privacy, authentication, and data integrity between a client (like a web browser) and a server, often seen as HTTPS.
 While SSL was the original protocol, it has been replaced by the more secure and modern TLS, but the term "SSL" is still commonly used to refer to the technology. 
@@ -714,7 +714,7 @@ It works by establishing an encrypted connection using certificates, preventing 
 
 ---
 
-#### 💡 How it works (Simplified)
+#### How it works (Simplified)
 
 1. **Handshake**: Your browser 🖥️ connects to a website 🌐, and the server 🗄️ sends its **SSL/TLS** certificate 🪪.
 2. **Verification**: Your browser 🖥️ verifies the certificate 🪪 to ensure the site is legitimate.
@@ -723,7 +723,7 @@ It works by establishing an encrypted connection using certificates, preventing 
 
 ---
 
-#### 💡 Key Functions
+#### Key Functions
 
 ✅ **Privacy**: Encrypts data so only the intended recipient can read it.  
 ✅ **Authentication**: Verifies the identity of the website or server.  
@@ -731,7 +731,7 @@ It works by establishing an encrypted connection using certificates, preventing 
 
 ---
 
-#### 💡 SSL vs. TLS
+#### SSL vs. TLS
 
 - SSL (Secure Sockets Layer): The older, now deprecated protocol with security vulnerabilities.
 - TLS (Transport Layer Security): The current, updated, and more secure standard, with versions like TLS 1.2 and 1.3 actively used.
@@ -767,7 +767,7 @@ Symmetric encryption relies on a single shared key, while asymmetric encryption 
 
 ## Keystore vs Truststore
 
-### 💡 What is a keystore?
+### What is a keystore?
 
 A keystore is a storage for a server’s private keys 🔐 and certificates. 📝
 
@@ -791,7 +791,7 @@ a file that contains private keys and often their corresponding X.509 certificat
 
 ---
 
-### 💡 What is a truststore?
+### What is a truststore?
 
 A truststore is a storage of certificates 📝 that a server 🗄️ trusts. 🤝
 
@@ -812,7 +812,7 @@ Example:
 
 ---
 
-### 💡 How do keystore and truststore relate to encryption and signatures?
+### How do keystore and truststore relate to encryption and signatures?
 
 🔶 **Keystore → private key**
 
@@ -846,7 +846,7 @@ Servers also have truststores:
 
 ---
 
-### 💡 Examples
+### Examples
 
 #### 🔶 Example 1 – User visits an HTTPS website (TLS handshake)  
 
@@ -945,7 +945,7 @@ This **<span style='color:darkseagreen'>acts as mutual identity verification</sp
 
 ## Public vs private key
 
-### 💡 What is a key pair?
+### What is a key pair?
 
 A key pair consists of two mathematically related keys:
 
@@ -958,7 +958,7 @@ A key pair consists of two mathematically related keys:
 
 ---
 
-### 💡 Two uses of the same key pair
+### Two uses of the same key pair
 #### 🔶 Use case A — Data encryption
 
 **When do we use the public key?**  
@@ -980,7 +980,7 @@ Here the process is reversed:
 
 ---
 
-### 💡 Why does this work?
+### Why does this work?
 
 The mathematics of asymmetric cryptography (RSA, ECDSA, Ed25519) ensures that:
 
@@ -991,7 +991,7 @@ The mathematics of asymmetric cryptography (RSA, ECDSA, Ed25519) ensures that:
 
 ---
 
-### 💡 How does this look in practice?
+### How does this look in practice?
 #### 🔶 TLS / HTTPS
 
 The server has in its keystore:
@@ -1022,7 +1022,7 @@ The server stores **only** the public key 🔑, to verify that login signatures 
 
 ---
 
-### 💡 Most important rules
+### Most important rules
 
 🔑 **Public key**:
 
@@ -1040,7 +1040,7 @@ The server stores **only** the public key 🔑, to verify that login signatures 
 
 ---
 
-### 💡 The simplest possible metaphor
+### The simplest possible metaphor
 
 Imagine a mailbox:
 
@@ -1058,7 +1058,7 @@ Now the other side (digital signature):
 
 ---
 
-### 💡 Three-sentence summary
+### Three-sentence summary
 
 🔑 The public key is used for encryption or signature verification and can be publicly distributed.  
 🔐 The private key is used for decryption or signing and must remain secret at all times.  
@@ -1069,7 +1069,7 @@ Asymmetry means that knowing one key does not allow reconstructing the other, ye
 
 ## 🌐 CORS — Cross-Origin Resource Sharing
 
-### 💡 What is CORS?
+### What is CORS?
 
 > CORS is a browser security mechanism that controls:  
 > whether a web page from one origin is allowed to make an HTTP request to another origin.
@@ -1078,7 +1078,7 @@ Asymmetry means that knowing one key does not allow reconstructing the other, ye
 📌 CORS <span style='color:hotpink'>**does not**</span> apply to server-to-server communication  
 📌 CORS <span style='color:forestgreen'>**applies only**</span> to web browsers  
 
-### 💡 Why does CORS exist?
+### Why does CORS exist?
 
 CORS is a consequence of the Same-Origin Policy (SOP).
 
@@ -1088,7 +1088,7 @@ CORS is a consequence of the Same-Origin Policy (SOP).
 
 Changing any of these creates a different origin.
 
-### 💡 What exactly does CORS block?
+### What exactly does CORS block?
 
 CORS does not block the request itself.
 
@@ -1101,7 +1101,7 @@ Meaning:
 - the backend receives the request
 - the frontend does not get access to the response
 
-### 💡 When does a CORS problem occur?
+### When does a CORS problem occur?
 
 Frontend: https://app.example.com  
 Backend:  https://api.example.com
@@ -1109,7 +1109,7 @@ Backend:  https://api.example.com
 From the browser’s perspective, these are two different origins.  
 ⚠️ If the backend does not explicitly allow this → CORS error.
 
-### 💡 How does CORS work technically?
+### How does CORS work technically?
 
 🔶 **1. Simple request**
 
@@ -1159,7 +1159,7 @@ If the response is valid:
 If not:  
 ❌ the request is **never** sent
 
-### 💡 Most important CORS headers
+### Most important CORS headers
 
 🔸 **Response headers (from backend)**
 
@@ -1174,7 +1174,7 @@ Access-Control-Allow-Credentials: true
 
 `Origin: https://app.example.com`
 
-### 💡 Credentials and CORS (very important)
+### Credentials and CORS (very important)
 
 If you use:
 
@@ -1196,7 +1196,7 @@ Allow-Origin: *
 Allow-Credentials: true
 ```
 
-### 💡 CORS and JWT
+### CORS and JWT
 
 🔸 JWT in the Authorization header
 
@@ -1209,7 +1209,7 @@ Allow-Credentials: true
 
 `Access-Control-Allow-Headers: Authorization`
 
-### 💡 CORS ≠ backend security
+### CORS ≠ backend security
 
 This is critical to understand:
 
@@ -1225,7 +1225,7 @@ If an endpoint has no authentication:
 - another backend can call it
 - the browser is the only one restricted
 
-### 💡 Three-sentence summary
+### Three-sentence summary
 
 CORS is a browser mechanism that controls cross-origin access to HTTP responses.
 The backend declares CORS policy via headers, but the browser enforces it.
@@ -1236,7 +1236,7 @@ CORS does not secure APIs — it protects browser users.
 
 ## 🔐 Authentication, Authorization, LDAP, OAuth — core identity concepts
 
-### 💡 Authentication (AuthN)
+### Authentication (AuthN)
 
 Authentication answers the question:
 
@@ -1271,7 +1271,7 @@ If it <span style='color:hotpink'>**fails**</span> ➡️ access is denied immed
 ❌ No permission information  
 ❌ No access control  
 
-### 💡 Authorization (AuthZ)
+### Authorization (AuthZ)
 
 Authorization answers the question:
 
@@ -1312,7 +1312,7 @@ Based on identity + rules, the system decides:
 	
 ❗ You **cannot** authorize without authentication
 
-### 💡 LDAP
+### LDAP
 
 LDAP (Lightweight Directory Access Protocol) is a directory protocol used to:
 
@@ -1357,7 +1357,7 @@ dc=company,dc=com
 - OpenLDAP
 - FreeIPA
 
-### 💡 OAuth 2.0
+### OAuth 2.0
 
 OAuth 2.0 is an authorization framework, not an authentication protocol.
 
@@ -1386,7 +1386,7 @@ OAuth answers:
 ❌ Authentication by itself  
 ❌ User identity verification (without extensions)  
 
-### 💡 OAuth vs Authentication
+### OAuth vs Authentication
 
 OAuth tokens <span style='color:darkseagreen'>**answer**</span>:
 
@@ -1401,7 +1401,7 @@ That’s why:
 📌 OAuth ≠ login  
 📌 OAuth ≠ authentication  
 
-### 💡 How these concepts work together
+### How these concepts work together
 
 **Example:** `Web application login`
 
@@ -1417,7 +1417,7 @@ That’s why:
    1. authenticates token (signature)
    2. authorizes request (roles/scopes)
 
-### 💡 LDAP vs OAuth vs JWT
+### LDAP vs OAuth vs JWT
 
 | Concept        | Purpose                         |
 |----------------|---------------------------------|
@@ -1427,14 +1427,14 @@ That’s why:
 | Authentication | Identity verification           |
 | Authorization  | Access control                  |
 
-### 💡 Mental models (remember this)
+### Mental models (remember this)
 
 - Authentication → **Who are you?**
 - Authorization → **What can you do?**
 - LDAP → **Where users and groups live**
 - OAuth → **Who is allowed to access what, on whose behalf**
 
-### 💡 Three-sentence summary
+### Three-sentence summary
 
 Authentication verifies identity, authorization decides permissions.  
 LDAP is a directory used for storing users and authenticating them, not a token system.  

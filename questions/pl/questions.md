@@ -1,4 +1,4 @@
-# 💡 Questions
+# Questions
 
 * [📘 JAVA (Core / JVM)](1-jvm.md#-java-core--jvm)
 * [🌱 SPRING ECOSYSTEM](2-spring.md#-spring-ecosystem)

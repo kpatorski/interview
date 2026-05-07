@@ -5,39 +5,38 @@
 <!-- TOC -->
 * [🗄️ Databases](#-databases)
   * [🔒 Optimistic Locking](#-optimistic-locking)
-    * [💡 How it works](#-how-it-works)
-    * [💡 Pros / Cons](#-pros--cons)
-    * [💡 When to use](#-when-to-use)
+    * [How it works](#how-it-works)
+    * [Pros / Cons](#pros--cons)
+    * [When to use](#when-to-use)
   * [🔐 Pessimistic Locking](#-pessimistic-locking)
-    * [💡 How it works](#-how-it-works-1)
-    * [💡Pros / Cons](#pros--cons)
-    * [💡 When to use](#-when-to-use-1)
+    * [How it works](#how-it-works-1)
+    * [When to use](#when-to-use-1)
   * [🧠 Optimistic vs Pessimistic](#-optimistic-vs-pessimistic)
   * [🔌 Connection Pool](#-connection-pool)
-    * [💡 How it works](#-how-it-works-2)
-    * [💡 Why it matters](#-why-it-matters)
-    * [💡 Common pool settings](#-common-pool-settings)
+    * [How it works](#how-it-works-2)
+    * [Why it matters](#why-it-matters)
+    * [Common pool settings](#common-pool-settings)
   * [🐞 Database Debugging](#-database-debugging)
-    * [💡 Step-by-step approach](#-step-by-step-approach)
+    * [Step-by-step approach](#step-by-step-approach)
   * [📇 Indexes](#-indexes)
-    * [💡 What indexes are good for](#-what-indexes-are-good-for)
-    * [💡 What indexes are bad for](#-what-indexes-are-bad-for)
-    * [💡 Common mistakes](#-common-mistakes)
+    * [What indexes are good for](#what-indexes-are-good-for)
+    * [What indexes are bad for](#what-indexes-are-bad-for)
+    * [Common mistakes](#common-mistakes)
     * [📌 Rule of thumb](#-rule-of-thumb)
-    * [💡 Implementation](#-implementation)
+    * [Implementation](#implementation)
   * [📄 Pagination](#-pagination)
-    * [💡 Why pagination exists](#-why-pagination-exists)
-    * [💡 Offset-based pagination](#-offset-based-pagination)
-    * [💡 Keyset (cursor) pagination (preferred)](#-keyset-cursor-pagination-preferred)
+    * [Why pagination exists](#why-pagination-exists)
+    * [Offset-based pagination](#offset-based-pagination)
+    * [Keyset (cursor) pagination (preferred)](#keyset-cursor-pagination-preferred)
   * [🧩 Partitioning](#-partitioning)
-    * [💡 Types](#-types)
-    * [💡 Why partition?](#-why-partition)
-    * [💡 Partitioning ≠ Sharding](#-partitioning--sharding)
+    * [Types](#types)
+    * [Why partition?](#why-partition)
+    * [Partitioning ≠ Sharding](#partitioning--sharding)
   * [🧩 Sharding — horizontal scaling of databases](#-sharding--horizontal-scaling-of-databases)
-  * [💡 Why sharding exists](#-why-sharding-exists)
-  * [💡 Sharding vs Partitioning](#-sharding-vs-partitioning)
-  * [💡 The core idea: shard key](#-the-core-idea-shard-key)
-  * [💡 What breaks when you shard](#-what-breaks-when-you-shard)
+  * [Why sharding exists](#why-sharding-exists)
+  * [Sharding vs Partitioning](#sharding-vs-partitioning)
+  * [The core idea: shard key](#the-core-idea-shard-key)
+  * [What breaks when you shard](#what-breaks-when-you-shard)
 <!-- TOC -->
 
 ## 🔒 Optimistic Locking
@@ -48,7 +47,7 @@ Optimistic locking assumes:
 
 No lock is held while reading data.
 
-### 💡 How it works
+### How it works
 
 - Each row has a version (number or timestamp)
 - Transaction:
@@ -70,7 +69,7 @@ If `0 rows updated` ➡️ conflict detected.
 
 ---
 
-### 💡 Pros / Cons
+### Pros / Cons
 
 ✅ High concurrency  
 ✅ No blocking  
@@ -81,7 +80,7 @@ If `0 rows updated` ➡️ conflict detected.
 
 ---
 
-### 💡 When to use
+### When to use
 
 ✅ Read-heavy systems  
 ✅ Web apps  
@@ -102,7 +101,7 @@ Data is locked immediately.
 
 ---
 
-### 💡 How it works
+### How it works
 
 ```sql
 SELECT * FROM orders
@@ -115,7 +114,7 @@ FOR UPDATE;
 
 ---
 
-### 💡Pros / Cons
+###Pros / Cons
 
 ✅ Strong consistency  
 ✅ No lost updates  
@@ -126,7 +125,7 @@ FOR UPDATE;
 
 ---
 
-### 💡 When to use
+### When to use
 
 ✅ Financial systems  
 ✅ Critical invariants  
@@ -155,13 +154,13 @@ FOR UPDATE;
 > A connection pool is a cache of open DB connections.  
 > Opening a DB connection is expensive.
 
-### 💡 How it works
+### How it works
 
 1. App starts
 2. Pool opens N connections
 3. Threads borrow and return connections
 
-### 💡 Why it matters
+### Why it matters
 
 ✅ Performance  
 ✅ Resource control  
@@ -173,7 +172,7 @@ Without pooling:
 - latency spikes
 - system collapse
 
-### 💡 Common pool settings
+### Common pool settings
 
 - max pool size
 - connection timeout
@@ -189,7 +188,7 @@ Without pooling:
 
 > Most DB problems are query or index problems, not DB problems.
 
-### 💡 Step-by-step approach
+### Step-by-step approach
 
 1️⃣ Identify the symptom
 
@@ -245,19 +244,19 @@ users table:
 - O(N) complexity  
 - Slow for large tables
 
-### 💡 What indexes are good for
+### What indexes are good for
 
 ✅ WHERE clauses  
 ✅ JOINs  
 ✅ ORDER BY  
 ✅ GROUP BY  
 
-### 💡 What indexes are bad for
+### What indexes are bad for
 
 ❌ Frequent writes  
 ❌ Low-selectivity columns (boolean, small enums)  
 
-### 💡 Common mistakes
+### Common mistakes
 
 ❌ Indexing everything  
 ❌ Missing composite indexes  
@@ -267,7 +266,7 @@ users table:
 
 > Index columns you filter by, not columns you display.
  
-### 💡 Implementation
+### Implementation
 
 🔸 **The most common index: B-Tree**
 
@@ -355,13 +354,13 @@ DB must:
 
 ## 📄 Pagination
 
-### 💡 Why pagination exists
+### Why pagination exists
 
 - limit memory usage
 - improve response time
 - protect DB
 
-### 💡 Offset-based pagination
+### Offset-based pagination
 
 ```sql
 SELECT * FROM orders
@@ -371,7 +370,7 @@ LIMIT 20 OFFSET 100;
 ❌ Slow for large offsets  
 ❌ Unstable with inserts  
 
-### 💡 Keyset (cursor) pagination (preferred)
+### Keyset (cursor) pagination (preferred)
 
 ```sql
 SELECT * FROM orders
@@ -393,13 +392,13 @@ LIMIT 20;
 
 > Splitting a large table into smaller physical pieces.
 
-### 💡 Types
+### Types
 
 - Range (by date)
 - Hash (by key)
 - List (by category)
 
-### 💡 Why partition?
+### Why partition?
 
 ✅ Performance  
 ✅ Maintenance (drop old data fast)  
@@ -413,7 +412,7 @@ orders_2024
 orders_2025
 ```
 
-### 💡 Partitioning ≠ Sharding
+### Partitioning ≠ Sharding
 
 - partitioning → inside one DB
 - sharding → across databases
@@ -444,7 +443,7 @@ Shard 1   Shard 2   Shard 3   Shard 4
 
 ---
 
-## 💡 Why sharding exists
+## Why sharding exists
 
 <span style='color:hotpink'>**Vertical**</span> scaling (bigger machine) hits <span style='color:hotpink'>**limits**</span>:
 
@@ -462,7 +461,7 @@ Sharding enables:
 
 ---
 
-## 💡 Sharding vs Partitioning
+## Sharding vs Partitioning
 
 | Feature        | Partitioning       | Sharding          |
 |----------------|--------------------|-------------------|
@@ -477,7 +476,7 @@ Sharding enables:
 
 ---
 
-## 💡 The core idea: shard key
+## The core idea: shard key
 
 Everything in sharding revolves around the shard key.
 
@@ -491,7 +490,7 @@ Examples:
 
 ---
 
-## 💡 What breaks when you shard
+## What breaks when you shard
 
 🔸 **Joins across shards**
 

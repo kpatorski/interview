@@ -5,19 +5,19 @@
 <!-- TOC -->
 * [Communication](#communication)
   * [🌐 REST API](#-rest-api)
-    * [💡 HTTP Methods](#-http-methods)
-      * [💡 PUT vs POST](#-put-vs-post)
-      * [💡 HTTP Status Codes](#-http-status-codes)
-      * [💡 Retry rules](#-retry-rules)
-      * [💡 Idempotency keys (POST safety)](#-idempotency-keys-post-safety)
-    * [💡 API Versioning](#-api-versioning)
+    * [HTTP Methods](#http-methods)
+      * [PUT vs POST](#put-vs-post)
+      * [HTTP Status Codes](#http-status-codes)
+      * [Retry rules](#retry-rules)
+      * [Idempotency keys (POST safety)](#idempotency-keys-post-safety)
+    * [API Versioning](#api-versioning)
   * [🔌 WebSockets — real-time communication](#-websockets--real-time-communication)
-    * [💡 What is WebSocket?](#-what-is-websocket)
-    * [💡 WebSocket vs HTTP](#-websocket-vs-http)
-    * [💡 When should you use WebSockets?](#-when-should-you-use-websockets)
-    * [💡 When should you NOT use WebSockets?](#-when-should-you-not-use-websockets)
+    * [What is WebSocket?](#what-is-websocket)
+    * [WebSocket vs HTTP](#websocket-vs-http)
+    * [When should you use WebSockets?](#when-should-you-use-websockets)
+    * [When should you NOT use WebSockets?](#when-should-you-not-use-websockets)
   * [📩 Messaging — Kafka vs RabbitMQ](#-messaging--kafka-vs-rabbitmq)
-    * [💡 Apache Kafka](#-apache-kafka)
+    * [Apache Kafka](#apache-kafka)
       * [🔶 Three absolute Kafka basics](#-three-absolute-kafka-basics)
       * [🔶 Topic & Partitions](#-topic--partitions)
         * [Topic](#topic)
@@ -34,7 +34,7 @@
       * [🔶 How Kafka chooses a partition](#-how-kafka-chooses-a-partition)
       * [🔶 Failure handling in Kafka](#-failure-handling-in-kafka)
       * [🔶 Kafka mental model](#-kafka-mental-model)
-    * [💡 RabbitMQ](#-rabbitmq)
+    * [RabbitMQ](#rabbitmq)
       * [🔶 Three absolute RabbitMQ basics](#-three-absolute-rabbitmq-basics)
       * [🔶 Delivery guarantees in RabbitMQ](#-delivery-guarantees-in-rabbitmq)
       * [🔶 Ordering guarantees in RabbitMQ](#-ordering-guarantees-in-rabbitmq)
@@ -47,7 +47,7 @@
 
 ## 🌐 REST API
 
-### 💡 HTTP Methods
+### HTTP Methods
 
 > HTTP methods express intent, not implementation.
 
@@ -63,7 +63,7 @@
 
 ---
 
-#### 💡 PUT vs POST
+#### PUT vs POST
 
 | Aspect             | 	POST       | 	PUT               |
 |--------------------|-------------|--------------------|
@@ -80,7 +80,7 @@
 
 ---
 
-#### 💡 HTTP Status Codes
+#### HTTP Status Codes
 
 🔶 **Client errors (4xx)**
 
@@ -109,7 +109,7 @@
 
 ---
 
-#### 💡 Retry rules
+#### Retry rules
 
 > Retry only what is idempotent or transient.  
 > Retries should target transient server failures, never client-side validation errors.  
@@ -130,7 +130,7 @@
 
 ---
 
-#### 💡 Idempotency keys (POST safety)
+#### Idempotency keys (POST safety)
 
 To safely retry `POST`:
 
@@ -143,7 +143,7 @@ Server must **guarantee**:
 
 ---
 
-### 💡 API Versioning
+### API Versioning
 
 🔶 **Why version APIs?**
 
@@ -169,7 +169,7 @@ Server must **guarantee**:
 
 ## 🔌 WebSockets — real-time communication
 
-### 💡 What is WebSocket?
+### What is WebSocket?
 
 WebSocket is a protocol that provides:
 
@@ -181,7 +181,7 @@ Unlike HTTP:
 - both sides can send messages at any time
 - no request/response pairing
 
-### 💡 WebSocket vs HTTP
+### WebSocket vs HTTP
 
 | Aspect     | 	HTTP            | 	WebSocket     |
 |------------|------------------|----------------|
@@ -191,7 +191,7 @@ Unlike HTTP:
 | Latency    | 	higher          | 	very low      |
 | Real-time  | 	❌               | 	✅             |
 
-### 💡 When should you use WebSockets?
+### When should you use WebSockets?
 
 ✅ Real-time updates  
 ✅ Chat systems  
@@ -200,7 +200,7 @@ Unlike HTTP:
 ✅ Collaborative editors  
 ✅ Notifications  
 
-### 💡 When should you NOT use WebSockets?
+### When should you NOT use WebSockets?
 
 ❌ Simple CRUD APIs  
 ❌ Rare updates  
@@ -227,7 +227,7 @@ Core goals:
 
 ---
 
-### 💡 Apache Kafka
+### Apache Kafka
 
 Kafka is a distributed event streaming platform designed for:
 
@@ -696,7 +696,7 @@ Typical patterns:
 - **Keys** define **ordering**
 ---
 
-### 💡 RabbitMQ
+### RabbitMQ
 
 RabbitMQ is a message broker implementing:
 
