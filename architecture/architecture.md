@@ -98,7 +98,7 @@ Adapters</span>** (e.g. `UserDatabaseRepository`, `UserFileSystemRepository`) th
 Clean Architecture is a software design philosophy introduced by Robert C. Martin ("Uncle Bob") that **emphasizes the separation of concerns by organizing code into concentric layers**. 
 Its primary objective is to create systems that are independent of frameworks, UI, and databases, making them highly testable and maintainable over the long term.
 
-ℹ️ **Core principles**
+💡 **Core principles**
 
 - **The Dependency Rule**: Dependencies must always point inward. Code in an inner layer cannot know anything about the functions, classes, or variables defined in an outer layer.
 - **Separation of Concerns**: Each layer has a specific responsibility, keeping business logic isolated from technical implementation details.
@@ -108,7 +108,7 @@ Its primary objective is to create systems that are independent of frameworks, U
 - It focuses on use cases.
 - The idea that the folder structure should "scream" what the application does, not what frameworks it uses.
 
-ℹ️ **The Four Layers**
+💡 **The Four Layers**
 
 Most implementations follow this standard "onion" structure:
 - **Entities (Inner Circle)**: Contains enterprise-wide business rules. These are the most high-level, stable objects that change the least.
@@ -118,7 +118,7 @@ Most implementations follow this standard "onion" structure:
 
 <img src="clean-architecture.png" alt="drawing" width="600"/>
 
-ℹ️ **Difference vs. Hexagonal**
+💡 **Difference vs. Hexagonal**
 - Clean formalizes layers
 - Hexagonal tells you how to communicate, not how to divide packages
 
@@ -143,13 +143,13 @@ Most implementations follow this standard "onion" structure:
 
 Onion Architecture is a software design pattern that **emphasizes separation of concerns by structuring an application into concentric layers**, ensuring the core business logic remains independent of external concerns like databases or UIs.
 
-ℹ️ **Core principles**
+💡 **Core principles**
 
 - **The Dependency Rule**: The fundamental principle is that all dependencies flow inward. Inner layers must not depend on outer layers. This ensures the core of the application remains isolated from specific technology implementations.
 - **Domain at the Core**: The heart of the application is the domain model (business entities and rules), which is independent of any infrastructure or application services.
 - **Interfaces and Inversion of Control (IoC)**: Layers interact through interfaces defined by the inner layers and implemented by the outer layers. IoC and Dependency Injection are used to manage these relationships at runtime.
 
-ℹ️ **Key Layers**
+💡 **Key Layers**
 
 While the exact number of layers can vary, a typical Onion Architecture consists of:
 - **Domain Layer (Innermost)**: Contains the core business logic, entities, and enterprise-wide rules. It has no dependencies on other layers.
@@ -194,7 +194,7 @@ While the exact number of layers can vary, a typical Onion Architecture consists
 | Boilerplate          | Medium                 | High                  | Medium             |
 
 
-ℹ️ **One-sentence intuition**
+💡 **One-sentence intuition**
 
 **Hexagonal asks**: **<span style='color:darkseagreen'>How</span>** does the application **<span style='color:darkseagreen'>
 talk</span>** to the outside world?  
@@ -209,7 +209,7 @@ business</span>** domain?
 
 Evolving style where applications are built as a collection of small, independent services. Each service focuses on a single business capability and communicates via lightweight protocols like REST, gRPC, or message brokers.
 
-ℹ️ **Core principles**
+💡 **Core principles**
 
 - **Independent Deployability**: Each service can be updated and deployed without affecting the rest of the system.  
 - **Loose Coupling**: Services are self-contained with their own databases, ensuring that internal changes in one don't require changes in others.  

@@ -5,30 +5,30 @@
 <!-- TOC -->
 * [Patterns](#patterns)
   * [📥 Inbox pattern](#-inbox-pattern)
-    * [ℹ️ What problem does it solve?](#ℹ-what-problem-does-it-solve)
-    * [ℹ️ Core idea](#ℹ-core-idea)
-    * [ℹ️ How It Works](#ℹ-how-it-works)
-    * [ℹ️ Key Benefits](#ℹ-key-benefits)
+    * [💡 What problem does it solve?](#-what-problem-does-it-solve)
+    * [💡 Core idea](#-core-idea)
+    * [💡 How It Works](#-how-it-works)
+    * [💡 Key Benefits](#-key-benefits)
   * [📤 Outbox pattern](#-outbox-pattern)
-    * [ℹ️ What problem does it solve?](#ℹ-what-problem-does-it-solve-1)
-    * [ℹ️ Core idea](#ℹ-core-idea-1)
-    * [ℹ️ How It Works](#ℹ-how-it-works-1)
-    * [ℹ️ Key Benefits](#ℹ-key-benefits-1)
+    * [💡 What problem does it solve?](#-what-problem-does-it-solve-1)
+    * [💡 Core idea](#-core-idea-1)
+    * [💡 How It Works](#-how-it-works-1)
+    * [💡 Key Benefits](#-key-benefits-1)
   * [Inbox vs Outbox pattern](#inbox-vs-outbox-pattern)
   * [🔄 Saga pattern](#-saga-pattern)
-    * [ℹ️ What problem does it solve?](#ℹ-what-problem-does-it-solve-2)
-    * [ℹ️ Core idea](#ℹ-core-idea-2)
-    * [ℹ️ How it works (step by step)](#ℹ-how-it-works-step-by-step)
-    * [ℹ️ Two Saga styles](#ℹ-two-saga-styles)
-    * [ℹ️ Key benefits](#ℹ-key-benefits-2)
-    * [ℹ️ Trade-offs](#ℹ-trade-offs)
+    * [💡 What problem does it solve?](#-what-problem-does-it-solve-2)
+    * [💡 Core idea](#-core-idea-2)
+    * [💡 How it works (step by step)](#-how-it-works-step-by-step)
+    * [💡 Two Saga styles](#-two-saga-styles)
+    * [💡 Key benefits](#-key-benefits-2)
+    * [💡 Trade-offs](#-trade-offs)
   * [🔌 Circuit breaker pattern](#-circuit-breaker-pattern)
-    * [ℹ️ What problem does it solve?](#ℹ-what-problem-does-it-solve-3)
-    * [ℹ️ Core idea](#ℹ-core-idea-3)
-    * [ℹ️ How it works (step by step)](#ℹ-how-it-works-step-by-step-1)
-    * [ℹ️ Circuit states](#ℹ-circuit-states)
-    * [ℹ️ Key benefits](#ℹ-key-benefits-3)
-    * [ℹ️ Trade-offs](#ℹ-trade-offs-1)
+    * [💡 What problem does it solve?](#-what-problem-does-it-solve-3)
+    * [💡 Core idea](#-core-idea-3)
+    * [💡 How it works (step by step)](#-how-it-works-step-by-step-1)
+    * [💡 Circuit states](#-circuit-states)
+    * [💡 Key benefits](#-key-benefits-3)
+    * [💡 Trade-offs](#-trade-offs-1)
 <!-- TOC -->
 
 ## 📥 Inbox pattern
@@ -36,7 +36,7 @@
 The Inbox Pattern is a reliable messaging design pattern in microservices used on the consumer side to ensure exactly-once processing. 
 While most message brokers provide "at-least-once" delivery, the Inbox Pattern **prevents a service from processing the same message multiple times** due to network retries or crashes.
 
-### ℹ️ What problem does it solve?
+### 💡 What problem does it solve?
 
 The Inbox Pattern guarantees idempotent message consumption.
 
@@ -46,13 +46,13 @@ It answers:
 
 (Because at-least-once delivery is the default in most brokers.)
 
-### ℹ️ Core idea
+### 💡 Core idea
 
 > Persist incoming message metadata before processing, and process each message only once.
 
 The consumer remembers what it has already processed.
 
-### ℹ️ How It Works
+### 💡 How It Works
 
 1. **Message Receipt**: The consumer service receives a message from a broker (like Kafka or RabbitMQ).
 2. **Deduplication Check**: Before executing any logic, the service checks an inbox table in its database for the unique `message_id`.
@@ -61,7 +61,7 @@ The consumer remembers what it has already processed.
    2. Executes the required business logic (e.g., updating an inventory count).
 4. **Acknowledgment**: Once the transaction commits, the message is acknowledged to the broker. If the same message arrives again, the inbox check will find the existing ID and skip processing.
 
-### ℹ️ Key Benefits
+### 💡 Key Benefits
 
 ✅ **Idempotency**: Guarantees that even if a message is delivered multiple times, the business state is only updated once.  
 ✅ **Resilience**: If the service crashes mid-processing, the database transaction rolls back, allowing the message to be safely retried later without partial data corruption.  
@@ -72,7 +72,7 @@ The consumer remembers what it has already processed.
 
 ## 📤 Outbox pattern
 
-### ℹ️ What problem does it solve?
+### 💡 What problem does it solve?
 
 The Outbox Pattern guarantees reliable event publishing when a service updates its database and needs to notify other systems (via Kafka, RabbitMQ, SQS, etc.).
 
@@ -80,13 +80,13 @@ It solves the classic problem:
 
 > “What if my database transaction commits, but sending the event fails?”
 
-### ℹ️ Core idea
+### 💡 Core idea
 
 >Persist events in the same database transaction as business data, then publish them asynchronously.
 
 The database becomes the source of truth, not the message broker.
 
-### ℹ️ How It Works
+### 💡 How It Works
 
 1. Business logic executes
     1. Example: OrderPlaced
@@ -101,7 +101,7 @@ The database becomes the source of truth, not the message broker.
    1. Sent to Kafka / RabbitMQ / SNS / etc.
 6. Outbox entry is marked as published or deleted after successful delivery
 
-### ℹ️ Key Benefits
+### 💡 Key Benefits
 
 ✅ **Guaranteed Delivery**: Messages are sent if and only if the original database transaction commits, ensuring eventual consistency.  
 ✅ **No 2PC Required**: It avoids the complexity and performance penalties of Two-Phase Commit (2PC) by using the local database's ACID properties.  
@@ -124,7 +124,7 @@ The database becomes the source of truth, not the message broker.
 
 ## 🔄 Saga pattern
 
-### ℹ️ What problem does it solve?
+### 💡 What problem does it solve?
 
 The Saga Pattern manages data consistency across multiple services without distributed transactions.
 
@@ -132,13 +132,13 @@ It answers:
 
 > “How do I keep the system consistent when a business process spans multiple services and something fails halfway?”
 
-### ℹ️ Core idea
+### 💡 Core idea
 
 >A saga is a sequence of local transactions, each with a compensating action.
 
 If one step fails, previous successful steps are undone via compensations.
 
-### ℹ️ How it works (step by step)
+### 💡 How it works (step by step)
 
 **Example: Order processing**
 
@@ -152,7 +152,7 @@ If step 3 fails:
 - payment is refunded
 - order is cancelled
 
-### ℹ️ Two Saga styles
+### 💡 Two Saga styles
 
 1️⃣ **Choreography-based Saga**
 
@@ -203,7 +203,7 @@ On failure:
 ✅ Easier debugging & monitoring  
 ⚠️ Orchestrator can become complex  
 
-### ℹ️ Key benefits
+### 💡 Key benefits
 
 ✅ No distributed transactions
 - Avoids 2PC and XA
@@ -216,7 +216,7 @@ On failure:
 
 ✅ Cloud- and microservice-friendly
 
-### ℹ️ Trade-offs
+### 💡 Trade-offs
 
 ⚠️ Eventual consistency  
 ⚠️ Compensations can be complex  
@@ -228,7 +228,7 @@ On failure:
 
 ## 🔌 Circuit breaker pattern
 
-### ℹ️ What problem does it solve?
+### 💡 What problem does it solve?
 
 The Circuit Breaker Pattern prevents cascading failures when calling unreliable or overloaded services.
 
@@ -236,13 +236,13 @@ It answers:
 
 > “How do I stop a failing service from taking the whole system down?”
 
-### ℹ️ Core idea
+### 💡 Core idea
 
 > Stop calling a failing dependency temporarily and fail fast.
 
 Instead of retrying endlessly, the system protects itself.
 
-### ℹ️ How it works (step by step)
+### 💡 How it works (step by step)
 
 1️⃣ **Closed (normal state)**
 - Requests flow normally
@@ -258,20 +258,20 @@ Instead of retrying endlessly, the system protects itself.
 - If successful → back to Closed
 - If failure → Open again
 
-### ℹ️ Circuit states
+### 💡 Circuit states
 
 `CLOSED → OPEN → HALF-OPEN → CLOSED`
 
 <img src="circuit-breaker-pattern.png" alt="drawing" width="600"/>
 
-### ℹ️ Key benefits
+### 💡 Key benefits
 
 ✅ Prevents cascading failures  
 ✅ Fast failure instead of timeouts  
 ✅ Protects threads & resources  
 ✅ Improves system stability  
 
-### ℹ️ Trade-offs
+### 💡 Trade-offs
 
 ⚠️ Requests may fail even if service recovers briefly  
 ⚠️ Requires tuning thresholds and timeouts  

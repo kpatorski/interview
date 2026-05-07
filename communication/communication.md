@@ -5,19 +5,19 @@
 <!-- TOC -->
 * [Communication](#communication)
   * [🌐 REST API](#-rest-api)
-    * [ℹ️ HTTP Methods](#ℹ-http-methods)
-      * [ℹ️ PUT vs POST](#ℹ-put-vs-post)
-      * [ℹ️ HTTP Status Codes](#ℹ-http-status-codes)
-      * [ℹ️ Retry rules](#ℹ-retry-rules)
-      * [ℹ️ Idempotency keys (POST safety)](#ℹ-idempotency-keys-post-safety)
-    * [ℹ️ API Versioning](#ℹ-api-versioning)
+    * [💡 HTTP Methods](#-http-methods)
+      * [💡 PUT vs POST](#-put-vs-post)
+      * [💡 HTTP Status Codes](#-http-status-codes)
+      * [💡 Retry rules](#-retry-rules)
+      * [💡 Idempotency keys (POST safety)](#-idempotency-keys-post-safety)
+    * [💡 API Versioning](#-api-versioning)
   * [🔌 WebSockets — real-time communication](#-websockets--real-time-communication)
-    * [ℹ️ What is WebSocket?](#ℹ-what-is-websocket)
-    * [ℹ️ WebSocket vs HTTP](#ℹ-websocket-vs-http)
-    * [ℹ️ When should you use WebSockets?](#ℹ-when-should-you-use-websockets)
-    * [ℹ️ When should you NOT use WebSockets?](#ℹ-when-should-you-not-use-websockets)
+    * [💡 What is WebSocket?](#-what-is-websocket)
+    * [💡 WebSocket vs HTTP](#-websocket-vs-http)
+    * [💡 When should you use WebSockets?](#-when-should-you-use-websockets)
+    * [💡 When should you NOT use WebSockets?](#-when-should-you-not-use-websockets)
   * [📩 Messaging — Kafka vs RabbitMQ](#-messaging--kafka-vs-rabbitmq)
-    * [ℹ️ Apache Kafka](#ℹ-apache-kafka)
+    * [💡 Apache Kafka](#-apache-kafka)
       * [🔶 Three absolute Kafka basics](#-three-absolute-kafka-basics)
       * [🔶 Topic & Partitions](#-topic--partitions)
         * [Topic](#topic)
@@ -34,7 +34,7 @@
       * [🔶 How Kafka chooses a partition](#-how-kafka-chooses-a-partition)
       * [🔶 Failure handling in Kafka](#-failure-handling-in-kafka)
       * [🔶 Kafka mental model](#-kafka-mental-model)
-    * [ℹ️ RabbitMQ](#ℹ-rabbitmq)
+    * [💡 RabbitMQ](#-rabbitmq)
       * [🔶 Three absolute RabbitMQ basics](#-three-absolute-rabbitmq-basics)
       * [🔶 Delivery guarantees in RabbitMQ](#-delivery-guarantees-in-rabbitmq)
       * [🔶 Ordering guarantees in RabbitMQ](#-ordering-guarantees-in-rabbitmq)
@@ -47,7 +47,7 @@
 
 ## 🌐 REST API
 
-### ℹ️ HTTP Methods
+### 💡 HTTP Methods
 
 > HTTP methods express intent, not implementation.
 
@@ -63,7 +63,7 @@
 
 ---
 
-#### ℹ️ PUT vs POST
+#### 💡 PUT vs POST
 
 | Aspect             | 	POST       | 	PUT               |
 |--------------------|-------------|--------------------|
@@ -80,7 +80,7 @@
 
 ---
 
-#### ℹ️ HTTP Status Codes
+#### 💡 HTTP Status Codes
 
 🔶 **Client errors (4xx)**
 
@@ -109,7 +109,7 @@
 
 ---
 
-#### ℹ️ Retry rules
+#### 💡 Retry rules
 
 > Retry only what is idempotent or transient.  
 > Retries should target transient server failures, never client-side validation errors.  
@@ -130,7 +130,7 @@
 
 ---
 
-#### ℹ️ Idempotency keys (POST safety)
+#### 💡 Idempotency keys (POST safety)
 
 To safely retry `POST`:
 
@@ -143,7 +143,7 @@ Server must **guarantee**:
 
 ---
 
-### ℹ️ API Versioning
+### 💡 API Versioning
 
 🔶 **Why version APIs?**
 
@@ -169,7 +169,7 @@ Server must **guarantee**:
 
 ## 🔌 WebSockets — real-time communication
 
-### ℹ️ What is WebSocket?
+### 💡 What is WebSocket?
 
 WebSocket is a protocol that provides:
 
@@ -181,7 +181,7 @@ Unlike HTTP:
 - both sides can send messages at any time
 - no request/response pairing
 
-### ℹ️ WebSocket vs HTTP
+### 💡 WebSocket vs HTTP
 
 | Aspect     | 	HTTP            | 	WebSocket     |
 |------------|------------------|----------------|
@@ -191,7 +191,7 @@ Unlike HTTP:
 | Latency    | 	higher          | 	very low      |
 | Real-time  | 	❌               | 	✅             |
 
-### ℹ️ When should you use WebSockets?
+### 💡 When should you use WebSockets?
 
 ✅ Real-time updates  
 ✅ Chat systems  
@@ -200,7 +200,7 @@ Unlike HTTP:
 ✅ Collaborative editors  
 ✅ Notifications  
 
-### ℹ️ When should you NOT use WebSockets?
+### 💡 When should you NOT use WebSockets?
 
 ❌ Simple CRUD APIs  
 ❌ Rare updates  
@@ -227,7 +227,7 @@ Core goals:
 
 ---
 
-### ℹ️ Apache Kafka
+### 💡 Apache Kafka
 
 Kafka is a distributed event streaming platform designed for:
 
@@ -696,7 +696,7 @@ Typical patterns:
 - **Keys** define **ordering**
 ---
 
-### ℹ️ RabbitMQ
+### 💡 RabbitMQ
 
 RabbitMQ is a message broker implementing:
 

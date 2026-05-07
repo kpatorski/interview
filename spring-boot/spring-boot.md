@@ -4,21 +4,21 @@
 
 <!-- TOC -->
 * [🍃 Spring Boot](#-spring-boot)
-  * [ℹ️ IoC - Inversion of Control](#ℹ-ioc---inversion-of-control)
-  * [ℹ️ Proxy](#ℹ-proxy)
+  * [💡 IoC - Inversion of Control](#-ioc---inversion-of-control)
+  * [💡 Proxy](#-proxy)
     * [Two types of proxies](#two-types-of-proxies)
     * [When proxies DO NOT work](#when-proxies-do-not-work)
-  * [ℹ️ AOP — Aspect-Oriented Programming](#ℹ-aop--aspect-oriented-programming)
-  * [ℹ️ Transactions](#ℹ-transactions)
+  * [💡 AOP — Aspect-Oriented Programming](#-aop--aspect-oriented-programming)
+  * [💡 Transactions](#-transactions)
     * [@Transactional](#transactional)
     * [Propagation](#propagation)
     * [Isolation](#isolation)
     * [Rollback](#rollback)
     * [Thread boundaries](#thread-boundaries)
-  * [ℹ️ Beans](#ℹ-beans)
+  * [💡 Beans](#-beans)
 <!-- TOC -->
 
-## ℹ️ IoC - Inversion of Control
+## 💡 IoC - Inversion of Control
 
 > Your application does not build itself. The container builds it.
 
@@ -42,7 +42,7 @@ Spring:
 ---
 <div style="break-after: page;"></div>
 
-## ℹ️ Proxy
+## 💡 Proxy
 
 > An object that wraps another object and intercepts method calls.
 
@@ -80,7 +80,7 @@ this.save();  // bypass proxy
 ---
 <div style="break-after: page;"></div>
 
-## ℹ️ AOP — Aspect-Oriented Programming
+## 💡 AOP — Aspect-Oriented Programming
 
 🔸 **What is AOP?**
 
@@ -125,7 +125,7 @@ Examples:
 ---
 <div style="break-after: page;"></div>
 
-## ℹ️ Transactions
+## 💡 Transactions
 
 Spring transaction management is:
 
@@ -286,7 +286,7 @@ They **<span style='color:hotpink'>DO NOT</span>**:
 ---
 <div style="break-after: page;"></div>
 
-## ℹ️ Beans
+## 💡 Beans
 
 | Scope                 | Important                                                                                                                                                                                                                 |
 |-----------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|

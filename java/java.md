@@ -673,7 +673,7 @@ Before Java 8, collisions always became a linked list:
 The core pipeline for both `get` and `put`
 
 1. Compute #️⃣ hash
-2. Convert hash to bucket ℹ️ index
+2. Convert hash to bucket 💡 index
 3. 🚶Traverse bucket (**<span style='color:darkseagreen'>list</span>** or **<span style='color:dodgerblue'>tree</span>**)
 4. Compare keys using equals
 5. Return or insert/update
@@ -689,7 +689,7 @@ It mixes bits to reduce poor distribution:
 
 Reason: bucket index uses low bits; <span style='color:darkseagreen'>mixing helps spread</span> entropy(randomness).
 
-🔹 ℹ️ index calculation
+🔹 💡 index calculation
 
 Index is computed with bitmask (fast) because capacity is power-of-two:
 ```ini

@@ -4,9 +4,9 @@
 
 <!-- TOC -->
 * [🔭 Observability — seeing what your system is really doing](#-observability--seeing-what-your-system-is-really-doing)
-  * [ℹ️ What is Observability?](#ℹ-what-is-observability)
-  * [ℹ️ Popular observability frameworks & tools (ecosystem)](#ℹ-popular-observability-frameworks--tools-ecosystem)
-  * [ℹ️ The three pillars of observability](#ℹ-the-three-pillars-of-observability)
+  * [💡 What is Observability?](#-what-is-observability)
+  * [💡 Popular observability frameworks & tools (ecosystem)](#-popular-observability-frameworks--tools-ecosystem)
+  * [💡 The three pillars of observability](#-the-three-pillars-of-observability)
   * [📜 Logs](#-logs)
     * [🔸What are logs?](#what-are-logs)
     * [🔸 When logs are useful](#-when-logs-are-useful)
@@ -24,7 +24,7 @@
   * [Anti-patterns](#anti-patterns)
 <!-- TOC -->
 
-## ℹ️ What is Observability?
+## 💡 What is Observability?
 
 Observability is the ability to:
 
@@ -39,7 +39,7 @@ Those outputs are:
 📌 Monitoring tells you something is wrong  
 📌 Observability helps you answer why it is wrong  
 
-## ℹ️ Popular observability frameworks & tools (ecosystem)
+## 💡 Popular observability frameworks & tools (ecosystem)
 
 🔸 **Core standards / instrumentation**
 
@@ -79,7 +79,7 @@ Those outputs are:
 
 ---
 
-## ℹ️ The three pillars of observability
+## 💡 The three pillars of observability
 
 ```bash
 Logs    → what happened?
