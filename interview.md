@@ -92,7 +92,7 @@
     * [Threading](java/java.md#threading)
       * [Executors](java/java.md#executors)
       * [Callable](java/java.md#callable)
-    * [JDK vs JRE vs JVM](java/java.md#)
+    * [JDK vs JRE vs JVM](java/java.md#jdk-vs-jre-vs-jvm)
     * [JIT](java/java.md#jit)
 * [Git](#git)
 * [maven](#maven)

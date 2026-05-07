@@ -5,7 +5,7 @@
 <!-- TOC -->
 * [🚀 Kubernetes](#-kubernetes)
   * [📘 What is Kubernetes?](#-what-is-kubernetes)
-  * [🏗  Cluster Architecture](#-cluster-architecture)
+  * [🏗 Cluster Architecture](#-cluster-architecture)
     * [control Plane](#control-plane)
       * [kube-apiserver](#kube-apiserver)
       * [etcd](#etcd)
@@ -75,7 +75,7 @@ declared state.
 
 ---
 
-## 🏗  Cluster Architecture
+## 🏗 Cluster Architecture
 
 A Kubernetes cluster consists of:
 
