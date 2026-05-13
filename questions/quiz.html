@@ -1759,7 +1759,722 @@ wrong:{
   'Flame graph wizualizuje error rate per endpoint w czasie — pomarańczowy kolor = wysoki error rate': 'Error rate per endpoint to dashboardy w Grafana/Kibana (line chart, heatmap). Flame graph pochodzi z CPU profiling (perf, async-profiler, Java Flight Recorder).'
 },
 exp:'Flame graph (Brendan Gregg): X-axis = % CPU time (nie czas rzeczywisty), Y-axis = call stack. Szeroka ramka = funkcja zajmuje dużo CPU. Jak czytać: znajdź szeroką ramkę na szczycie (nie ma callees → to hot path). Tools: async-profiler (Java), perf (Linux), py-spy (Python). Używaj gdy: "aplikacja jest wolna ale nie wiem gdzie".'
+},,
+{cat:'architecture',type:'single',
+q:'Co to jest Domain-Driven Design (DDD)?',
+opts:[
+  'Metodologia projektowania baz danych oparta na normalizacji tabel do trzeciej postaci normalnej',
+  'Podejście do tworzenia oprogramowania skupiające się na modelu domeny biznesowej i języku wspólnym (Ubiquitous Language) z ekspertami dziedzinowymi',
+  'Framework do automatycznego generowania kodu na podstawie schematu bazy danych',
+  'Wzorzec projektowy do separacji logiki biznesowej od warstwy prezentacji w aplikacjach webowych'
+],
+cor:'Podejście do tworzenia oprogramowania skupiające się na modelu domeny biznesowej i języku wspólnym (Ubiquitous Language) z ekspertami dziedzinowymi',
+wrong:{
+  'Metodologia projektowania baz danych oparta na normalizacji tabel do trzeciej postaci normalnej':'DDD dotyczy modelu obiektowego domeny biznesowej, nie struktury bazy danych. Normalizacja to technika relacyjna, niezwiązana z DDD.',
+  'Framework do automatycznego generowania kodu na podstawie schematu bazy danych':'To opis narzędzi ORM lub code generation. DDD to filozofia i zestaw wzorców — nie framework ani narzędzie.',
+  'Wzorzec projektowy do separacji logiki biznesowej od warstwy prezentacji w aplikacjach webowych':'To opis wzorca MVC. DDD jest szerszy — dotyczy całego modelu domeny, Ubiquitous Language, Bounded Context i taktycznych wzorców jak Agregat, Encja, Value Object.'
 },
+exp:'DDD (opracowane przez Erica Evansa) to podejście w którym centralnym punktem jest model domeny biznesowej. Kluczowe koncepty: Ubiquitous Language (wspólny język developerów i ekspertów dziedzinowych), Bounded Context (granica w której model jest spójny), oraz wzorce taktyczne: Aggregate, Entity, Value Object, Domain Event, Repository, Service.'
+},
+
+{cat:'architecture',type:'single',
+q:'Co to jest Aggregate w DDD?',
+opts:[
+  'Widok bazodanowy agregujący dane z wielu tabel w jednym zapytaniu SQL',
+  'Klaster powiązanych obiektów traktowany jako jednostka spójności (consistency boundary) z jednym korzeniem (Aggregate Root) kontrolującym dostęp',
+  'Wzorzec projektowy do łączenia wielu interfejsów w jeden zunifikowany interfejs dla klienta',
+  'Zbiór wszystkich encji w ramach jednego Bounded Context'
+],
+cor:'Klaster powiązanych obiektów traktowany jako jednostka spójności (consistency boundary) z jednym korzeniem (Aggregate Root) kontrolującym dostęp',
+wrong:{
+  'Widok bazodanowy agregujący dane z wielu tabel w jednym zapytaniu SQL':'To opis SQL VIEW lub złożonego zapytania. Aggregate DDD to obiekt domenowy, nie konstrukt bazodanowy.',
+  'Wzorzec projektowy do łączenia wielu interfejsów w jeden zunifikowany interfejs dla klienta':'To opis wzorca Facade. Aggregate to granica spójności w modelu domenowym, nie wzorzec strukturalny.',
+  'Zbiór wszystkich encji w ramach jednego Bounded Context':'Bounded Context może zawierać wiele Agregatów. Aggregate to mniejsza jednostka — granica spójności dla konkretnego zestawu powiązanych obiektów, np. Order z OrderLines.'
+},
+exp:'Aggregate to granica spójności: wszystkie zmiany wewnątrz agregatu muszą być atomowe (jedna transakcja). Aggregate Root to jedyna klasa przez którą można modyfikować agregat z zewnątrz. Przykład: Order (root) zawiera OrderLines — nie modyfikujesz OrderLine bezpośrednio, tylko przez Order. Reguła: jeden agregat = jedna transakcja.'
+},
+
+{cat:'architecture',type:'single',
+q:'Co to jest Value Object w DDD?',
+opts:[
+  'Obiekt przechowujący wartość z bazy danych w pamięci podręcznej aplikacji',
+  'Niezmienny (immutable) obiekt definiowany przez swoje atrybuty, bez tożsamości — dwa Value Objects o tych samych atrybutach są równe',
+  'Obiekt transferu danych (DTO) używany do przesyłania danych między warstwami aplikacji',
+  'Zmienne pole w encji przechowujące wartości skalarne (int, String)'
+],
+cor:'Niezmienny (immutable) obiekt definiowany przez swoje atrybuty, bez tożsamości — dwa Value Objects o tych samych atrybutach są równe',
+wrong:{
+  'Obiekt przechowujący wartość z bazy danych w pamięci podręcznej aplikacji':'To opis cache. Value Object to koncepcja domenowa — obiekt bez tożsamości, równość przez wartości atrybutów.',
+  'Obiekt transferu danych (DTO) używany do przesyłania danych między warstwami aplikacji':'DTO to wzorzec infrastrukturalny do transferu danych. Value Object to część modelu domenowego z logiką biznesową (np. Money.add()).',
+  'Zmienne pole w encji przechowujące wartości skalarne (int, String)':'Value Object w DDD to pełnoprawny obiekt (klasa) z metodami, nie zwykłe pole. Jest immutable — każda zmiana tworzy nowy obiekt.'
+},
+exp:'Przykłady Value Objects: Money(amount=100, currency=PLN), Address(street, city, zip), Email(value). Równość przez atrybuty: Money(100, PLN) == Money(100, PLN). Immutable — nie ma setterów. Logika biznesowa: Money.add(other). Różnica od Encji: Encja ma tożsamość (ID), Value Object nie — liczy się tylko wartość.'
+},
+
+{cat:'architecture',type:'single',
+q:'Co to jest Domain Event w DDD?',
+opts:[
+  'Wyjątek rzucany przez warstwę domenową gdy reguła biznesowa zostaje naruszona',
+  'Niemutowalne zdarzenie reprezentujące coś znaczącego co się wydarzyło w domenie biznesowej, opisane w czasie przeszłym',
+  'Komunikat wysyłany przez mikroserwis do zewnętrznego systemu przez REST API',
+  'Log aplikacyjny zapisywany do pliku przy każdej zmianie stanu encji'
+],
+cor:'Niemutowalne zdarzenie reprezentujące coś znaczącego co się wydarzyło w domenie biznesowej, opisane w czasie przeszłym',
+wrong:{
+  'Wyjątek rzucany przez warstwę domenową gdy reguła biznesowa zostaje naruszona':'To opis Domain Exception (np. InsufficientFundsException). Domain Event to zdarzenie które się WYDARZYŁO — sukces, nie błąd.',
+  'Komunikat wysyłany przez mikroserwis do zewnętrznego systemu przez REST API':'Domain Event to koncepcja domenowa, nie transport. Może być opublikowany przez REST/Kafka/RabbitMQ, ale samo zdarzenie jest częścią modelu domeny.',
+  'Log aplikacyjny zapisywany do pliku przy każdej zmianie stanu encji':'Logi są dla developerów/operatorów. Domain Event jest częścią modelu biznesowego i może triggerować logikę biznesową w innych częściach systemu.'
+},
+exp:'Przykłady Domain Events: OrderPlaced, PaymentProcessed, UserRegistered. Cechy: immutable, nazwane w czasie przeszłym, zawierają dane zdarzenia (timestamp, ID, zmiany). Zastosowania: komunikacja między Bounded Contexts, Event Sourcing, integracja z innymi systemami. Agregat emituje Domain Events jako efekt uboczny poleceń.'
+},
+
+{cat:'architecture',type:'single',
+q:'Czym jest Saga Pattern i jaki problem rozwiązuje?',
+opts:[
+  'Wzorzec do cachowania wyników zapytań bazodanowych w celu poprawy wydajności aplikacji',
+  'Sekwencja lokalnych transakcji z akcjami kompensacyjnymi do utrzymania spójności danych w procesach biznesowych spanning wielu serwisów, bez użycia rozproszonych transakcji',
+  'Wzorzec do synchronizacji stanu między wieloma węzłami klastra Kubernetes',
+  'Mechanizm automatycznego rollbacku transakcji bazodanowych przy wykryciu deadlocka'
+],
+cor:'Sekwencja lokalnych transakcji z akcjami kompensacyjnymi do utrzymania spójności danych w procesach biznesowych spanning wielu serwisów, bez użycia rozproszonych transakcji',
+wrong:{
+  'Wzorzec do cachowania wyników zapytań bazodanowych w celu poprawy wydajności aplikacji':'To opis cache-aside lub query cache. Saga dotyczy spójności danych w systemach rozproszonych, nie wydajności.',
+  'Wzorzec do synchronizacji stanu między wieloma węzłami klastra Kubernetes':'To opis etcd i reconciliation loop w Kubernetes. Saga to wzorzec architektoniczny dla transakcji biznesowych w mikrousługach.',
+  'Mechanizm automatycznego rollbacku transakcji bazodanowych przy wykryciu deadlocka':'Deadlock detection i rollback to funkcja bazy danych. Saga to sekwencja lokalnych transakcji z logicznymi kompensacjami na poziomie aplikacji.'
+},
+exp:'Problem: zamówienie obejmuje 3 serwisy (Order, Payment, Inventory) — brak jednej transakcji ACID. Saga: krok 1 utwórz zamówienie, krok 2 pobierz płatność, krok 3 zarezerwuj towar. Jeśli krok 3 zawiedzie: kompensacja kroku 2 (zwrot płatności) i kompensacja kroku 1 (anulowanie zamówienia). Eventual consistency zamiast ACID.'
+},
+
+{cat:'architecture',type:'single',
+q:'Co to jest Anti-Corruption Layer (ACL) w DDD?',
+opts:[
+  'Warstwa bezpieczeństwa filtrująca złośliwe dane wejściowe w REST API',
+  'Warstwa translacji izolująca model domenowy od zewnętrznych systemów lub starszych modeli — tłumaczy obce koncepty na własny model domeny',
+  'Mechanizm walidacji encji przed zapisem do bazy danych',
+  'Wzorzec do obsługi błędów w warstwie infrastruktury aplikacji'
+],
+cor:'Warstwa translacji izolująca model domenowy od zewnętrznych systemów lub starszych modeli — tłumaczy obce koncepty na własny model domeny',
+wrong:{
+  'Warstwa bezpieczeństwa filtrująca złośliwe dane wejściowe w REST API':'To opis input validation lub WAF (Web Application Firewall). ACL w DDD nie ma związku z bezpieczeństwem — jest wzorcem integracyjnym.',
+  'Mechanizm walidacji encji przed zapisem do bazy danych':'To opis bean validation (@Valid, @NotNull) lub domain invariants. ACL dotyczy integracji z zewnętrznymi systemami.',
+  'Wzorzec do obsługi błędów w warstwie infrastruktury aplikacji':'To opis error handling lub circuit breaker. ACL jest warstwą translacji chroniącą model domenowy przed "skażeniem" przez obcy model.'
+},
+exp:'ACL stosowany gdy integrujemy się z legacy systemem lub zewnętrznym API o innym modelu. Bez ACL: ich koncepty "wyciekają" do naszej domeny. Z ACL: tłumaczymy ich Order na nasz PurchaseOrder, ich Customer na naszego Client. Domena pozostaje czysta i niezależna od zewnętrznych systemów. Typowa implementacja: Adapter + Mapper.'
+},
+
+{cat:'patterns',type:'single',
+q:'Co to jest wzorzec Retry z exponential backoff?',
+opts:[
+  'Wzorzec do równoległego wykonywania wielu operacji i zwracania pierwszego wyniku',
+  'Automatyczne ponowienie nieudanej operacji z rosnącym czasem oczekiwania między próbami — chroni przed przeciążeniem downstream serwisu',
+  'Mechanizm cache\'owania wyników operacji aby unikać powtarzania kosztownych obliczeń',
+  'Wzorzec podziału operacji na etapy wykonywane przez oddzielne wątki'
+],
+cor:'Automatyczne ponowienie nieudanej operacji z rosnącym czasem oczekiwania między próbami — chroni przed przeciążeniem downstream serwisu',
+wrong:{
+  'Wzorzec do równoległego wykonywania wielu operacji i zwracania pierwszego wyniku':'To opis wzorca Race / CompetingConsumers lub CompletableFuture.anyOf(). Retry dotyczy ponawiania jednej operacji, nie równoległości.',
+  'Mechanizm cache\'owania wyników operacji aby unikać powtarzania kosztownych obliczeń':'To opis Cache-Aside lub Memoization. Retry nie cache\'uje — ponawia nieudaną operację.',
+  'Wzorzec podziału operacji na etapy wykonywane przez oddzielne wątki':'To opis Pipeline lub Producer-Consumer. Retry to prosty wzorzec odporności — ponów przy błędzie.'
+},
+exp:'Exponential backoff: pierwsza próba natychmiast, po błędzie czekaj 1s, po kolejnym błędzie 2s, 4s, 8s... z jitterem (losowym przesunięciem) dla uniknięcia "thundering herd". Resilience4j: @Retry(name="myRetry"). Ważne: operacja musi być idempotentna! Retry na POST bez idempotency key = duplikaty. Łącz z Circuit Breaker: retry → CB otwiera się po N próbach.'
+},
+
+{cat:'patterns',type:'single',
+q:'Co to jest Bulkhead Pattern?',
+opts:[
+  'Wzorzec do szyfrowania komunikacji między serwisami w architekturze mikroserwisowej',
+  'Izolacja zasobów (pul wątków, połączeń) dla różnych konsumentów — awaria jednego nie wyczerpuje zasobów innych',
+  'Wzorzec tworzenia kopii zapasowych danych w odizolowanych lokalizacjach geograficznych',
+  'Mechanizm autoryzacji dzielący użytkowników na grupy z różnymi uprawnieniami'
+],
+cor:'Izolacja zasobów (pul wątków, połączeń) dla różnych konsumentów — awaria jednego nie wyczerpuje zasobów innych',
+wrong:{
+  'Wzorzec do szyfrowania komunikacji między serwisami w architekturze mikroserwisowej':'To opis mTLS lub service mesh (Istio). Bulkhead dotyczy izolacji zasobów, nie szyfrowania.',
+  'Wzorzec tworzenia kopii zapasowych danych w odizolowanych lokalizacjach geograficznych':'To opis georedundancy lub disaster recovery. Bulkhead to metafora z budownictwa okrętowego — wodoszczelne przegrody w kadłubie.',
+  'Mechanizm autoryzacji dzielący użytkowników na grupy z różnymi uprawnieniami':'To opis RBAC. Bulkhead izoluje zasoby techniczne (wątki, połączenia), nie uprawnienia.'
+},
+exp:'Metafora: przegrody (bulkheads) w statku — dziura w jednym przedziale nie zatopia całości. W IT: oddzielna pula wątków dla każdego downstream serwisu. Jeśli serwis B jest wolny i 100 wątków go czeka, nie blokuje wywołań do serwisu C. Resilience4j Bulkhead: thread pool isolation lub semaphore isolation. Połącz z Circuit Breaker dla pełnej odporności.'
+},
+
+{cat:'patterns',type:'single',
+q:'Co to jest wzorzec Transactional Outbox i czym różni się od zwykłego publikowania eventów?',
+opts:[
+  'Outbox to kolejka w pamięci (in-memory queue) do asynchronicznego przetwarzania zdarzeń wewnątrz jednej aplikacji',
+  'Outbox zapisuje zdarzenia do tabeli w tej samej transakcji co dane, zapewniając atomowość — zwykłe publikowanie to dwie osobne operacje bez gwarancji atomowości',
+  'Outbox szyfruje zdarzenia przed wysłaniem do brokera — zwykłe publikowanie wysyła plaintext',
+  'Outbox buforuje zdarzenia gdy broker jest przeciążony — zwykłe publikowanie odrzuca je przy backpressure'
+],
+cor:'Outbox zapisuje zdarzenia do tabeli w tej samej transakcji co dane, zapewniając atomowość — zwykłe publikowanie to dwie osobne operacje bez gwarancji atomowości',
+wrong:{
+  'Outbox to kolejka w pamięci (in-memory queue) do asynchronicznego przetwarzania zdarzeń wewnątrz jednej aplikacji':'In-memory queue (np. ArrayBlockingQueue) nie przeżyje restartu aplikacji. Outbox używa trwałej tabeli bazodanowej właśnie dla gwarancji trwałości i atomowości.',
+  'Outbox szyfruje zdarzenia przed wysłaniem do brokera — zwykłe publikowanie wysyła plaintext':'Szyfrowanie to osobna warstwa (TLS, message-level encryption). Outbox dotyczy atomowości i niezawodności, nie bezpieczeństwa.',
+  'Outbox buforuje zdarzenia gdy broker jest przeciążony — zwykłe publikowanie odrzuca je przy backpressure':'Zarówno Outbox jak i zwykłe publikowanie mogą implementować retry przy niedostępności brokera. Kluczowa różnica Outbox to atomowość z transakcją bazodanową.'
+},
+exp:'Problem bez Outbox: saveOrder() + publishEvent() — baza OK, broker down = zdarzenie zagubione; broker OK, baza rollback = ghost event. Z Outbox: BEGIN TRANSACTION; INSERT order; INSERT outbox; COMMIT; → relay publikuje asynchronicznie. Gwarancja: jeśli commit się powiódł — zdarzenie BĘDZIE opublikowane. At-least-once delivery (relay może ponowić).'
+},
+
+{cat:'patterns',type:'single',
+q:'Co to jest wzorzec CQRS (Command Query Responsibility Segregation)?',
+opts:[
+  'Wzorzec separacji logiki biznesowej od warstwy dostępu do danych w architekturze warstwowej',
+  'Separacja operacji zmieniających stan (Command) od operacji odczytujących stan (Query) — oddzielne modele, opcjonalnie oddzielne bazy',
+  'Wzorzec kolejkowania żądań HTTP aby chronić serwer przed przeciążeniem',
+  'Mechanizm synchronizacji cache z bazą danych przy użyciu zdarzeń'
+],
+cor:'Separacja operacji zmieniających stan (Command) od operacji odczytujących stan (Query) — oddzielne modele, opcjonalnie oddzielne bazy',
+wrong:{
+  'Wzorzec separacji logiki biznesowej od warstwy dostępu do danych w architekturze warstwowej':'To opis Repository Pattern lub Clean Architecture. CQRS to separacja Command/Query, nie warstw aplikacji.',
+  'Wzorzec kolejkowania żądań HTTP aby chronić serwer przed przeciążeniem':'To opis rate limiting lub load leveling. CQRS dotyczy modelu danych i operacji, nie ruchu sieciowego.',
+  'Mechanizm synchronizacji cache z bazą danych przy użyciu zdarzeń':'To opis cache invalidation przez eventy. CQRS to wzorzec architektoniczny, nie mechanizm cache.'
+},
+exp:'CQRS: Command (PlaceOrder, CancelOrder) → modyfikuje stan → zapisuje do Write DB. Query (GetOrderList, GetOrderDetails) → odczytuje → z Read DB (może być denormalizowana). Korzyści: niezależne skalowanie odczytu/zapisu, optymalizacja modelu pod konkretne potrzeby. Lightweight CQRS: ta sama baza, oddzielne modele. Full CQRS: oddzielne bazy + projekcje.'
+},
+
+{cat:'jpa',type:'single',
+q:'Co to jest Persistence Context w JPA i jaką rolę pełni?',
+opts:[
+  'Plik konfiguracyjny persistence.xml definiujący połączenie z bazą danych i mapowania encji',
+  'Cache pierwszego poziomu śledzący zarządzane encje w ramach jednej sesji — gwarantuje że ta sama encja w sesji to zawsze ta sama instancja Java',
+  'Globalny cache drugiego poziomu współdzielony przez wszystkie sesje w aplikacji',
+  'Kontekst Spring Security przechowujący dane zalogowanego użytkownika w wątku'
+],
+cor:'Cache pierwszego poziomu śledzący zarządzane encje w ramach jednej sesji — gwarantuje że ta sama encja w sesji to zawsze ta sama instancja Java',
+wrong:{
+  'Plik konfiguracyjny persistence.xml definiujący połączenie z bazą danych i mapowania encji':'persistence.xml to konfiguracja jednostki trwałości (persistence unit), nie Persistence Context. PC to runtime concept — kontener encji w trakcie działania.',
+  'Globalny cache drugiego poziomu współdzielony przez wszystkie sesje w aplikacji':'To opis Second Level Cache (L2). Persistence Context to cache L1 — per EntityManager, nie współdzielony.',
+  'Kontekst Spring Security przechowujący dane zalogowanego użytkownika w wątku':'To opis SecurityContext ze Spring Security. Persistence Context to koncepcja JPA do zarządzania encjami.'
+},
+exp:'Persistence Context (PC) = identity map + unit of work. Identity map: ten sam ID w sesji → zawsze ta sama instancja Java (findById dwa razy = ten sam obiekt). Unit of work: śledzi zmiany (dirty checking), zbiera operacje, wysyła je do DB przy flush. Zakres: domyślnie transaction-scoped — nowy PC na każdą @Transactional metodę.'
+},
+
+{cat:'jpa',type:'single',
+q:'Jakie są cztery stany cyklu życia encji w JPA?',
+opts:[
+  'Created, Saved, Updated, Deleted — odpowiadają operacjom CRUD',
+  'New, Active, Inactive, Archived — odzwierciedlają stany biznesowe encji',
+  'Transient (nowa), Managed (zarządzana), Detached (odłączona), Removed (oznaczona do usunięcia)',
+  'Pending, Committed, Rolled Back, Closed — odpowiadają stanom transakcji'
+],
+cor:'Transient (nowa), Managed (zarządzana), Detached (odłączona), Removed (oznaczona do usunięcia)',
+wrong:{
+  'Created, Saved, Updated, Deleted — odpowiadają operacjom CRUD':'To intuicyjne nazwy, ale nie są terminologią JPA. JPA używa: Transient, Managed, Detached, Removed. Mylenie ich z CRUD prowadzi do nieporozumień.',
+  'New, Active, Inactive, Archived — odzwierciedlają stany biznesowe encji':'To stany domenowe (biznesowe) encji, nie stany cyklu życia JPA. Encja może być w stanie Managed (JPA) i jednocześnie Active (biznesowo).',
+  'Pending, Committed, Rolled Back, Closed — odpowiadają stanom transakcji':'To stany transakcji bazodanowej, nie encji. Encja może być Managed w trakcie transakcji i stać się Detached po jej zakończeniu.'
+},
+exp:'Transient: new User() — brak ID, nieznana PC. Managed: po persist() lub findById() — PC śledzi, dirty checking aktywny. Detached: po zamknięciu sesji, em.detach(), em.clear() — brak śledzenia, LAZY asocjacje niedostępne. Removed: po em.remove() — zaplanowany DELETE przy flush. Przejścia: Transient→Managed: persist(). Managed→Detached: close(). Detached→Managed: merge().'
+},
+
+{cat:'jpa',type:'single',
+q:'Co to jest JPQL i czym różni się od SQL?',
+opts:[
+  'JPQL to skompresowana forma SQL działająca szybciej dzięki eliminacji białych znaków i komentarzy',
+  'JPQL (Java Persistence Query Language) operuje na encjach i ich polach Java, a nie na tabelach i kolumnach — jest przenośny między bazami danych',
+  'JPQL to procedura składowana Javy wykonywana bezpośrednio w silniku bazy danych',
+  'JPQL to XML-owy format zapytań konwertowany automatycznie na SQL przez Spring Data'
+],
+cor:'JPQL (Java Persistence Query Language) operuje na encjach i ich polach Java, a nie na tabelach i kolumnach — jest przenośny między bazami danych',
+wrong:{
+  'JPQL to skompresowana forma SQL działająca szybciej dzięki eliminacji białych znaków i komentarzy':'JPQL nie jest szybszy od SQL — jest tłumaczony na SQL przez Hibernate. Nie ma związku z kompresją.',
+  'JPQL to procedura składowana Javy wykonywana bezpośrednio w silniku bazy danych':'Procedury składowane to kod SQL w bazie danych. JPQL to język zapytań wykonywany po stronie aplikacji przez JPA provider.',
+  'JPQL to XML-owy format zapytań konwertowany automatycznie na SQL przez Spring Data':'JPQL to tekstowy język zapytań (podobny do SQL ale obiektowy). Spring Data może używać JPQL w @Query, ale sam JPQL nie jest XML.'
+},
+exp:'JPQL: <code>SELECT o FROM Order o JOIN o.customer c WHERE c.city = :city</code>. SQL: <code>SELECT o.* FROM orders o JOIN customers c ON o.customer_id = c.id WHERE c.city = ?</code>. JPQL: encje i pola Java (Order.customer), przenośny między PostgreSQL/MySQL/Oracle. Hibernate tłumaczy JPQL → SQL specyficzny dla bazy. Ograniczenia: brak window functions, JSONB operators → wtedy natywny SQL.'
+},
+
+{cat:'jpa',type:'single',
+q:'Co to jest FetchType.LAZY vs FetchType.EAGER w JPA?',
+opts:[
+  'LAZY ładuje encje w tle przez oddzielny wątek, EAGER ładuje synchronicznie w głównym wątku',
+  'LAZY: asocjacja ładowana na żądanie (gdy pierwszy raz dostępisz) — proxy; EAGER: asocjacja ładowana zawsze razem z encją nadrzędną w jednym zapytaniu',
+  'LAZY używa cache L1, EAGER używa cache L2 — różnica w poziomie cachowania',
+  'LAZY wysyła mniej danych przez sieć, EAGER kompresuje dane przed wysłaniem'
+],
+cor:'LAZY: asocjacja ładowana na żądanie (gdy pierwszy raz dostępisz) — proxy; EAGER: asocjacja ładowana zawsze razem z encją nadrzędną w jednym zapytaniu',
+wrong:{
+  'LAZY ładuje encje w tle przez oddzielny wątek, EAGER ładuje synchronicznie w głównym wątku':'Oba tryby są synchroniczne. LAZY nie uruchamia tła — po prostu odracza zapytanie SQL do momentu faktycznego dostępu do asocjacji.',
+  'LAZY używa cache L1, EAGER używa cache L2 — różnica w poziomie cachowania':'Oba korzystają z cache L1 (Persistence Context). Wybór LAZY/EAGER nie determinuje poziomu cachowania.',
+  'LAZY wysyła mniej danych przez sieć, EAGER kompresuje dane przed wysłaniem':'Sieć nie jest tu kluczowa — chodzi o liczbę i moment wykonania zapytań SQL do bazy danych, nie o transmisję sieciową.'
+},
+exp:'Domyślne: @OneToMany i @ManyToMany → LAZY. @ManyToOne i @OneToOne → EAGER. Problem z EAGER: zawsze ładuje asocjację nawet gdy niepotrzebna — wydajność. Problem z LAZY: LazyInitializationException gdy dostęp poza sesją. Best practice: zostań przy LAZY, używaj JOIN FETCH lub @EntityGraph gdy potrzebujesz asocjacji.'
+},
+
+{cat:'spring',type:'single',
+q:'Co to jest Spring Bean i jak jest zarządzany przez kontener?',
+opts:[
+  'Klasa Java oznaczona @Bean jest automatycznie serializowana do JSON przy każdym żądaniu HTTP',
+  'Obiekt zarządzany przez kontener Spring IoC — Spring odpowiada za jego tworzenie, konfigurację, wstrzykiwanie zależności i niszczenie',
+  'Singleton zdefiniowany przez programistę przez wywołanie new() i ręczną rejestrację w ApplicationContext',
+  'Encja JPA automatycznie mapowana na tabelę bazodanową przez Spring Data'
+],
+cor:'Obiekt zarządzany przez kontener Spring IoC — Spring odpowiada za jego tworzenie, konfigurację, wstrzykiwanie zależności i niszczenie',
+wrong:{
+  'Klasa Java oznaczona @Bean jest automatycznie serializowana do JSON przy każdym żądaniu HTTP':'Serializacja JSON to odpowiedzialność Jackson/Gson i @RestController/@ResponseBody. Spring Bean to obiekt zarządzany przez kontener, nie koncepcja serializacji.',
+  'Singleton zdefiniowany przez programistę przez wywołanie new() i ręczną rejestrację w ApplicationContext':'Ręczne new() tworzy obiekt poza kontrolą Spring — nie jest beanem. Bean tworzy i zarządza Spring IoC kontener.',
+  'Encja JPA automatycznie mapowana na tabelę bazodanową przez Spring Data':'Encja JPA (@Entity) to odrębna koncepcja. Może być beanem Springa, ale nie każdy bean to encja JPA i vice versa.'
+},
+exp:'Bean w Spring: POJO zarządzany przez ApplicationContext. Adnotacje tworzące beany: @Component, @Service, @Repository, @Controller, @Configuration + @Bean. Cykl życia: instantiation → dependency injection → @PostConstruct → działanie → @PreDestroy → destruction. Kontener zarządza zależnościami — ty nie tworzysz beanów przez new().'
+},
+
+{cat:'spring',type:'single',
+q:'Co to jest @ComponentScan i do czego służy?',
+opts:[
+  'Adnotacja skanująca kod pod kątem podatności bezpieczeństwa i nieużywanych importów',
+  'Instruuje Spring aby przeszukał wskazane pakiety w poszukiwaniu klas z @Component, @Service, @Repository, @Controller i zarejestrował je jako beany',
+  'Skanuje classpath w poszukiwaniu plików properties i automatycznie ładuje konfigurację',
+  'Adnotacja aktywująca skanowanie tabel bazodanowych i automatyczne tworzenie encji JPA'
+],
+cor:'Instruuje Spring aby przeszukał wskazane pakiety w poszukiwaniu klas z @Component, @Service, @Repository, @Controller i zarejestrował je jako beany',
+wrong:{
+  'Adnotacja skanująca kod pod kątem podatności bezpieczeństwa i nieużywanych importów':'To opis narzędzi jak SonarQube lub SpotBugs. @ComponentScan to mechanizm autowykrywania beanów, nie analiza kodu.',
+  'Skanuje classpath w poszukiwaniu plików properties i automatycznie ładuje konfigurację':'Ładowanie properties to @PropertySource lub spring.config.import. @ComponentScan skanuje klasy Java, nie pliki konfiguracyjne.',
+  'Adnotacja aktywująca skanowanie tabel bazodanowych i automatyczne tworzenie encji JPA':'Automatyczne tworzenie tabel to spring.jpa.hibernate.ddl-auto. @ComponentScan dotyczy wykrywania beanów Spring, nie struktury bazy danych.'
+},
+exp:'@SpringBootApplication zawiera @ComponentScan domyślnie skanujący pakiet klasy głównej i podpakiety. Własny scan: @ComponentScan("com.example.services"). Bez @ComponentScan: musisz ręcznie deklarować każdy bean w @Configuration. Wykluczone pakiety: @ComponentScan(excludeFilters = @Filter(...)). Ważne: skanuje tylko adnotowane klasy, nie wszystkie.'
+},
+
+{cat:'spring',type:'single',
+q:'Co to jest @Transactional w Spring i co się dzieje gdy nie użyjemy tej adnotacji?',
+opts:[
+  '@Transactional to adnotacja do walidacji danych wejściowych — bez niej Spring nie waliduje parametrów',
+  '@Transactional otwiera transakcję bazodanową przed metodą i zatwierdza (lub cofa) po zakończeniu — bez niej każde zapytanie JPA wykonuje się w osobnej auto-committed transakcji',
+  '@Transactional jest opcjonalna — Spring automatycznie grupuje wszystkie zapytania w jedną transakcję w ramach jednego wątku',
+  '@Transactional działa tylko z @Repository — bez tej kombinacji JPA nie może działać poprawnie'
+],
+cor:'@Transactional otwiera transakcję bazodanową przed metodą i zatwierdza (lub cofa) po zakończeniu — bez niej każde zapytanie JPA wykonuje się w osobnej auto-committed transakcji',
+wrong:{
+  '@Transactional to adnotacja do walidacji danych wejściowych — bez niej Spring nie waliduje parametrów':'Walidacja to @Valid/@Validated z Bean Validation (JSR-380). @Transactional zarządza transakcjami bazodanowymi.',
+  '@Transactional jest opcjonalna — Spring automatycznie grupuje wszystkie zapytania w jedną transakcję w ramach jednego wątku':'Spring NIE grupuje automatycznie zapytań. Bez @Transactional: każde zapytanie = osobna transakcja. Dirty checking nie działa. Lazy loading może wyrzucić wyjątek.',
+  '@Transactional działa tylko z @Repository — bez tej kombinacji JPA nie może działać poprawnie':'@Transactional działa na @Service, @Component, @Controller — wszędzie. @Repository to tylko stereotyp dla warstwy dostępu do danych.'
+},
+exp:'Bez @Transactional: findById() otwiera transakcję, zamyka. Potem update() otwiera nową transakcję, zamyka. Nie ma dirty checking — zmiany encji nie są automatycznie zapisywane. Nie można lazy-loadować poza metodą. Z @Transactional: jedna transakcja na całą metodę, dirty checking aktywny, lazy loading dostępny w granicach metody.'
+},
+
+{cat:'spring',type:'single',
+q:'Co to jest Aspect-Oriented Programming (AOP) i jak Spring go używa?',
+opts:[
+  'Paradygmat programowania gdzie każda klasa może mieć co najwyżej jeden aspekt odpowiedzialności',
+  'Technika modularyzacji cross-cutting concerns (logowanie, bezpieczeństwo, transakcje) przez aspekty przechwytujące wywołania metod bez modyfikacji ich kodu',
+  'Wzorzec projektowy polegający na dynamicznym dodawaniu pól do obiektów w trakcie działania',
+  'Mechanizm automatycznego testowania kodu przez wstrzykiwanie asercji do metod produkcyjnych'
+],
+cor:'Technika modularyzacji cross-cutting concerns (logowanie, bezpieczeństwo, transakcje) przez aspekty przechwytujące wywołania metod bez modyfikacji ich kodu',
+wrong:{
+  'Paradygmat programowania gdzie każda klasa może mieć co najwyżej jeden aspekt odpowiedzialności':'To błędna interpretacja SRP (Single Responsibility Principle). AOP to nie ograniczenie liczby odpowiedzialności, ale wydzielenie przekrojowych zagadnień.',
+  'Wzorzec projektowy polegający na dynamicznym dodawaniu pól do obiektów w trakcie działania':'To opis reflection lub bytecode manipulation. AOP dotyczy przechwytywania wywołań metod, nie modyfikacji struktury obiektów.',
+  'Mechanizm automatycznego testowania kodu przez wstrzykiwanie asercji do metod produkcyjnych':'To opis contract testing lub defensive programming. AOP to technika produkcyjna dla cross-cutting concerns, nie testowania.'
+},
+exp:'Cross-cutting concerns: logowanie, @Transactional, @Cacheable, @Secured, @Async. Bez AOP: każda metoda serwisowa sama zarządza transakcją, logowaniem, uprawnieniami → duplikacja. Z AOP: Spring opakowuje bean w proxy, proxy przechwytuje wywołanie, wykonuje "before/after" advice. Ograniczenie Spring AOP: tylko public metody Spring beanów przez proxy — nie bytecode weaving jak AspectJ.'
+},
+
+{cat:'spring',type:'single',
+q:'Co to są Profile w Spring Boot i do czego służą?',
+opts:[
+  'Profile to konfiguracja wydajności JVM optymalizująca Spring Boot pod różne środowiska sprzętowe',
+  'Mechanizm aktywowania różnych zestawów beanów i konfiguracji dla różnych środowisk (dev, test, prod) przez @Profile i spring.profiles.active',
+  'Narzędzie do profilowania wydajności aplikacji generujące raporty zużycia CPU i pamięci',
+  'Konfiguracja bezpieczeństwa definiująca różne role użytkowników w aplikacji'
+],
+cor:'Mechanizm aktywowania różnych zestawów beanów i konfiguracji dla różnych środowisk (dev, test, prod) przez @Profile i spring.profiles.active',
+wrong:{
+  'Profile to konfiguracja wydajności JVM optymalizująca Spring Boot pod różne środowiska sprzętowe':'Profilowanie JVM to Java Flight Recorder, VisualVM, JProfiler. Spring Profiles to izolacja konfiguracji dla środowisk, nie optymalizacja JVM.',
+  'Narzędzie do profilowania wydajności aplikacji generujące raporty zużycia CPU i pamięci':'To opis profilerów (Async Profiler, JFR). Spring Profiles to koncepcja konfiguracyjna — aktywacja innych beanów i properties.',
+  'Konfiguracja bezpieczeństwa definiująca różne role użytkowników w aplikacji':'Role użytkowników to Spring Security (RBAC). Profiles dotyczą środowisk wdrożeniowych, nie ról w systemie.'
+},
+exp:'Przykład: @Profile("dev") → H2 in-memory DB. @Profile("prod") → PostgreSQL. application-dev.yml i application-prod.yml — różne konfiguracje. Aktywacja: spring.profiles.active=prod (env var, JVM arg, properties). @ActiveProfiles("test") w testach. Spring Boot auto-konfiguruje odpowiednie beany. Można łączyć: spring.profiles.active=prod,metrics.'
+},
+
+{cat:'databases',type:'single',
+q:'Co to jest transakcja bazodanowa i jakie właściwości ACID gwarantuje?',
+opts:[
+  'Transakcja to pojedyncze zapytanie SQL wykonywane przez aplikację — każde zapytanie jest automatycznie transakcją',
+  'Transakcja to jednostka pracy traktowana atomowo: albo wszystkie operacje są zatwierdzone, albo żadna — z właściwościami Atomicity, Consistency, Isolation, Durability',
+  'Transakcja to mechanizm autoryzacji sprawdzający uprawnienia użytkownika przed każdą operacją na bazie',
+  'Transakcja to bufor zapytań wykonywanych wsadowo dla poprawy wydajności'
+],
+cor:'Transakcja to jednostka pracy traktowana atomowo: albo wszystkie operacje są zatwierdzone, albo żadna — z właściwościami Atomicity, Consistency, Isolation, Durability',
+wrong:{
+  'Transakcja to pojedyncze zapytanie SQL wykonywane przez aplikację — każde zapytanie jest automatycznie transakcją':'W trybie auto-commit każde zapytanie jest oddzielną mini-transakcją. Ale transakcja biznesowa to wiele powiązanych operacji jako jedna jednostka logiczna.',
+  'Transakcja to mechanizm autoryzacji sprawdzający uprawnienia użytkownika przed każdą operacją na bazie':'To opis database-level access control (GRANT, REVOKE). Transakcja to koncepcja spójności danych, nie bezpieczeństwa dostępu.',
+  'Transakcja to bufor zapytań wykonywanych wsadowo dla poprawy wydajności':'To opis batch processing lub statement batching. Transakcja dotyczy spójności i atomowości, nie wydajności (choć może mieć wpływ na wydajność).'
+},
+exp:'ACID: Atomicity (całość albo nic — rollback przy błędzie), Consistency (dane spełniają wszystkie constraints po transakcji), Isolation (równoległe transakcje nie widzą się nawzajem — stopień zależy od isolation level), Durability (po COMMIT dane są trwałe nawet przy awarii — WAL/redo log). Przykład atomicity: przelew bankowy = debit + credit — jedno bez drugiego = błąd.'
+},
+
+{cat:'databases',type:'single',
+q:'Co to jest indeks bazodanowy i jak przyspiesza zapytania?',
+opts:[
+  'Indeks to kopia tabeli przechowywana w pamięci RAM dla szybszego dostępu do często używanych danych',
+  'Oddzielna struktura danych (zazwyczaj B-Tree) zawierająca wartości kolumn i wskaźniki do wierszy tabeli — umożliwia szybkie wyszukiwanie bez skanowania całej tabeli',
+  'Indeks to komentarz w schemacie bazy danych opisujący przeznaczenie tabeli i jej kolumn',
+  'Mechanizm kompresji danych przechowywanych w tabeli redukujący rozmiar na dysku'
+],
+cor:'Oddzielna struktura danych (zazwyczaj B-Tree) zawierająca wartości kolumn i wskaźniki do wierszy tabeli — umożliwia szybkie wyszukiwanie bez skanowania całej tabeli',
+wrong:{
+  'Indeks to kopia tabeli przechowywana w pamięci RAM dla szybszego dostępu do często używanych danych':'Indeks nie jest kopią tabeli ani nie musi być w RAM. To oddzielna struktura B-Tree na dysku zawierająca tylko wartości indeksowanych kolumn i wskaźniki (rowid/ctid).',
+  'Indeks to komentarz w schemacie bazy danych opisujący przeznaczenie tabeli i jej kolumn':'To opis komentarzy do schematu (COMMENT ON TABLE). Indeks to fizyczna struktura danych wpływająca na wydajność zapytań.',
+  'Mechanizm kompresji danych przechowywanych w tabeli redukujący rozmiar na dysku':'Kompresja tabel to osobna funkcja bazy (np. PostgreSQL TOAST, pg_column_toast). Indeks to struktura wyszukiwawcza, może wręcz zwiększać rozmiar na dysku.'
+},
+exp:'Bez indeksu: SELECT * FROM users WHERE email = "x" → pełny skan tabeli O(N). Z indeksem B-Tree na email: przejście drzewa O(log N) → kilka odczytów dysku. Cena indeksu: dodatkowe miejsce na dysku + aktualizacja przy każdym INSERT/UPDATE/DELETE. Kiedy zakładać: kolumny w WHERE, JOIN, ORDER BY o wysokiej selektywności.'
+},
+
+{cat:'databases',type:'single',
+q:'Co to jest normalizacja bazy danych?',
+opts:[
+  'Proces szyfrowania danych w bazie w celu zapewnienia bezpieczeństwa przechowywanych informacji',
+  'Proces organizowania struktury tabel w celu redukcji redundancji danych i anomalii aktualizacji — przez podział na mniejsze powiązane tabele',
+  'Automatyczne dostosowanie wydajności bazy przez optymalizator zapytań na podstawie statystyk',
+  'Standaryzacja formatów dat, walut i kodowania znaków w całej bazie danych'
+],
+cor:'Proces organizowania struktury tabel w celu redukcji redundancji danych i anomalii aktualizacji — przez podział na mniejsze powiązane tabele',
+wrong:{
+  'Proces szyfrowania danych w bazie w celu zapewnienia bezpieczeństwa przechowywanych informacji':'Szyfrowanie to encryption at rest lub column-level encryption. Normalizacja dotyczy struktury relacji między tabelami, nie bezpieczeństwa.',
+  'Automatyczne dostosowanie wydajności bazy przez optymalizator zapytań na podstawie statystyk':'To opis query optimization lub autovacuum w PostgreSQL. Normalizacja to manualna decyzja projektowa o strukturze danych.',
+  'Standaryzacja formatów dat, walut i kodowania znaków w całej bazie danych':'To opis data standardization lub data quality. Normalizacja to teoria relacyjna (1NF, 2NF, 3NF) dotycząca zależności między kolumnami.'
+},
+exp:'Postacie normalne: 1NF — brak grup powtarzających się (atomowe wartości). 2NF — każda kolumna zależy od całego klucza głównego. 3NF — brak zależności tranzytywnych (kolumna A → B → C). Denormalizacja: celowe odejście od normalizacji dla wydajności (np. materialized views, read models w CQRS). Kompromis: normalizacja = spójność danych, denormalizacja = wydajność odczytu.'
+},
+
+{cat:'databases',type:'single',
+q:'Co to jest connection pool i dlaczego bez niego aplikacja działa wolno?',
+opts:[
+  'Connection pool to pula zapytań SQL buforowanych w pamięci przed wysłaniem do bazy',
+  'Pula gotowych połączeń do bazy wielokrotnie reużywanych — bez puli każde zapytanie wymaga nawiązania nowego połączenia TCP (kosztowne: handshake, autentykacja, ~100ms)',
+  'Mechanizm równoważenia obciążenia rozdzielający połączenia między replikami bazy danych',
+  'Cache wyników zapytań współdzielony między wszystkimi połączeniami do bazy'
+],
+cor:'Pula gotowych połączeń do bazy wielokrotnie reużywanych — bez puli każde zapytanie wymaga nawiązania nowego połączenia TCP (kosztowne: handshake, autentykacja, ~100ms)',
+wrong:{
+  'Connection pool to pula zapytań SQL buforowanych w pamięci przed wysłaniem do bazy':'To opis statement cache lub prepared statement cache. Connection pool zarządza połączeniami (socket TCP), nie zapytaniami.',
+  'Mechanizm równoważenia obciążenia rozdzielający połączenia między replikami bazy danych':'Load balancing połączeń to np. PgBouncer lub ProxySQL. Connection pool (HikariCP) zarządza połączeniami do jednej bazy, nie między replikami.',
+  'Cache wyników zapytań współdzielony między wszystkimi połączeniami do bazy':'To opis query cache (np. MySQL query cache, Redis). Connection pool zarządza kanałami komunikacji (połączeniami), nie wynikami zapytań.'
+},
+exp:'Nawiązanie połączenia: TCP 3-way handshake + SSL + autentykacja PostgreSQL = ~50-200ms. Bez puli: każdy request HTTP otwiera połączenie, wykonuje zapytanie, zamyka = huge latency. HikariCP (Spring Boot domyślny): minimumIdle=10, maximumPoolSize=10. Request pobiera wolne połączenie z puli, używa, oddaje. Połączenie fizyczne żyje minuty/godziny.'
+},
+
+{cat:'databases',type:'single',
+q:'Co to jest deadlock w bazie danych i jak mu zapobiegać?',
+opts:[
+  'Deadlock to sytuacja gdy zapytanie czeka zbyt długo na wynik i baza je automatycznie kończy',
+  'Wzajemne blokowanie: transakcja A blokuje zasób X i czeka na Y, transakcja B blokuje Y i czeka na X — żadna nie może kontynuować',
+  'Błąd połączenia do bazy spowodowany przekroczeniem limitu connection pool',
+  'Sytuacja gdy dwie transakcje jednocześnie modyfikują ten sam wiersz i ostatnia nadpisuje pierwszą'
+],
+cor:'Wzajemne blokowanie: transakcja A blokuje zasób X i czeka na Y, transakcja B blokuje Y i czeka na X — żadna nie może kontynuować',
+wrong:{
+  'Deadlock to sytuacja gdy zapytanie czeka zbyt długo na wynik i baza je automatycznie kończy':'To opis query timeout lub statement_timeout. Deadlock to wzajemne blokowanie, nie timeout jednej operacji.',
+  'Błąd połączenia do bazy spowodowany przekroczeniem limitu connection pool':'To connection pool exhaustion. Deadlock to problem blokowania zasobów wewnątrz bazy, niezwiązany z połączeniami.',
+  'Sytuacja gdy dwie transakcje jednocześnie modyfikują ten sam wiersz i ostatnia nadpisuje pierwszą':'To Lost Update problem. Deadlock to wzajemne oczekiwanie na zasoby — żadna transakcja nie może ruszyć.'
+},
+exp:'Baza wykrywa deadlock i cofa jedną transakcję (victim). Zapobieganie: (1) Spójna kolejność blokowania zasobów (zawsze blokuj w tej samej kolejności). (2) Krótkie transakcje — im krócej trzymasz blokadę, tym mniej ryzyko. (3) Optimistic locking zamiast pessimistic. (4) Unikaj interaktywnych transakcji (long-running z waitem na użytkownika).'
+},
+
+{cat:'java',type:'single',
+q:'Co to jest JVM (Java Virtual Machine) i jaką rolę pełni?',
+opts:[
+  'Narzędzie do kompilacji kodu Java do plików .class z rozszerzeniem bytecode',
+  'Abstrakcyjna maszyna obliczeniowa która interpretuje lub kompiluje bytecode Java do natywnych instrukcji maszynowych — zapewnia "write once, run anywhere"',
+  'Biblioteka standardowa Javy zawierająca klasy jak String, ArrayList, HashMap',
+  'Serwer aplikacyjny do uruchamiania aplikacji webowych napisanych w Javie'
+],
+cor:'Abstrakcyjna maszyna obliczeniowa która interpretuje lub kompiluje bytecode Java do natywnych instrukcji maszynowych — zapewnia "write once, run anywhere"',
+wrong:{
+  'Narzędzie do kompilacji kodu Java do plików .class z rozszerzeniem bytecode':'To opis kompilatora javac (część JDK). JVM nie kompiluje kodu źródłowego Java — to robi javac. JVM uruchamia już skompilowany bytecode.',
+  'Biblioteka standardowa Javy zawierająca klasy jak String, ArrayList, HashMap':'To opis Java Standard Library (Java SE API). JVM to środowisko wykonawcze — maszyna wirtualna, nie biblioteka klas.',
+  'Serwer aplikacyjny do uruchamiania aplikacji webowych napisanych w Javie':'Serwery aplikacyjne to Tomcat, JBoss, WebSphere. JVM to warstwa niższa — środowisko na którym działają serwery aplikacyjne.'
+},
+exp:'JVM odpowiada za: ładowanie class files (ClassLoader), weryfikację bytecode, wykonanie (interpret + JIT kompilacja), zarządzanie pamięcią (GC), obsługę wyjątków, wielowątkowość. Zasada "write once, run anywhere": skompilowany bytecode działa na każdej JVM (Windows, Linux, macOS) bez rekompilacji. JVM jest specyfikacją — istnieją różne implementacje: HotSpot (Oracle), OpenJ9, GraalVM.'
+},
+
+{cat:'java',type:'single',
+q:'Co to jest interfejs funkcyjny (functional interface) w Java 8+?',
+opts:[
+  'Interfejs który może być implementowany tylko przez klasy funkcyjne (bez pól i konstruktorów)',
+  'Interfejs posiadający dokładnie jedną abstrakcyjną metodę — może być użyty jako cel dla wyrażeń lambda i referencji do metod',
+  'Interfejs automatycznie implementowany przez kompilator dla wszystkich klas z metodą main()',
+  'Interfejs który implementuje wszystkie metody domyślnie przez default implementation bez konieczności dziedziczenia'
+],
+cor:'Interfejs posiadający dokładnie jedną abstrakcyjną metodę — może być użyty jako cel dla wyrażeń lambda i referencji do metod',
+wrong:{
+  'Interfejs który może być implementowany tylko przez klasy funkcyjne (bez pól i konstruktorów)':'Nie istnieje pojęcie "klasy funkcyjnej" w Javie. Interfejs funkcyjny to interfejs z jedną metodą abstrakcyjną — może go implementować dowolna klasa.',
+  'Interfejs automatycznie implementowany przez kompilator dla wszystkich klas z metodą main()':'Kompilator nie tworzy automatycznych implementacji interfejsów. Interfejs funkcyjny to adnotacja i konwencja dla lambd.',
+  'Interfejs który implementuje wszystkie metody domyślnie przez default implementation bez konieczności dziedziczenia':'To opis interfejsu z wszystkimi metodami jako default. Interfejs funkcyjny ma dokładnie JEDNĄ abstrakcyjną metodę (może mieć wiele default i static metod).'
+},
+exp:'Przykłady wbudowanych interfejsów funkcyjnych: Runnable (brak argumentów, brak wyniku), Supplier<T> (brak argumentów, zwraca T), Consumer<T> (przyjmuje T, brak wyniku), Function<T,R> (przyjmuje T, zwraca R), Predicate<T> (przyjmuje T, zwraca boolean). Lambda: <code>(x) -> x * 2</code> implementuje Function<Integer,Integer>. @FunctionalInterface: opcjonalna adnotacja dokumentacyjna.'
+},
+
+{cat:'java',type:'single',
+q:'Czym jest garbage collection i kiedy obiekt jest zbierany?',
+opts:[
+  'Garbage collection to ręczny proces wywoływany przez System.gc() aby zwolnić pamięć nieużywanych obiektów',
+  'Automatyczny mechanizm JVM usuwający obiekty nieosiągalne od korzeni GC (GC Roots) — obiekty bez aktywnych referencji są zbierane automatycznie',
+  'Mechanizm Spring czyszczący beany o zasięgu request po zakończeniu każdego żądania HTTP',
+  'Proces defragmentacji sterty Java uruchamiany co noc przez system operacyjny'
+],
+cor:'Automatyczny mechanizm JVM usuwający obiekty nieosiągalne od korzeni GC (GC Roots) — obiekty bez aktywnych referencji są zbierane automatycznie',
+wrong:{
+  'Garbage collection to ręczny proces wywoływany przez System.gc() aby zwolnić pamięć nieużywanych obiektów':'System.gc() to wskazówka dla JVM, nie polecenie. GC działa automatycznie w tle bez wywołania. Ręczne zarządzanie pamięcią to C/C++.',
+  'Mechanizm Spring czyszczący beany o zasięgu request po zakończeniu każdego żądania HTTP':'Spring niszczy beany request-scoped po zakończeniu żądania, ale to nie jest garbage collection JVM. GC dotyczy wszystkich obiektów na stercie.',
+  'Proces defragmentacji sterty Java uruchamiany co noc przez system operacyjny':'GC nie jest planowany przez system operacyjny i nie jest defragmentacją dysku. JVM sam decyduje kiedy uruchomić GC na podstawie dostępnej pamięci sterty.'
+},
+exp:'GC Roots: zmienne lokalne na stosie, pola statyczne, aktywne wątki, JNI references. Obiekt jest zbierany gdy żaden GC Root nie ma do niego ścieżki referencji. Generational GC: Young generation (eden + survivor) — Minor GC, szybkie. Old generation — Major/Full GC, wolne. G1 GC (Java 9+): region-based, przewidywalne pauzy. ZGC/Shenandoah: sub-ms STW.'
+},
+
+{cat:'java',type:'single',
+q:'Co to są Java Generics i jaką korzyść przynoszą?',
+opts:[
+  'Generics to mechanizm generowania kodu Java na podstawie szablonów XML zdefiniowanych w konfiguracji Maven',
+  'Parametryzacja typów umożliwiająca pisanie kodu który działa z różnymi typami przy zachowaniu bezpieczeństwa typów w czasie kompilacji — eliminuje konieczność castowania',
+  'Klasy abstrakcyjne w Javie które mogą być automatycznie implementowane przez kompilator',
+  'Mechanizm refleksji pozwalający na tworzenie obiektów o nieznanym typie w czasie działania'
+],
+cor:'Parametryzacja typów umożliwiająca pisanie kodu który działa z różnymi typami przy zachowaniu bezpieczeństwa typów w czasie kompilacji — eliminuje konieczność castowania',
+wrong:{
+  'Generics to mechanizm generowania kodu Java na podstawie szablonów XML zdefiniowanych w konfiguracji Maven':'Generowanie kodu z XML to np. JAXB lub OpenAPI generator. Java Generics to system typów kompilatora, nie generowanie kodu.',
+  'Klasy abstrakcyjne w Javie które mogą być automatycznie implementowane przez kompilator':'Kompilator nie implementuje klas abstrakcyjnych automatycznie. Generics to parametryzacja typów, nie automatyczna implementacja.',
+  'Mechanizm refleksji pozwalający na tworzenie obiektów o nieznanym typie w czasie działania':'Refleksja (Class.forName(), getDeclaredMethods()) działa w runtime. Generics działają w czasie kompilacji — type erasure usuwa informacje o typach generic w runtime.'
+},
+exp:'Bez Generics: <code>List list = new ArrayList(); list.add("hello"); String s = (String) list.get(0);</code> — cast w runtime. Z Generics: <code>List<String> list = new ArrayList<>(); String s = list.get(0);</code> — bez cast, błąd przy list.add(123) w compile time. Type erasure: <code>List<String></code> w runtime = <code>List</code> — informacja o typie usunięta.'
+},
+
+{cat:'security',type:'single',
+q:'Co to jest HTTPS i jak działa szyfrowanie połączenia?',
+opts:[
+  'HTTPS to wersja HTTP z kompresją danych która przyspiesza przesyłanie przez zmniejszenie rozmiaru pakietów',
+  'HTTP przesyłane przez szyfrowane połączenie TLS — przeglądarka i serwer uzgadniają klucz sesji przez TLS handshake, potem szyfrują cały ruch symetrycznie (AES)',
+  'HTTPS to protokół wymagający uwierzytelnienia użytkownika hasłem przed każdym żądaniem HTTP',
+  'Rozszerzenie HTTP dodające nagłówki bezpieczeństwa (Content-Security-Policy, X-Frame-Options) do odpowiedzi serwera'
+],
+cor:'HTTP przesyłane przez szyfrowane połączenie TLS — przeglądarka i serwer uzgadniają klucz sesji przez TLS handshake, potem szyfrują cały ruch symetrycznie (AES)',
+wrong:{
+  'HTTPS to wersja HTTP z kompresją danych która przyspiesza przesyłanie przez zmniejszenie rozmiaru pakietów':'Kompresja HTTP to Content-Encoding: gzip/brotli — osobna funkcja. HTTPS = HTTP + TLS = szyfrowanie, nie kompresja.',
+  'HTTPS to protokół wymagający uwierzytelnienia użytkownika hasłem przed każdym żądaniem HTTP':'HTTPS to szyfrowanie transportu, nie mechanizm autentykacji użytkownika. Autentykacja to JWT, OAuth, Basic Auth — osobna warstwa.',
+  'Rozszerzenie HTTP dodające nagłówki bezpieczeństwa (Content-Security-Policy, X-Frame-Options) do odpowiedzi serwera':'Security headers to osobna warstwa ochrony. HTTPS dotyczy szyfrowania kanału komunikacji, nie treści nagłówków.'
+},
+exp:'TLS Handshake: klient wysyła ClientHello, serwer odpowiada certyfikatem, klient weryfikuje certyfikat przez CA, uzgodnienie klucza sesji przez ECDHE. Potem: wszystko szyfrowane AES-GCM. HTTPS chroni: poufność (nikt nie widzi treści), integralność (nie można zmienić pakietów), autentyczność serwera (certyfikat). Nie chroni: metadanych (kto z kim), URL-i (widoczne dla ISP w SNI).'
+},
+
+{cat:'security',type:'single',
+q:'Co to jest XSS (Cross-Site Scripting) i jak zapobiegać?',
+opts:[
+  'Atak polegający na wstrzykiwaniu złośliwych zapytań SQL do formularzy webowych w celu wyciągnięcia danych z bazy',
+  'Wstrzykiwanie złośliwego JavaScript na stronę webową (przez niezwalidowane dane użytkownika) — skrypt wykonuje się w przeglądarce innych użytkowników i może kraść ciasteczka, sesje, dane',
+  'Atak na serwer DNS podmieniający adresy IP dla popularnych domen na złośliwe serwery',
+  'Przechwytywanie ruchu HTTPS przez fałszywe certyfikaty SSL zainstalowane w przeglądarce'
+],
+cor:'Wstrzykiwanie złośliwego JavaScript na stronę webową (przez niezwalidowane dane użytkownika) — skrypt wykonuje się w przeglądarce innych użytkowników i może kraść ciasteczka, sesje, dane',
+wrong:{
+  'Atak polegający na wstrzykiwaniu złośliwych zapytań SQL do formularzy webowych w celu wyciągnięcia danych z bazy':'To opis SQL Injection. XSS dotyczy wstrzykiwania kodu JavaScript do stron HTML, nie zapytań do bazy danych.',
+  'Atak na serwer DNS podmieniający adresy IP dla popularnych domen na złośliwe serwery':'To opis DNS spoofing lub DNS cache poisoning. XSS to atak po stronie klienta na przeglądarkę.',
+  'Przechwytywanie ruchu HTTPS przez fałszywe certyfikaty SSL zainstalowane w przeglądarce':'To opis ataku SSL stripping lub MITM z fałszywym certyfikatem. XSS to wstrzykiwanie kodu, nie przechwytywanie ruchu.'
+},
+exp:'Rodzaje XSS: Stored (złośliwy skrypt zapisany w DB, wyświetlany wszystkim), Reflected (skrypt w URL, wykonywany dla klikającego), DOM-based (manipulacja DOM bez serwera). Obrona: Output encoding (escape < jako &lt; etc.), Content Security Policy (CSP), httpOnly cookies (XSS nie może ukraść tokenu), sanitizacja HTML (DOMPurify). React auto-escape po default.'
+},
+
+{cat:'security',type:'single',
+q:'Co to jest authorization vs authentication i w jakiej kolejności są sprawdzane?',
+opts:[
+  'Authentication sprawdza co użytkownik może zrobić, Authorization sprawdza kim jest — sprawdzane w odwrotnej kolejności dla wydajności',
+  'Authentication (autentykacja) weryfikuje tożsamość (KIM jesteś), Authorization (autoryzacja) weryfikuje uprawnienia (CO możesz) — zawsze najpierw autentykacja, potem autoryzacja',
+  'Są synonimami — oba termin opisują proces weryfikacji hasła użytkownika przy logowaniu',
+  'Authentication działa na poziomie sieci (IP, MAC), Authorization na poziomie aplikacji (role, zasoby)'
+],
+cor:'Authentication (autentykacja) weryfikuje tożsamość (KIM jesteś), Authorization (autoryzacja) weryfikuje uprawnienia (CO możesz) — zawsze najpierw autentykacja, potem autoryzacja',
+wrong:{
+  'Authentication sprawdza co użytkownik może zrobić, Authorization sprawdza kim jest — sprawdzane w odwrotnej kolejności dla wydajności':'Odwrotnie: AuthN = kim jesteś, AuthZ = co możesz. Kolejność też odwrotna niż podana — zawsze najpierw autentykacja.',
+  'Są synonimami — oba termin opisują proces weryfikacji hasła użytkownika przy logowaniu':'To dwa różne procesy. Hasło to mechanizm autentykacji. Autoryzacja (RBAC, permissions) jest sprawdzana po pomyślnej autentykacji.',
+  'Authentication działa na poziomie sieci (IP, MAC), Authorization na poziomie aplikacji (role, zasoby)':'AuthN może działać na wielu poziomach (sieć, aplikacja, API). Podział sieć/aplikacja to nie właściwe kryterium różnicowania.'
+},
+exp:'Przykład: login (AuthN) → JWT z rolą ADMIN (AuthZ). Żądanie: weryfikacja JWT (AuthN: czy token ważny?) → sprawdzenie roli (AuthZ: czy ma uprawnienie DELETE_USER?). Mechanizmy AuthN: hasło, biometria, certyfikat, TOTP. Mechanizmy AuthZ: RBAC (role), ABAC (atrybuty), ACL (listy kontroli dostępu). Błąd: 401 (brak AuthN), 403 (brak AuthZ).'
+},
+
+{cat:'security',type:'single',
+q:'Co to jest token JWT i kiedy wygasa?',
+opts:[
+  'JWT to format bazy danych przechowujący dane sesji użytkownika po stronie serwera',
+  'JSON Web Token — samodzielny, podpisany token zawierający claims (dane) użytkownika w payload; wygasa po czasie zdefiniowanym w polu exp (Unix timestamp)',
+  'JWT to zaszyfrowane hasło użytkownika transmitowane przy każdym żądaniu HTTP w nagłówku Authorization',
+  'JWT to identyfikator sesji generowany przez serwer i przechowywany w bazie danych'
+],
+cor:'JSON Web Token — samodzielny, podpisany token zawierający claims (dane) użytkownika w payload; wygasa po czasie zdefiniowanym w polu exp (Unix timestamp)',
+wrong:{
+  'JWT to format bazy danych przechowujący dane sesji użytkownika po stronie serwera':'JWT jest stateless — dane są w tokenie, nie w bazie. Sesja po stronie serwera to tradycyjny model (session store). JWT eliminuje potrzebę przechowywania sesji.',
+  'JWT to zaszyfrowane hasło użytkownika transmitowane przy każdym żądaniu HTTP w nagłówku Authorization':'Hasło NIGDY nie powinno być w JWT. JWT zawiera claims (sub, role, exp) — nie hasło. JWT jest podpisany, nie zaszyfrowany (chyba że JWE).',
+  'JWT to identyfikator sesji generowany przez serwer i przechowywany w bazie danych':'To opis session token (opaque token). JWT jest self-contained — serwer może zweryfikować token bez bazy danych (przez weryfikację podpisu).'
+},
+exp:'Struktura JWT: header (alg: RS256) + payload (sub: userId, exp: 1735689600, roles: [ADMIN]) + signature. Weryfikacja: serwer sprawdza podpis kluczem publicznym — brak zapytania do DB. exp: Unix timestamp (sekundy od 1970-01-01). Krótki TTL access tokenu (15min-1h) + długi refresh token (7-30 dni). Brak możliwości unieważnienia przed exp — używaj krótkich tokenów lub token revocation list.'
+},
+
+{cat:'communication',type:'single',
+q:'Co to jest REST API i jakie są jego główne zasady?',
+opts:[
+  'REST to protokół komunikacyjny oparty na XML używany do integracji systemów korporacyjnych (SOAP upgrade)',
+  'Styl architektoniczny dla API oparty na HTTP: bezstanowość, zasoby identyfikowane przez URI, operacje przez metody HTTP (GET/POST/PUT/DELETE), reprezentacje w JSON/XML',
+  'Framework Java do budowania mikroserwisów z automatyczną dokumentacją OpenAPI',
+  'Binarny protokół komunikacyjny szybszy od HTTP używany przez nowoczesne API'
+],
+cor:'Styl architektoniczny dla API oparty na HTTP: bezstanowość, zasoby identyfikowane przez URI, operacje przez metody HTTP (GET/POST/PUT/DELETE), reprezentacje w JSON/XML',
+wrong:{
+  'REST to protokół komunikacyjny oparty na XML używany do integracji systemów korporacyjnych (SOAP upgrade)':'To opis SOAP (Simple Object Access Protocol). REST nie jest protokołem — to styl architektoniczny. REST typowo używa JSON, nie XML (choć może). REST nie jest "następcą SOAP".',
+  'Framework Java do budowania mikroserwisów z automatyczną dokumentacją OpenAPI':'To opis Spring Boot + SpringDoc/Swagger. REST to styl architektoniczny, nie framework.',
+  'Binarny protokół komunikacyjny szybszy od HTTP używany przez nowoczesne API':'To opis gRPC (Protocol Buffers + HTTP/2). REST używa HTTP z tekstowymi formatami (JSON) — nie jest binarny.'
+},
+exp:'Zasady REST (Roy Fielding): bezstanowość (każde żądanie zawiera wszystkie potrzebne informacje), zasoby jako URI (/users/123, /orders), metody HTTP dla operacji (GET=odczyt, POST=utwórz, PUT=zastąp, PATCH=aktualizuj, DELETE=usuń), reprezentacje (JSON, XML), HATEOAS (hiperłącza w odpowiedzi). REST API: /users GET (lista), POST (utwórz), /users/{id} GET (pobierz), PUT (zastąp), DELETE (usuń).'
+},
+
+{cat:'communication',type:'single',
+q:'Co to jest message broker i do czego służy?',
+opts:[
+  'Serwer HTTP pośredniczący między klientem a serwerem w celu buforowania odpowiedzi',
+  'Pośrednik przyjmujący wiadomości od producentów i dostarczający je do konsumentów — oddziela nadawcę od odbiorcy i zapewnia asynchroniczną komunikację',
+  'Baza danych specjalizowana w przechowywaniu dużych plików binarnych i strumieniowaniu mediów',
+  'Narzędzie do monitorowania ruchu sieciowego między mikroserwisami w klastrze'
+],
+cor:'Pośrednik przyjmujący wiadomości od producentów i dostarczający je do konsumentów — oddziela nadawcę od odbiorcy i zapewnia asynchroniczną komunikację',
+wrong:{
+  'Serwer HTTP pośredniczący między klientem a serwerem w celu buforowania odpowiedzi':'To opis reverse proxy lub CDN (np. Nginx, Varnish). Message broker to warstwa asynchroniczna oparta na kolejkach/tematach, nie HTTP proxy.',
+  'Baza danych specjalizowana w przechowywaniu dużych plików binarnych i strumieniowaniu mediów':'To opis object storage (S3) lub CDN streamingowego. Message broker przechowuje tymczasowo wiadomości do przetworzenia, nie pliki medialne.',
+  'Narzędzie do monitorowania ruchu sieciowego między mikroserwisami w klastrze':'To opis service mesh (Istio) lub APM (Dynatrace). Message broker to infrastruktura do asynchronicznej komunikacji.'
+},
+exp:'Message broker (Kafka, RabbitMQ, ActiveMQ): producent wysyła wiadomość do kolejki/tematu → broker przechowuje → konsument pobiera gdy gotowy. Korzyści: decoupling (producent nie musi wiedzieć o konsumencie), odporność (broker buforuje gdy konsument niedostępny), skalowanie (wiele konsumentów). Wzorce: Point-to-Point (jedna kolejka, jeden konsument), Pub/Sub (temat, wielu konsumentów).'
+},
+
+{cat:'communication',type:'single',
+q:'Co to jest synchroniczna vs asynchroniczna komunikacja między serwisami?',
+opts:[
+  'Synchroniczna komunikacja używa HTTP, asynchroniczna używa HTTPS — różnica tylko w szyfrowaniu',
+  'Synchroniczna: wywołujący czeka na odpowiedź (HTTP/REST, gRPC); asynchroniczna: wywołujący wysyła wiadomość i nie czeka — przetwarzanie w tle (Kafka, RabbitMQ)',
+  'Synchroniczna komunikacja działa tylko w sieci lokalnej, asynchroniczna przez internet',
+  'Synchroniczna używa JSON, asynchroniczna używa binarnych formatów jak Protobuf'
+],
+cor:'Synchroniczna: wywołujący czeka na odpowiedź (HTTP/REST, gRPC); asynchroniczna: wywołujący wysyła wiadomość i nie czeka — przetwarzanie w tle (Kafka, RabbitMQ)',
+wrong:{
+  'Synchroniczna komunikacja używa HTTP, asynchroniczna używa HTTPS — różnica tylko w szyfrowaniu':'HTTP i HTTPS mogą być używane zarówno synchronicznie jak i asynchronicznie. Różnica sync/async nie zależy od szyfrowania.',
+  'Synchroniczna komunikacja działa tylko w sieci lokalnej, asynchroniczna przez internet':'Oba typy komunikacji działają zarówno lokalnie jak i przez internet. To nie jest kryterium rozróżnienia.',
+  'Synchroniczna używa JSON, asynchroniczna używa binarnych formatów jak Protobuf':'Format danych (JSON, Protobuf, Avro) jest niezależny od modelu sync/async. Kafka może używać JSON, REST może używać Protobuf.'
+},
+exp:'Synchroniczna (REST/gRPC): wątek wywołujący blokuje się i czeka. Prosta, łatwa do debugowania, ale: coupling (obie strony muszą być dostępne), problemy z latencją, cascading failures. Asynchroniczna (Kafka/RabbitMQ): wątek nie blokuje, przetwarzanie w tle. Zalety: decoupling, odporność, skalowalność. Wady: eventual consistency, trudniejsze debugowanie. Wybór: natychmiastowa odpowiedź → sync; długie procesy, duże obciążenie → async.'
+},
+
+{cat:'kubernetes',type:'single',
+q:'Co to jest Pod w Kubernetes i co go wyróżnia?',
+opts:[
+  'Pod to synonim kontenera Docker — każdy kontener w Kubernetes jest automatycznie Podem',
+  'Najmniejsza jednostka wdrożeniowa w K8s zawierająca jeden lub więcej kontenerów współdzielących sieć i storage — każdy Pod ma własny IP i jest efemeryczny',
+  'Pod to węzeł klastra Kubernetes odpowiedzialny za wykonywanie workloadów',
+  'Pod to konfiguracja YAML definiująca zasoby (CPU, RAM) przydzielone dla aplikacji'
+],
+cor:'Najmniejsza jednostka wdrożeniowa w K8s zawierająca jeden lub więcej kontenerów współdzielących sieć i storage — każdy Pod ma własny IP i jest efemeryczny',
+wrong:{
+  'Pod to synonim kontenera Docker — każdy kontener w Kubernetes jest automatycznie Podem':'Pod może zawierać wiele kontenerów (main + sidecar). Pod to abstrakcja wyższego poziomu niż kontener. Nie każdy kontener to Pod — K8s może używać innych runtime (containerd, CRI-O).',
+  'Pod to węzeł klastra Kubernetes odpowiedzialny za wykonywanie workloadów':'Węzeł (Node) to maszyna (VM lub fizyczna) w klastrze. Pod to workload uruchamiany na węźle.',
+  'Pod to konfiguracja YAML definiująca zasoby (CPU, RAM) przydzielone dla aplikacji':'YAML to format konfiguracji, nie sam Pod. Pod to uruchomiona instancja, nie plik konfiguracyjny.'
+},
+exp:'Pod: jeden lub więcej kontenerów (main + sidecar/init), wspólna przestrzeń sieciowa (localhost komunikacja), wspólne wolumeny, własny IP (klasterowy, nie publiczny), efemeryczny (może być usunięty i odtworzony w każdej chwili). Sidecar pattern: main kontener + logging agent + proxy (Envoy). Zwykle nie tworzysz Podów bezpośrednio — Deployment/StatefulSet zarządza nimi.'
+},
+
+{cat:'kubernetes',type:'single',
+q:'Co to jest Service w Kubernetes i dlaczego jest potrzebny?',
+opts:[
+  'Service to kontener specjalny K8s odpowiedzialny za health checks pozostałych kontenerów w klastrze',
+  'Stały wirtualny adres IP i DNS name dla grupy Podów — potrzebny bo Pody mają efemeryczne IP zmieniające się przy każdym restarcie',
+  'Service to plik konfiguracyjny definiujący zasoby i limity dla Deployment',
+  'Komponent K8s odpowiedzialny za replikację danych między węzłami klastra'
+],
+cor:'Stały wirtualny adres IP i DNS name dla grupy Podów — potrzebny bo Pody mają efemeryczne IP zmieniające się przy każdym restarcie',
+wrong:{
+  'Service to kontener specjalny K8s odpowiedzialny za health checks pozostałych kontenerów w klastrze':'Health checks to sondy (Liveness/Readiness Probes) konfigurowane w Pod spec. Service to abstrakcja sieciowa, nie monitoring.',
+  'Service to plik konfiguracyjny definiujący zasoby i limity dla Deployment':'Zasoby i limity definiuje się w spec.containers.resources w Pod/Deployment. Service to obiekt sieciowy K8s.',
+  'Komponent K8s odpowiedzialny za replikację danych między węzłami klastra':'Replikacja danych między węzłami to zadanie storage providerów (CSI drivers). Service to warstwa sieciowa dla stabilnego dostępu do Podów.'
+},
+exp:'Problem: Pod A woła Pod B przez IP 10.0.0.5 → B restartuje → nowe IP 10.0.0.8 → A nie może połączyć. Rozwiązanie: Service "my-service" → stały ClusterIP + DNS (my-service.namespace.svc.cluster.local) → kube-proxy przekierowuje ruch do aktualnych Podów przez selector: {app: my-app}. Service = load balancer + service discovery. Typy: ClusterIP (internal), NodePort, LoadBalancer, ExternalName.'
+},
+
+{cat:'kubernetes',type:'single',
+q:'Co to jest Deployment w Kubernetes?',
+opts:[
+  'Deployment to plik YAML opisujący jak zainstalować aplikację na serwerze produkcyjnym',
+  'Zasób K8s deklarujący desired state dla bezstanowych aplikacji: liczba replik, obraz kontenera, strategia aktualizacji — zarządza ReplicaSetami',
+  'Proces ręcznego kopiowania plików aplikacji na węzły klastra przez administratora',
+  'Deployment to kontener uruchomiony jednorazowo do wykonania zadania inicjalizacyjnego'
+],
+cor:'Zasób K8s deklarujący desired state dla bezstanowych aplikacji: liczba replik, obraz kontenera, strategia aktualizacji — zarządza ReplicaSetami',
+wrong:{
+  'Deployment to plik YAML opisujący jak zainstalować aplikację na serwerze produkcyjnym':'YAML to format, nie Deployment. Deployment to obiekt K8s API który K8s utrzymuje w pożądanym stanie. Nie jest to instrukcja instalacji jak Ansible playbook.',
+  'Proces ręcznego kopiowania plików aplikacji na węzły klastra przez administratora':'K8s jest deklaratywny — nie kopiujesz plików ręcznie. Deployment deklaruje co chcesz, K8s to egzekwuje.',
+  'Deployment to kontener uruchomiony jednorazowo do wykonania zadania inicjalizacyjnego':'To opis Job (jednorazowe) lub CronJob (powtarzalne). Deployment utrzymuje stale działające repliki aplikacji.'
+},
+exp:'Deployment spec: replicas: 3, image: myapp:1.2, strategy: RollingUpdate. K8s tworzy ReplicaSet → ReplicaSet tworzy 3 Pody. Nowa wersja: kubectl set image → nowy ReplicaSet tworzony stopniowo, stary skalowany do 0. kubectl rollout undo → powrót do poprzedniego ReplicaSetu. Deployment = zarządzanie ReplicaSetami + historia rolloutów.'
+},
+
+{cat:'kubernetes',type:'single',
+q:'Co to jest Namespace w Kubernetes i do czego służy?',
+opts:[
+  'Namespace to fizyczna sieć izolująca ruch między węzłami klastra na poziomie TCP/IP',
+  'Logiczna partycja klastra K8s umożliwiająca izolację zasobów, separację środowisk i team\'ów oraz kontrolę dostępu przez RBAC',
+  'Namespace to katalog na dysku węzła gdzie K8s przechowuje logi i metryki Podów',
+  'Mechanizm replikacji danych między regionami geograficznymi w managed Kubernetes (EKS, GKE)'
+],
+cor:'Logiczna partycja klastra K8s umożliwiająca izolację zasobów, separację środowisk i team\'ów oraz kontrolę dostępu przez RBAC',
+wrong:{
+  'Namespace to fizyczna sieć izolująca ruch między węzłami klastra na poziomie TCP/IP':'Izolacja sieciowa to NetworkPolicy. Namespace to logiczna izolacja zasobów K8s API, nie fizyczna sieć.',
+  'Namespace to katalog na dysku węzła gdzie K8s przechowuje logi i metryki Podów':'Logi Podów są w /var/log/pods na węźle (lub zbierane przez Fluentd). Namespace to koncepcja API K8s, nie katalog na dysku.',
+  'Mechanizm replikacji danych między regionami geograficznymi w managed Kubernetes (EKS, GKE)':'Replikacja między regionami to cluster federation lub multi-cluster setup. Namespace działa wewnątrz jednego klastra.'
+},
+exp:'Zastosowania: dev/staging/prod w jednym klastrze, izolacja team A i team B, ResourceQuota per namespace (max CPU, RAM, liczba Podów). Zasoby namespaced: Pod, Service, ConfigMap, Secret, Deployment. Zasoby cluster-scoped: Node, PersistentVolume, ClusterRole. Domyślne namespace: default, kube-system (K8s system Pods), kube-public, kube-node-lease.'
+},
+
+{cat:'observability',type:'single',
+q:'Co to są logi aplikacyjne i czego powinny NIE zawierać?',
+opts:[
+  'Logi to pliki binarne generowane przez JVM zawierające trace GC i informacje o stopie pamięci',
+  'Ustrukturyzowane lub tekstowe rekordy zdarzeń z kontekstem (timestamp, poziom, serwis, wiadomość) — NIE powinny zawierać haseł, tokenów, danych osobowych (GDPR)',
+  'Logi to kopie zapasowe bazy danych generowane automatycznie przy każdej transakcji',
+  'Zapis wszystkich żądań HTTP w formacie access log — wyłącznie do celów debugowania w środowisku dev'
+],
+cor:'Ustrukturyzowane lub tekstowe rekordy zdarzeń z kontekstem (timestamp, poziom, serwis, wiadomość) — NIE powinny zawierać haseł, tokenów, danych osobowych (GDPR)',
+wrong:{
+  'Logi to pliki binarne generowane przez JVM zawierające trace GC i informacje o stopie pamięci':'GC logs to jeden specyficzny rodzaj logów JVM (flaga -Xlog:gc). Logi aplikacyjne to Logback/Log4j2/SLF4J — tekstowe lub JSON, nie binarne.',
+  'Logi to kopie zapasowe bazy danych generowane automatycznie przy każdej transakcji':'Kopie zapasowe to backup/dump. Baza danych ma WAL (write-ahead log) ale to nie to samo co logi aplikacyjne.',
+  'Zapis wszystkich żądań HTTP w formacie access log — wyłącznie do celów debugowania w środowisku dev':'Access log (Nginx/Apache) to jeden typ logów. Logi aplikacyjne istnieją na wszystkich środowiskach i logują zdarzenia biznesowe, błędy, operacje.'
+},
+exp:'Dobre logi: timestamp ISO-8601, poziom (ERROR/WARN/INFO/DEBUG), correlation ID, serwis, wiadomość, kontekst biznesowy (orderId, userId). Złe logi: hasła w plaintext, tokeny JWT/API keys, numery kart kredytowych, PESEL/SSID (naruszenie GDPR). Strukturyzowane (JSON): łatwe do parsowania przez Kibana/Splunk. Poziomy: ERROR (wymaga działania), WARN (potencjalny problem), INFO (normalne zdarzenia), DEBUG (szczegóły do dev).'
+},
+
+{cat:'observability',type:'single',
+q:'Co to jest APM (Application Performance Monitoring) i jakie dane zbiera?',
+opts:[
+  'APM to narzędzie do automatycznego wdrażania aplikacji na serwery produkcyjne z monitorowaniem statusu deploymenta',
+  'Monitorowanie wydajności aplikacji w czasie rzeczywistym: czasy odpowiedzi, error rates, trasy żądań, zużycie zasobów — narzędzia: Datadog, New Relic, Dynatrace, Elastic APM',
+  'Protokół do zdalnego zarządzania serwerami i zbierania metryk przez SSH bez agenta',
+  'Framework do testów wydajnościowych mierzący throughput i latencję aplikacji pod obciążeniem'
+],
+cor:'Monitorowanie wydajności aplikacji w czasie rzeczywistym: czasy odpowiedzi, error rates, trasy żądań, zużycie zasobów — narzędzia: Datadog, New Relic, Dynatrace, Elastic APM',
+wrong:{
+  'APM to narzędzie do automatycznego wdrażania aplikacji na serwery produkcyjne z monitorowaniem statusu deploymenta':'Automatyczne wdrażanie to CI/CD (Jenkins, GitLab CI, ArgoCD). APM monitoruje działającą aplikację, nie proces wdrożenia.',
+  'Protokół do zdalnego zarządzania serwerami i zbierania metryk przez SSH bez agenta':'To opis agentless monitoring przez SSH (np. Ansible dla konfiguracji). APM zazwyczaj używa agentów instrumentujących aplikację.',
+  'Framework do testów wydajnościowych mierzący throughput i latencję aplikacji pod obciążeniem':'To opis load testing (JMeter, Gatling, k6). APM monitoruje produkcję w czasie rzeczywistym, a nie testy syntetyczne.'
+},
+exp:'APM zbiera: czasy odpowiedzi per endpoint, error rate i typy błędów, distributed traces (gdzie spędza czas zapytanie), database query times (N+1 detection), external service calls, JVM metrics (heap, GC, threads). Automatyczna instrumentacja: agent wstrzykuje kod przez Java Agent (-javaagent:). Korzyść: wykrycie wąskich gardeł w produkcji bez kodu monitorującego w aplikacji.'
+},
+
+{cat:'observability',type:'single',
+q:'Co to jest log aggregation i dlaczego jest niezbędna w architekturze mikroserwisów?',
+opts:[
+  'Log aggregation to kompresja logów w celu zmniejszenia zużycia dysku na serwerach produkcyjnych',
+  'Centralne zbieranie logów ze wszystkich serwisów w jedno miejsce — bez tego debugowanie wymaga SSH na każdy serwis osobno i ręcznego przeszukiwania plików',
+  'Automatyczne generowanie raportów biznesowych na podstawie logów transakcyjnych aplikacji',
+  'Synchronizacja logów między środowiskiem dev i prod w celu odtworzenia błędów produkcyjnych lokalnie'
+],
+cor:'Centralne zbieranie logów ze wszystkich serwisów w jedno miejsce — bez tego debugowanie wymaga SSH na każdy serwis osobno i ręcznego przeszukiwania plików',
+wrong:{
+  'Log aggregation to kompresja logów w celu zmniejszenia zużycia dysku na serwerach produkcyjnych':'Kompresja to osobna kwestia (gzip, retention policies). Aggregation to centralizacja — zbieranie w jedno miejsce, nie kompresja.',
+  'Automatyczne generowanie raportów biznesowych na podstawie logów transakcyjnych aplikacji':'Raporty biznesowe to business intelligence (BI). Log aggregation to operacyjne zbieranie logów dla debugowania i monitorowania.',
+  'Synchronizacja logów między środowiskiem dev i prod w celu odtworzenia błędów produkcyjnych lokalnie':'To nie standard practice (dane prod na dev = ryzyko GDPR). Log aggregation to centralizacja logów produkcyjnych w jednym narzędziu.'
+},
+exp:'Problem: 50 mikroserwisów × 10 instancji = 500 miejsc z logami. 1 żądanie wchodzi do api-gateway, idzie przez 5 serwisów. Znalezienie błędu = SSH na każdy serwis + grep. Z log aggregation (ELK Stack / Grafana Loki): jeden interfejs, search po correlation_id, dashboardy. Stack: Fluentd/Filebeat (agent zbierający) → Elasticsearch/Loki (magazyn) → Kibana/Grafana (UI).'
+},
+
+
 ];
 
 const CAT={
