@@ -98,7 +98,7 @@ opts:[
   'Hexagonal jest architekturą mikroserwisową, Clean jest architekturą monolityczną'
 ],
 cor:'Hexagonal skupia się na tym jak aplikacja komunikuje się ze światem zewnętrznym (integracje), Clean na tym co aplikacja robi (use cases)',
-exp:'"Hexagonal asks: How does the app talk to the world? Clean asks: What does the app do?" Onion dopowiada: "What is the core business domain?" Trzy architekury uzupełniają się, nie wykluczają.'
+exp:'Hexagonal pyta: jak aplikacja komunikuje się ze światem zewnętrznym? Clean pyta: co aplikacja robi (jakie ma przypadki użycia)? Onion pyta: czym jest rdzeń biznesu domenowego? Trzy architektury uzupełniają się nawzajem i nie wykluczają.'
 },
 {cat:'architecture',type:'multi',
 q:'Które twierdzenia o CQRS są PRAWDZIWE? (wielokrotny wybór)',
@@ -189,7 +189,7 @@ opts:[
   'Serializacji eventów do formatu zgodnego z Apache Avro lub Protobuf'
 ],
 cor:'Zapewnienia że event jest opublikowany wtedy i tylko wtedy gdy transakcja bazodanowa się powiedzie — eliminuje partial failure',
-exp:'"What if DB commits but sending event fails?" Outbox: event zapisywany w tabeli outbox w tej samej transakcji co dane domenowe. Relay asynchronicznie publikuje. Eliminuje: "DB OK, event not sent" i "event sent, DB rolled back".'
+exp:'Co się stanie gdy baza zatwierdzi transakcję, ale wysłanie zdarzenia się nie powiedzie? Wzorzec Outbox zapisuje zdarzenie w tabeli outbox w tej samej transakcji co dane domenowe. Oddzielny proces relay asynchronicznie publikuje zdarzenia do brokera. Eliminuje oba problemy: baza OK ale zdarzenie nie wysłane, oraz zdarzenie wysłane ale baza cofnięta.'
 },
 {cat:'patterns',type:'single',
 q:'Inbox Pattern rozwiązuje problem:',
@@ -391,7 +391,7 @@ opts:[
   'Metoda wykona się w transakcji rodzica — @Transactional jest dziedziczone z nadklasy'
 ],
 cor:'Adnotacja zostanie zignorowana — Spring AOP działa tylko na public metodach Spring beanów via proxy',
-exp:'"Spring AOP works only on public methods." Prywatna metoda nie może być nadpisana przez proxy (CGLIB) ani zaimplementowana przez proxy (JDK). Adnotacja jest obecna w bytecode ale proxy jej nie widzi.'
+exp:'Spring AOP działa wyłącznie na publicznych metodach beanów Springa. Prywatna metoda nie może zostać nadpisana przez proxy CGLIB ani zaimplementowana przez proxy JDK. Adnotacja @Transactional jest co prawda obecna w bajtkodzie klasy, ale proxy jej nie widzi i nie może przechwycić wywołania.'
 },
 {cat:'spring',type:'single',
 q:'Self-invocation problem: metoda A wywołuje @Transactional metodę B w tej samej klasie. Skutek:',
@@ -424,7 +424,7 @@ opts:[
   'Non-repeatable reads — wiersz zmienia wartość między dwoma odczytami w tej samej transakcji'
 ],
 cor:'Dirty reads — odczytaniu niezatwierdzonych danych z innej transakcji, które mogą zostać wycofane',
-exp:'"Dirty Read: Transaction B reads uncommitted data of A. If A rolls back → B saw data that never existed." READ_COMMITTED: czytasz tylko zatwierdzone dane. NIE zapobiega: non-repeatable reads i phantom reads.'
+exp:'Brudny odczyt: transakcja B czyta niezatwierdzone dane transakcji A. Jeśli transakcja A zostanie cofnięta, transakcja B widziała dane które nigdy nie istniały. Poziom izolacji READ_COMMITTED zapobiega temu problemowi — odczytujesz tylko zatwierdzone dane. Nie chroni jednak przed niepowtarzalnymi odczytami i widmowymi wierszami.'
 },
 {cat:'spring',type:'single',
 q:'@Transactional domyślnie NIE wykona rollback dla:',
@@ -435,7 +435,7 @@ opts:[
   'Wyjątku rzuconego przez metodę oznaczoną @Async wywołaną wewnątrz transakcji'
 ],
 cor:'Checked Exception (np. IOException) — domyślnie rollback tylko dla RuntimeException i Error',
-exp:'"By default: RuntimeException → rollback. Checked Exception → NO rollback." Fix: <code>@Transactional(rollbackFor = Exception.class)</code>. Pułapka: łapanie wyjątku w try-catch bez re-throw = Spring nie widzi wyjątku = brak rollback.'
+exp:'Domyślnie Spring cofa transakcję tylko dla RuntimeException i Error. Sprawdzane wyjątki (np. IOException) nie powodują automatycznego cofnięcia. Rozwiązanie: <code>@Transactional(rollbackFor = Exception.class)</code>. Częsta pułapka: złapanie wyjątku w try-catch bez ponownego rzucenia — Spring nie widzi wyjątku i nie cofa transakcji.'
 },
 {cat:'spring',type:'single',
 q:'Singleton-scoped bean z mutable stanem w Spring — dlaczego problem?',
@@ -446,7 +446,7 @@ opts:[
   'Singleton nie może być wstrzykiwany do request-scoped beanów ze względu na cykl życia'
 ],
 cor:'Jeden bean shared między wszystkimi wątkami — mutable field = race condition przy concurrent requestach',
-exp:'"Singleton scope: One per container. NOT thread-safe by default (one object shared by many threads)." Bezstanowy bean (no instance fields) = thread-safe. Mutable field = problem. Fix: bezstanowe beany lub synchronizacja.'
+exp:'Zasięg singleton oznacza jedną instancję beana na kontener Springa. Ta jedna instancja jest współdzielona przez wszystkie wątki obsługujące żądania. Bean bezstanowy (bez pól instancji) jest bezpieczny wątkowo. Modyfikowalne pole instancji to wyścig danych przy współbieżnych żądaniach. Rozwiązanie: bezstanowe beany lub synchronizacja dostępu.'
 },
 {cat:'spring',type:'single',
 q:'MANDATORY propagation w @Transactional — zachowanie gdy brak aktywnej transakcji:',
@@ -457,7 +457,7 @@ opts:[
   'Spring zawiesza wykonanie i czeka aż inna transakcja zostanie otwarta przez inny wątek'
 ],
 cor:'Rzuca IllegalTransactionStateException — metoda musi być wywołana w ramach istniejącej transakcji',
-exp:'"Must run inside existing transaction. If none exists → IllegalTransactionStateException." Użycie: walidacja że wywołujący kod poprawnie zarządza transakcją. Dokumentuje kontrakt: "nie wywołuj mnie bez transakcji."'
+exp:'Propagacja MANDATORY wymaga aktywnej transakcji przy wywołaniu metody. Gdy brak transakcji rzucany jest IllegalTransactionStateException. Zastosowanie: walidacja że kod wywołujący poprawnie zarządza transakcją. Adnotacja dokumentuje kontrakt: ta metoda nie powinna być wywoływana bez kontekstu transakcyjnego.'
 },
 {cat:'spring',type:'single',
 q:'Non-Repeatable Read w kontekście izolacji transakcji:',
@@ -481,7 +481,7 @@ opts:[
   'Zawsze gdy używamy mikrousług — distributed transactions wymagają pesymistycznego blokowania'
 ],
 cor:'W systemach finansowych z wysoką szansą konfliktu (np. rezerwacja miejsc) gdzie retry jest kosztowny lub niedopuszczalny',
-exp:'"Pessimistic: Conflicts are likely. Use for: Financial systems, Critical invariants, Short fast transactions." Optimistic: rzadkie konflikty, retry akceptowalny. Pessimistic: pewność bez retry, ale: blocking i ryzyko deadlock.'
+exp:'Blokada pesymistyczna jest właściwa gdy konflikty są częste — systemy finansowe, krytyczne niezmienniki, krótkie szybkie transakcje. Blokada optymistyczna sprawdza się gdy konflikty są rzadkie i ponowna próba jest akceptowalna. Blokada pesymistyczna daje pewność bez retry, ale może powodować blokowanie i ryzyko zakleszczenia.'
 },
 {cat:'databases',type:'single',
 q:'B-Tree index — dlaczego zwykłe Binary Search Tree byłoby złym wyborem dla bazy danych?',
@@ -514,7 +514,7 @@ opts:[
   'Replikacja — każdy shard nie może mieć własnych replik dla high availability'
 ],
 cor:'JOIN między danymi z różnych shardów, transakcje cross-shard, globalne unique constraints i foreign keys',
-exp:'"What breaks: Joins across shards (not possible natively), Cross-shard transactions (slow, complex, often avoided), Global constraints (not enforceable globally)." ACID działa wewnątrz jednego shardu. Fix: Saga, denormalizacja, app-level constraints.'
+exp:'Po podziale na shardy przestają działać: złączenia danych z różnych shardów (niemożliwe natywnie), transakcje obejmujące wiele shardów (powolne, złożone, często unikane), globalne ograniczenia integralności i klucze obce (niewykonalne globalnie). ACID działa tylko wewnątrz jednego shardu. Rozwiązania: wzorzec Saga, denormalizacja, ograniczenia na poziomie aplikacji.'
 },
 {cat:'databases',type:'single',
 q:'EXPLAIN ANALYZE w PostgreSQL vs EXPLAIN — kluczowa różnica:',
@@ -626,7 +626,7 @@ opts:[
   'Wywołanie obj.finalize() — metoda finalize sygnalizuje GC że obiekt jest gotowy do usunięcia'
 ],
 cor:'Brak osiągalnych referencji od GC Roots (local variables, static fields, active threads) — obiekt niedostępny',
-exp:'"What Makes an Object Eligible for GC? No reference from GC Roots." Tracing GC (nie reference counting) — cykle referencji NIE zapobiegają GC w Javie. <code>System.gc()</code> = hint, nie polecenie. finalize() deprecated.'
+exp:'Obiekt kwalifikuje się do garbage collection gdy żadna ścieżka od korzeni GC (zmienne lokalne, pola statyczne, aktywne wątki) nie prowadzi do tego obiektu. Java używa śledzącego GC, a nie liczenia referencji — cykle referencji nie zapobiegają zebraniu pamięci. System.gc() to wskazówka dla JVM, nie polecenie. Metoda finalize() jest przestarzała.'
 },
 {cat:'java',type:'single',
 q:'Stop-The-World (STW) pause w GC — co to oznacza i jak nowoczesne GC to minimalizują?',
@@ -672,7 +672,7 @@ opts:[
   'localStorage wymaga HTTPS; cookie działa zarówno z HTTP jak i HTTPS'
 ],
 cor:'localStorage jest dostępny dla JavaScript — podatny na XSS; httpOnly cookie jest niedostępny dla JS — XSS nie może go ukraść',
-exp:'"Storing JWT in localStorage → vulnerable to XSS." <code>document.cookie</code> nie zwraca httpOnly cookies. XSS może wykonać dowolny JS → skraść token z localStorage. httpOnly + Secure + SameSite=Strict = best practice dla auth tokens.'
+exp:'Przechowywanie JWT w localStorage jest podatne na XSS — dowolny skrypt JavaScript uruchomiony na stronie może odczytać zawartość localStorage. Ciasteczko httpOnly jest niedostępne dla JavaScript — document.cookie go nie zwraca. Zalecana konfiguracja ciasteczka z tokenem: flaga httpOnly, Secure (tylko HTTPS) i SameSite=Strict.'
 },
 {cat:'security',type:'single',
 q:'JWS vs JWE — podstawowa różnica:',
@@ -683,7 +683,7 @@ opts:[
   'JWS jest używany w OAuth 2.0; JWE jest używany w OpenID Connect — różnica w protokole'
 ],
 cor:'JWS: podpisany token (integralność i autentyczność — payload czytelny); JWE: zaszyfrowany token (poufność — payload nieczytelny bez klucza)',
-exp:'JWS (JSON Web Signature): header.payload.signature. Payload czytelny, signature gwarantuje że nie zmieniony. JWE (JSON Web Encryption): 5 części, payload zaszyfrowany. "If you want to encrypt the token → use JWE."'
+exp:'JWS (JSON Web Signature) ma strukturę header.payload.signature. Payload jest czytelny dla każdego, podpis gwarantuje że nie został zmodyfikowany. JWE (JSON Web Encryption) składa się z 5 części, a payload jest zaszyfrowany i nieczytelny bez klucza prywatnego. Jeśli tokeny mają zawierać wrażliwe dane wymagające poufności, użyj JWE zamiast JWS.'
 },
 {cat:'security',type:'single',
 q:'CORS — czy zapewnia bezpieczeństwo endpointom API?',
@@ -751,7 +751,7 @@ opts:[
   'Commit log oznacza że każda wiadomość wymaga potwierdzenia (commit) od konsumenta przed następną'
 ],
 cor:'Wiadomości są przechowywane przez konfigurowalny czas (retention), nie usuwane po consumption; konsumenci śledzą własny offset; ten sam event może być czytany wielokrotnie przez różne consumer groups',
-exp:'"Kafka = distributed commit log. Messages are never removed immediately. Consumers track their own offsets. The same message can be read many times." RabbitMQ: wiadomość znika po ACK. Kafka: eventy dostępne dla wielu konsumentów niezależnie.'
+exp:'Kafka to rozproszony dziennik zmian: wiadomości nie są usuwane natychmiast po odebraniu, konsumenci śledzą własne pozycje (offsety) i ta sama wiadomość może być odczytana wielokrotnie przez różnych konsumentów niezależnie. RabbitMQ to klasyczny broker: wiadomość znika po potwierdzeniu odebrania. Kafka nadaje się do zdarzeń do odtworzenia, RabbitMQ do jednorazowych poleceń.'
 },
 {cat:'communication',type:'single',
 q:'Kafka gwarantuje ordering:',
@@ -769,11 +769,11 @@ q:'RabbitMQ vs Kafka — obsługa wiadomości które nie mogą być przetworzone
 opts:[
   'Oba mają identyczne wbudowane mechanizmy DLQ (Dead Letter Queue) z konfiguracją przez adnotacje',
   'RabbitMQ: brak DLQ; Kafka: wbudowany dead-letter exchange z automatycznym TTL retry',
-  'RabbitMQ: first-class DLQ support (dead-letter exchange, TTL retries); Kafka: brak wbudowanego DLQ, aplikacja sama zarządza retry topics',
+  'RabbitMQ: wbudowane wsparcie DLQ na poziomie brokera (dead-letter exchange, ponawianie z TTL); Kafka: brak wbudowanego DLQ, aplikacja sama zarządza tematami ponownych prób',
   'Oba nie mają DLQ — aplikacja musi ręcznie implementować logikę obsługi błędów dla obu brokerów'
 ],
-cor:'RabbitMQ: first-class DLQ support (dead-letter exchange, TTL retries); Kafka: brak wbudowanego DLQ, aplikacja sama zarządza retry topics',
-exp:'"RabbitMQ: first-class DLQ support — retry queue, dead-letter exchange, TTL-based retries, broker-level support." "Kafka has no built-in DLQ. Typical patterns: retry topics, dead-letter topics, manual offset management. The application decides."'
+cor:'RabbitMQ: wbudowane wsparcie DLQ na poziomie brokera (dead-letter exchange, ponawianie z TTL); Kafka: brak wbudowanego DLQ, aplikacja sama zarządza tematami ponownych prób',
+exp:'RabbitMQ ma wbudowane wsparcie dla kolejek niedostarczonych wiadomości na poziomie brokera: kolejka ponownych prób, dead-letter exchange, ponowne próby oparte na TTL. Kafka nie ma wbudowanego mechanizmu DLQ. Typowe wzorce: tematy ponownych prób, tematy martwych wiadomości, ręczne zarządzanie offsetami. O strategii obsługi błędów decyduje aplikacja konsumenta.'
 },
 {cat:'communication',type:'single',
 q:'at-least-once vs exactly-once delivery — trade-offs:',
@@ -874,7 +874,7 @@ opts:[
   'ConfigMap jest przechowywany tylko w pamięci węzła; Secret jest persystowany do etcd'
 ],
 cor:'ConfigMap: przechowywany plaintext w etcd; Secret: przechowywany jako base64 (domyślnie, nie szyfrowanie!) — opcjonalnie encryption at rest',
-exp:'"Secret: stored as base64 in etcd by default." Base64 to kodowanie, nie szyfrowanie — każdy z dostępem do etcd może odczytać. Dla prawdziwego bezpieczeństwa: encryption at rest lub external secret manager (HashiCorp Vault, AWS Secrets Manager).'
+exp:'ConfigMap przechowuje dane konfiguracyjne w postaci zwykłego tekstu w etcd. Secret przechowuje wrażliwe dane jako base64 — to kodowanie, a nie szyfrowanie. Każda osoba z dostępem do etcd może odczytać zawartość Secretu. Dla prawdziwego bezpieczeństwa: włącz szyfrowanie danych w spoczynku lub użyj zewnętrznego menedżera sekretów jak HashiCorp Vault lub AWS Secrets Manager.'
 },
 {cat:'kubernetes',type:'single',
 q:'kube-scheduler — jaką funkcję pełni w klastrze?',
@@ -909,7 +909,7 @@ opts:[
   'Counter dla błędów; Gauge dla sukcesu; Histogram dla wszystkich innych metryk'
 ],
 cor:'Counter dla liczby requestów (zawsze rośnie); Gauge dla aktywnych połączeń (up&down); Histogram dla latencji (rozkład wartości, p50/p95/p99)',
-exp:'"Counter: always increases (request count, error count)." "Gauge: up & down (memory, active connections, queue size)." "Histogram: distribution (latency buckets → p50, p95, p99)." "Summary: pre-calculated quantiles (p95 latency)."'
+exp:'Licznik (Counter): wartość tylko rośnie, nigdy nie maleje. Przykłady: liczba żądań, liczba błędów. Wskaźnik (Gauge): wartość może rosnąć i maleć. Przykłady: użycie pamięci, aktywne połączenia, długość kolejki. Histogram: rozkład wartości w kubełkach — latencja z kubełkami ≤100ms, ≤200ms, ≤500ms, na podstawie których obliczane są percentyle p50, p95, p99. Podsumowanie (Summary): wstępnie obliczone kwantyle.'
 },
 {cat:'observability',type:'single',
 q:'Distributed Tracing — czym jest Span w kontekście Trace?',
