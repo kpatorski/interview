@@ -887,6 +887,149 @@ opts:[
 cor:'Decyduje na którym węźle uruchomić nowy Pod na podstawie dostępnych zasobów, constraints i affinity rules',
 exp:'"kube-scheduler: Decides which Node a Pod runs on, Considers available resources and constraints." Proces: filtracja (które węzły spełniają Requests?) → scoring (który węzeł jest najlepszy?) → binding (przypisz Pod do węzła). etcd: stan. kube-apiserver: REST API.'
 },
+{cat:'kubernetes',type:'single',
+q:'startupProbe — czym różni się od livenessProbe i readinessProbe?',
+opts:[
+  'startupProbe działa przez cały czas życia Poda — zastępuje livenessProbe i readinessProbe',
+  'startupProbe uruchamia się tylko raz przy starcie Poda i blokuje liveness/readiness do czasu sukcesu — failure = restart; po sukcesie startupProbe wyłącza się',
+  'startupProbe jest aliasem livenessProbe z opóźnionym startem — różni się tylko wartością initialDelaySeconds',
+  'startupProbe nie powoduje restartu — usuwa Pod z rotacji Service tak jak readinessProbe'
+],
+cor:'startupProbe uruchamia się tylko raz przy starcie Poda i blokuje liveness/readiness do czasu sukcesu — failure = restart; po sukcesie startupProbe wyłącza się',
+exp:'startupProbe chroni wolno startujące aplikacje (np. JVM). Dopóki startupProbe nie zwróci sukcesu, liveness i readiness są wstrzymane. Failure = kubelet restartuje Pod. Po pierwszym sukcesie startupProbe "wyłącza się" i od tej chwili aktywne są liveness i readiness. Idealne zamiast wysokich <code>initialDelaySeconds</code> na livenessProbe.'
+},
+{cat:'kubernetes',type:'single',
+q:'Kiedy readinessProbe jest lepszym wyborem niż livenessProbe?',
+opts:[
+  'Gdy aplikacja nie odpowiada na żadne requesty i powinna być zrestartowana przez kubelet',
+  'Gdy aplikacja może być chwilowo niedostępna (np. ładuje dane z bazy) bez powodu do restartu — readinessProbe usuwa ją z rotacji Service bez restartu',
+  'readinessProbe jest zawsze lepszy — livenessProbe jest deprecated od K8s 1.25',
+  'Gdy chcemy ograniczyć liczbę połączeń do Poda podczas dużego obciążenia'
+],
+cor:'Gdy aplikacja może być chwilowo niedostępna (np. ładuje dane z bazy) bez powodu do restartu — readinessProbe usuwa ją z rotacji Service bez restartu',
+exp:'"readinessProbe: App not ready → remove from Service rotation (no restart)." vs "livenessProbe: App is dead → restart Pod." Przykład: serwis łączący się z wolno startującą bazą — niepoprawna livenessProbe restartowałaby go w kółko (restart loop). readinessProbe daje czas na połączenie bez restartów.'
+},
+{cat:'kubernetes',type:'single',
+q:'Helm: Chart, Release, Values — jakie relacje zachodzą między tymi pojęciami?',
+opts:[
+  'Chart = uruchomiona instancja w klastrze; Release = szablon; Values = historia zmian',
+  'Chart = szablon aplikacji (pliki YAML + templates/); Release = konkretna instalacja Chart w klastrze; Values = parametry konfiguracyjne nadpisujące domyślne',
+  'Chart i Release to synonimy — Values to plik z secretami dla Helm',
+  'Release = Chart + Repository; Values są częścią Chart i nie można ich nadpisać z zewnątrz'
+],
+cor:'Chart = szablon aplikacji (pliki YAML + templates/); Release = konkretna instalacja Chart w klastrze; Values = parametry konfiguracyjne nadpisujące domyślne',
+exp:'"Chart: A package — like an apt package. Release: An instance of a chart running in K8s. Values: Configuration parameters." Ten sam Chart może dać wiele niezależnych Releases (np. prod/staging). <code>helm install my-app ./chart -f prod-values.yaml</code> → tworzy Release "my-app". <code>helm upgrade my-app ./chart</code> → aktualizuje ten Release.'
+},
+{cat:'kubernetes',type:'single',
+q:'Co robi helm template w przeciwieństwie do helm install?',
+opts:[
+  'helm template instaluje Chart w trybie dry-run z automatycznym rollbackiem po 60s',
+  'helm template renderuje szablony do YAML na stdout bez kontaktowania się z klastrem — pozwala zobaczyć wygenerowane manifesty przed instalacją',
+  'helm template kompiluje Chart do binarnego formatu Helm Release — wymagany przed helm install',
+  'helm template i helm install robią to samo — różnią się tylko kolorowym outputem'
+],
+cor:'helm template renderuje szablony do YAML na stdout bez kontaktowania się z klastrem — pozwala zobaczyć wygenerowane manifesty przed instalacją',
+exp:'"helm template: Renders templates locally without connecting to a cluster." Użyteczne do: debugowania szablonów (sprawdź co wygeneruje <code>{{ .Values.image.tag }}</code>), code review, generowania manifestów do GitOps. <code>helm template my-app ./chart -f values.yaml | kubectl apply -f -</code> = deploy bez Helm Release.'
+},
+{cat:'kubernetes',type:'single',
+q:'kubectl apply vs kubectl create — kluczowa różnica w podejściu do zarządzania zasobami:',
+opts:[
+  'kubectl apply wymaga że zasób nie istnieje (tworzy tylko); kubectl create wymaga że zasób istnieje (aktualizuje tylko)',
+  'kubectl create i apply robią to samo — create jest aliasem apply dla kompatybilności wstecznej',
+  'kubectl apply używa 3-way merge (desired + last-applied + live state) i jest idempotentny; kubectl create tworzy zasób i failuje gdy już istnieje',
+  'kubectl apply działa tylko na Deployment; kubectl create działa na wszystkich typach zasobów'
+],
+cor:'kubectl apply używa 3-way merge (desired + last-applied + live state) i jest idempotentny; kubectl create tworzy zasób i failuje gdy już istnieje',
+exp:'"kubectl apply: Declarative, 3-way merge (desired, last-applied, live state), idempotent — safe to run multiple times." kubectl apply przechowuje ostatni apply w annotacji <code>kubectl.kubernetes.io/last-applied-configuration</code>. kubectl create: imperative — "create this now", Error: AlreadyExists przy ponownym wywołaniu. W GitOps i CI/CD: zawsze apply.'
+},
+{cat:'kubernetes',type:'single',
+q:'Dlaczego kubectl rollout restart deployment/X jest potrzebny po zmianie ConfigMap?',
+opts:[
+  'Deployment automatycznie wykrywa zmiany w ConfigMap i restartuje się — rollout restart nie jest potrzebny',
+  'ConfigMap zmiany nie wyzwalają automatycznego rolling update Deploymentu — rollout restart wymusza stopniowe zastąpienie Podów nowymi (które zamontują zaktualizowane wartości)',
+  'kubectl rollout restart aktualizuje ConfigMap w Vault i synchronizuje zmiany z ESO',
+  'rollout restart jest potrzebny tylko gdy zmienia się Secret, nie ConfigMap'
+],
+cor:'ConfigMap zmiany nie wyzwalają automatycznego rolling update Deploymentu — rollout restart wymusza stopniowe zastąpienie Podów nowymi (które zamontują zaktualizowane wartości)',
+exp:'"kubectl rollout restart deployment/<name> — Triggers rolling restart without changing the spec." Kubernetes nie śledzi czy ConfigMap/Secret używane przez Deployment się zmieniły. Stare Pody działają ze starą konfiguracją. rollout restart zmienia annotację <code>kubectl.kubernetes.io/restartedAt</code> → wyzwala rolling update → nowe Pody startują z aktualną konfiguracją.'
+},
+{cat:'kubernetes',type:'single',
+q:'Rolling Update: maxSurge=1, maxUnavailable=0 dla Deployment z 3 replikami — co opisuje ten scenariusz?',
+opts:[
+  'W każdej chwili działają co najwyżej 3 Pody; dopuszczalne 0 niedostępnych → update nie może się wykonać',
+  'Najpierw terminuj 1 stary Pod, potem stwórz nowy — zawsze 2 lub 3 Pody działają (może być 1 niedostępny)',
+  'Stwórz 1 dodatkowy nowy Pod (4 razem) zanim usuń stary → w każdym kroku min. 3 Pody dostępne → zero-downtime',
+  'maxSurge=1 oznacza że update może trwać max 1 minutę; maxUnavailable=0 że zero błędów jest dopuszczalne'
+],
+cor:'Stwórz 1 dodatkowy nowy Pod (4 razem) zanim usuń stary → w każdym kroku min. 3 Pody dostępne → zero-downtime',
+exp:'"maxSurge=1: Can temporarily have 4 Pods (3+1). maxUnavailable=0: Never below 3 available Pods." Krok po kroku: 3×v1 → stwórz 1×v2 (4 Pody) → usuń 1×v1 (3 Pody: 2×v1+1×v2) → stwórz 1×v2 (4 Pody) → … → 3×v2. Gwarancja: zawsze ≥3 Pody ready. maxUnavailable=1 = odwrotna kolejność (najpierw usuń, potem dodaj).'
+},
+{cat:'kubernetes',type:'single',
+q:'Dlaczego K8s Secrets są niewystarczające dla środowisk produkcyjnych?',
+opts:[
+  'K8s Secrets nie obsługują wartości dłuższych niż 1MB — to główne ograniczenie produkcyjne',
+  'Secrets są przechowywane jako base64 w etcd (domyślnie nieszyfrowane), brak audit logu kto odczytał, brak automatycznej rotacji i dynamicznych sekretów',
+  'Secrets są dostępne tylko dla Podów na tym samym węźle — nie można ich współdzielić w klastrze',
+  'K8s Secrets wymagają ręcznego base64 dekodowania przez aplikację — to zbyt skomplikowane'
+],
+cor:'Secrets są przechowywane jako base64 w etcd (domyślnie nieszyfrowane), brak audit logu kto odczytał, brak automatycznej rotacji i dynamicznych sekretów',
+exp:'"base64 is encoding, not encryption." Każdy z dostępem do etcd może odczytać Secret. Produkcyjne problemy: (1) Brak audit logu — nie wiesz kto i kiedy odczytał; (2) Brak rotacji — zmiana hasła = ręczna aktualizacja Secret + restart Podów; (3) Statyczne sekrety — brak TTL, sekrety nie wygasają; (4) Wielośrodowiskowość — trudna separacja dev/staging/prod. Rozwiązanie: HashiCorp Vault + ESO.'
+},
+{cat:'kubernetes',type:'single',
+q:'External Secrets Operator: SecretStore vs ExternalSecret — jakie role pełnią te zasoby?',
+opts:[
+  'SecretStore = lista sekretów do pobrania; ExternalSecret = dane uwierzytelniające do Vault',
+  'SecretStore definiuje JAK ESO łączy się z zewnętrznym systemem (adres, auth); ExternalSecret definiuje CO pobrać i pod jaką nazwą K8s Secret stworzyć',
+  'SecretStore i ExternalSecret to synonimy — można używać zamiennie',
+  'ExternalSecret zastępuje K8s Secret — aplikacja używa ExternalSecret zamiast Secret w envFrom'
+],
+cor:'SecretStore definiuje JAK ESO łączy się z zewnętrznym systemem (adres, auth); ExternalSecret definiuje CO pobrać i pod jaką nazwą K8s Secret stworzyć',
+exp:'"SecretStore: How to connect (address, authentication). ExternalSecret: What to fetch and where to put it." Podział: Ops tworzy SecretStore (credentials do Vault); Dev tworzy ExternalSecret (które pola pobrać). Flow: Vault → ESO sync → K8s Secret (auto-created) → Deployment envFrom. Aplikacja nie wie o Vaulcie — zero zmian w kodzie.'
+},
+{cat:'kubernetes',type:'single',
+q:'Dlaczego Kafka na Kubernetes wymaga StatefulSet a nie Deployment?',
+opts:[
+  'Deployment nie obsługuje więcej niż 3 replik — StatefulSet jest potrzebny dla większych klastrów Kafka',
+  'Kafka brokery muszą mieć stałe tożsamości (broker.id), stabilne DNS nazwy i dedykowane PersistentVolumes — co zapewnia StatefulSet, nie Deployment',
+  'StatefulSet jest szybszy przy rolling update — dlatego preferowany dla wydajnych systemów jak Kafka',
+  'Deployment nie obsługuje komunikacji między Podami — StatefulSet dodaje wewnętrzny Service mesh'
+],
+cor:'Kafka brokery muszą mieć stałe tożsamości (broker.id), stabilne DNS nazwy i dedykowane PersistentVolumes — co zapewnia StatefulSet, nie Deployment',
+exp:'"StatefulSet: Pods get stable names (kafka-0, kafka-1), stable DNS, dedicated PersistentVolumes." Deployment = anonimowe Pody, losowe nazwy, brak gwarantowanego storage. Kafka broker-0 musi zawsze być "broker 0" po restarcie — jego logi partycji (na PV) muszą być dostępne ponownie pod tą samą tożsamością. Deployment nie gwarantuje żadnej z tych właściwości.'
+},
+{cat:'kubernetes',type:'single',
+q:'Kafka Consumer Lag — co oznacza i kiedy jest alarmujący?',
+opts:[
+  'Consumer Lag = liczba konsumentów w grupie; wysoki lag = zbyt wiele konsumentów na partycję',
+  'Consumer Lag = różnica między najnowszym offsetem w partycji a ostatnim potwierdzonym offsetem konsumenta — rosnący lag oznacza że konsument nie nadąża za producentem',
+  'Consumer Lag = opóźnienie sieciowe między brokerem a konsumentem w milisekundach',
+  'Consumer Lag = liczba błędów w consumer group — lag=0 oznacza brak błędów'
+],
+cor:'Consumer Lag = różnica między najnowszym offsetem w partycji a ostatnim potwierdzonym offsetem konsumenta — rosnący lag oznacza że konsument nie nadąża za producentem',
+exp:'"Consumer Lag = Latest offset - Consumer committed offset. Growing lag = consumer can\'t keep up." Lag=0: konsument nadąża. Rosnący lag: konsument wolniejszy niż producent. Reakcje: (1) Zwiększ liczbę Podów konsumenta (max = liczba partycji); (2) Zoptymalizuj logikę konsumenta; (3) Zwiększ liczbę partycji. Monitor: <code>kafka-consumer-groups.sh --describe --group my-group</code>.'
+},
+{cat:'kubernetes',type:'single',
+q:'Dead Letter Topic (DLT) w Kafka — kiedy wiadomość trafia do DLT i co to daje?',
+opts:[
+  'DLT to topic z wiadomościami oczekującymi na potwierdzenie — broker przenosi je gdy konsument nie odpowie w 30s',
+  'Wiadomość trafia do DLT gdy nie może być przetworzona po N próbach — DLT izoluje poison pills i pozwala na ręczną analizę bez blokowania głównego topica',
+  'DLT zastępuje retry mechanism — każda nieudana wiadomość jest od razu usuwana z DLT po 24h',
+  'DLT jest automatycznie tworzony przez Kafka dla każdego topica — nie wymaga konfiguracji'
+],
+cor:'Wiadomość trafia do DLT gdy nie może być przetworzona po N próbach — DLT izoluje poison pills i pozwala na ręczną analizę bez blokowania głównego topica',
+exp:'"DLT: After N retries, message goes to DLT for manual inspection without blocking the main topic." Bez DLT: nieprzetworzona wiadomość blokuje partycję (at-least-once = offset nie jest commitowany). W Spring Kafka: <code>DeadLetterPublishingRecoverer</code> + <code>DefaultErrorHandler</code> + <code>FixedBackOff(2000, 3)</code>. DLT naming: <code>original.topic.name.DLT</code>. Pozwala na: analizę błędnych wiadomości, replay po naprawie, alerting.'
+},
+{cat:'kubernetes',type:'multi',
+q:'Idempotentny konsument Kafka — które stwierdzenia są PRAWDZIWE? (wielokrotny wybór)',
+opts:[
+  'Kafka gwarantuje exactly-once — idempotentność konsumenta nie jest potrzebna',
+  'Idempotentny konsument może bezpiecznie przetworzyć tę samą wiadomość wielokrotnie bez efektów ubocznych',
+  'Przy at-least-once delivery wiadomość może być dostarczona więcej niż raz — bez idempotentności dojdzie do duplikatów',
+  'Idempotentność można zrealizować przez sprawdzanie messageId w bazie przed przetworzeniem'
+],
+cor:['Idempotentny konsument może bezpiecznie przetworzyć tę samą wiadomość wielokrotnie bez efektów ubocznych','Przy at-least-once delivery wiadomość może być dostarczona więcej niż raz — bez idempotentności dojdzie do duplikatów','Idempotentność można zrealizować przez sprawdzanie messageId w bazie przed przetworzeniem'],
+exp:'(A)❌ Kafka domyślnie gwarantuje at-least-once (nie exactly-once) — duplikaty są możliwe przy rebalance lub retry. (B)✅ Idempotentny konsument: przetworzy wiadomość raz albo wiele razy — wynik zawsze taki sam. (C)✅ At-least-once + brak idempotentności = duplikaty w DB, podwójne emaile itp. (D)✅ Wzorzec: <code>INSERT ... ON CONFLICT DO NOTHING</code> lub deduplikacja po messageId w Redis.'
+},
 
 // ═══════ OBSERVABILITY ═══════
 {cat:'observability',type:'single',
