@@ -60,12 +60,12 @@
 
 Kubernetes (K8s) is a container orchestration platform that enables:
 
-- Running containerized applications\
-- Horizontal scaling\
-- Zero-downtime updates\
-- Automatic restarts\
-- Network management\
-- Storage management\
+- Running containerized applications
+- Horizontal scaling
+- Zero-downtime updates
+- Automatic restarts
+- Network management
+- Storage management
 - Separation of configuration from code
 
 Kubernetes operates using a **declarative model**.
@@ -92,25 +92,25 @@ The Control Plane manages the entire cluster.
 
 #### kube-apiserver
 
-- Central entry point — everything communicates through it (kubectl, other components)\
-- Exposes REST API\
+- Central entry point — everything communicates through it (kubectl, other components)
+- Exposes REST API
 - Validates and persists resources in etcd
 
 #### etcd
 
-- Distributed key-value store\
-- Stores the entire cluster state\
+- Distributed key-value store
+- Stores the entire cluster state
 - Single source of truth — if etcd dies, the cluster doesn't know what it's doing
 
 #### kube-scheduler
 
-- Decides which Node a new Pod runs on\
+- Decides which Node a new Pod runs on
 - Considers available resources, affinity rules, taints
 
 #### kube-controller-manager
 
-- Collection of control loops — one per resource type\
-- Each loop: read desired state → read actual state → correct the difference\
+- Collection of control loops — one per resource type
+- Each loop: read desired state → read actual state → correct the difference
 - Example: Deployment controller recreates a Pod the moment it dies
 
 ### Worker Node
@@ -119,17 +119,17 @@ A Node is a machine (VM or physical) that runs containers.
 
 #### kubelet
 
-- Agent on every node\
+- Agent on every node
 - Receives instructions from API Server and manages containers
 
 #### kube-proxy
 
-- Manages network routing\
+- Manages network routing
 - Implements Service load balancing via iptables/IPVS
 
 #### container runtime
 
-- e.g., containerd\
+- e.g., containerd
 - Actually pulls images and runs containers
 
 ---
@@ -154,9 +154,9 @@ Kubernetes continuously reconciles the system state — this is the foundation o
 
 The smallest deployable unit. Wraps one (or more) containers.
 
-- Containers in a Pod share networking and storage\
-- Has its own IP address\
-- **Ephemeral** — if a Pod dies, it does not come back by itself\
+- Containers in a Pod share networking and storage
+- Has its own IP address
+- **Ephemeral** — if a Pod dies, it does not come back by itself
 - Almost never created directly — use Deployment instead
 
 ### Deployment
@@ -227,8 +227,8 @@ You almost never create ReplicaSets directly; Deployment manages them.
 For stateful applications (databases, Kafka brokers).
 
 Provides:
-- Stable, predictable Pod names (`kafka-0`, `kafka-1` instead of random hashes)\
-- Persistent identity across restarts\
+- Stable, predictable Pod names (`kafka-0`, `kafka-1` instead of random hashes)
+- Persistent identity across restarts
 - Dedicated PVC per Pod
 
 ### Service
@@ -306,8 +306,8 @@ Ingress is just a config object — it requires an **Ingress Controller** (e.g.,
 actually accepts requests and routes them. The controller is a reverse proxy running as a Pod.
 
 Enables:
-- HTTP routing by domain and path\
-- Path-based routing to multiple services behind one address\
+- HTTP routing by domain and path
+- Path-based routing to multiple services behind one address
 - TLS termination in one place
 
 ---
@@ -359,17 +359,17 @@ temporarily busy (long GC, batch job) but shouldn't be killed.
 
 ### Flat Network Model
 
-- Every Pod has a unique IP address\
-- Every Pod can communicate with every other Pod directly\
+- Every Pod has a unique IP address
+- Every Pod can communicate with every other Pod directly
 - No default network segmentation
 
 Isolation can be introduced using **NetworkPolicy**.
 
 ### CNI (Container Network Interface)
 
-- Assigns IP addresses to Pods\
-- Configures routing between nodes\
-- Enforces network policies\
+- Assigns IP addresses to Pods
+- Configures routing between nodes
+- Enforces network policies
 - Examples: Calico, Flannel, Cilium
 
 ---
@@ -419,7 +419,7 @@ echo -n "secret" | base64          # c2VjcmV0
 echo "c2VjcmV0" | base64 -d        # secret
 
 # Read a specific field from a Secret
-kubectl get secret order-service-secret \
+kubectl get secret order-service-secret 
   -o jsonpath='{.data.DB_PASSWORD}' | base64 -d
 ```
 
@@ -459,8 +459,8 @@ resources:
     memory: "512Mi"   # exceeding memory limit → OOMKilled (container is killed)
 ```
 
-- `requests` — the Scheduler uses this to find a Node with enough free resources\
-- `limits` — hard ceiling; CPU is throttled, memory violation kills the container\
+- `requests` — the Scheduler uses this to find a Node with enough free resources
+- `limits` — hard ceiling; CPU is throttled, memory violation kills the container
 - **HPA requires `requests` to be set** — without it, autoscaling can't calculate % utilization
 
 ---
@@ -470,9 +470,9 @@ resources:
 A Namespace is a logical partition within a cluster — like folders in a filesystem.
 
 Used for:
-- Environment separation (dev / staging / prod in one cluster)\
-- Organizing resources by team or project\
-- Access control via RBAC\
+- Environment separation (dev / staging / prod in one cluster)
+- Organizing resources by team or project
+- Access control via RBAC
 - Resource quotas per namespace
 
 ```bash
@@ -482,7 +482,7 @@ kubectl get pods -n bookstore                                 # or specify expli
 ```
 
 K8s built-in namespaces you don't touch:
-- `default` — where resources land when no namespace is specified\
+- `default` — where resources land when no namespace is specified
 - `kube-system` — K8s internal components (API Server, Scheduler, etc.)
 
 ---
@@ -640,10 +640,10 @@ the API Server. If a template generates an invalid Deployment, K8s rejects it.
 # Add a repository and install a ready-made Chart
 helm repo add bitnami https://charts.bitnami.com/bitnami
 helm repo update
-helm install postgres bitnami/postgresql \
-  --namespace bookstore \
-  --set auth.database=bookstore \
-  --set auth.username=bookstore \
+helm install postgres bitnami/postgresql 
+  --namespace bookstore 
+  --set auth.database=bookstore 
+  --set auth.username=bookstore 
   --set auth.password=secret
 
 # Own Chart
@@ -677,16 +677,16 @@ resources:
 ## 🔐 Vault + ESO
 
 **Problem with K8s Secrets in production:**
-- base64 = encoding, not encryption — anyone with `kubectl` can decode\
-- etcd is not encrypted at rest by default\
-- no audit log (you don't know who read a secret and when)\
-- no automatic rotation\
+- base64 = encoding, not encryption — anyone with `kubectl` can decode
+- etcd is not encrypted at rest by default
+- no audit log (you don't know who read a secret and when)
+- no automatic rotation
 - no secret leasing/expiry
 
 **HashiCorp Vault** is a centralized secret store:
-- Encryption at rest (AES-256-GCM)\
-- Full audit log for every access\
-- Automatic rotation and TTL-based expiry\
+- Encryption at rest (AES-256-GCM)
+- Full audit log for every access
+- Automatic rotation and TTL-based expiry
 - Dynamic secrets (generates DB credentials on demand)
 
 **External Secrets Operator (ESO)** — integration pattern that keeps apps unaware of Vault.
@@ -706,7 +706,7 @@ Vault (source of truth) → ESO (syncs) → K8s Secret → envFrom in Deployment
 | When to use | Dev, staging | Production, compliance |
 
 Key ESO resources:
-- **`SecretStore`** — how ESO connects to Vault (address, authentication method)\
+- **`SecretStore`** — how ESO connects to Vault (address, authentication method)
 - **`ExternalSecret`** — which secrets to fetch and what K8s Secret to create
 
 ---
@@ -728,8 +728,8 @@ every Consumer Group reads independently at its own offset.
 | **DLT**            | Dead Letter Topic — events land here after exhausting retry attempts      |
 
 **Delivery semantics:**
-- `At-most-once` — fire and forget, may be lost\
-- `At-least-once` — retry on failure, may arrive twice (**Spring Kafka default** → handle duplicates!)\
+- `At-most-once` — fire and forget, may be lost
+- `At-least-once` — retry on failure, may arrive twice (**Spring Kafka default** → handle duplicates!)
 - `Exactly-once` — Kafka transactions, complex, rarely needed
 
 **Deployed as StatefulSet** — Kafka brokers need stable identity, stable DNS names (`kafka-0`),
@@ -740,18 +740,18 @@ and dedicated PVCs. A Deployment would reset all of this on restart.
 kubectl exec -it kafka-controller-0 -n bookstore -- bash
 
 kafka-topics.sh --bootstrap-server localhost:9092 --list
-kafka-topics.sh --bootstrap-server localhost:9092 \
+kafka-topics.sh --bootstrap-server localhost:9092 
   --create --topic order.confirmed --partitions 3 --replication-factor 1
 
 # Check Consumer Group lag
-kafka-consumer-groups.sh --bootstrap-server localhost:9092 \
+kafka-consumer-groups.sh --bootstrap-server localhost:9092 
   --describe --group notify-service
 # LAG column — number of unread events
 
 # Replay — reset offset and reprocess all events from the beginning
 kubectl scale deployment notify-service --replicas=0    # consumer must be down
-kafka-consumer-groups.sh --bootstrap-server localhost:9092 \
-  --group notify-service --topic order.confirmed \
+kafka-consumer-groups.sh --bootstrap-server localhost:9092 
+  --group notify-service --topic order.confirmed 
   --reset-offsets --to-earliest --execute
 kubectl scale deployment notify-service --replicas=1
 ```
@@ -777,8 +777,8 @@ public void onOrderConfirmed(OrderConfirmedEvent event) {
 
 Controls API access — who can do what on which resources.
 
-- **Role** — permissions within a namespace\
-- **ClusterRole** — cluster-wide permissions\
+- **Role** — permissions within a namespace
+- **ClusterRole** — cluster-wide permissions
 - **RoleBinding / ClusterRoleBinding** — assigns Role to a user/ServiceAccount
 
 ### ServiceAccount
@@ -907,10 +907,10 @@ kubectl exec -it deployment/<name> -- env | grep DB
 
 Kubernetes consists of:
 
-- **API Server** as the single interface — everything goes through it\
-- **etcd** as the source of truth — stores desired state\
-- **Controllers** synchronizing state — each watches one resource type\
-- **Scheduler** assigning Pods to Nodes\
+- **API Server** as the single interface — everything goes through it
+- **etcd** as the source of truth — stores desired state
+- **Controllers** synchronizing state — each watches one resource type
+- **Scheduler** assigning Pods to Nodes
 - **kubelet** executing containers on each Node
 
 Deployment, Service, ConfigMap, and Secret are declarative objects describing the desired
@@ -929,7 +929,7 @@ You write YAML  →  kubectl apply  →  API Server validates + stores in etcd
 ```
 
 **Key properties:**
-- **Declarative** — describe what you want, not how to get there\
-- **Self-healing** — controllers constantly reconcile actual ↔ desired state\
-- **Idempotent** — `kubectl apply` run 10 times produces the same result\
+- **Declarative** — describe what you want, not how to get there
+- **Self-healing** — controllers constantly reconcile actual ↔ desired state
+- **Idempotent** — `kubectl apply` run 10 times produces the same result
 - **Composable** — Deployment + Service + ConfigMap + Secret + Ingress = a production service
