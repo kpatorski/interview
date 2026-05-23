@@ -118,7 +118,12 @@
   * [📈 Scaling](kubernetes/kubernetes.md#-scaling)
   * [🔄 Updates](kubernetes/kubernetes.md#-updates)
   * [🧠 Mental Model](kubernetes/kubernetes.md#-mental-model) 
-* [Microservices]()
-  * [Load balancing]()
-  * [Caching]()
+* [Microservices](microservices/microservices.md)
+  * [Resilience Patterns](microservices/microservices.md#-resilience-patterns) — Retry, Timeout, Bulkhead, Rate Limiter, Fallback
+  * [Distributed Consistency](microservices/microservices.md#-distributed-consistency) — CAP, BASE, Eventual Consistency
+  * [Deployment Strategies](microservices/microservices.md#-deployment-strategies) — Blue-Green, Canary, Feature Flags
+  * [Service Discovery & Load Balancing](microservices/microservices.md#-service-discovery--load-balancing)
+  * [API Gateway](microservices/microservices.md#-api-gateway)
+  * [Caching Strategies](microservices/microservices.md#-caching-strategies)
+  * [Interview Scenarios](microservices/microservices.md#-interview-scenarios)
 * [Cloud]()

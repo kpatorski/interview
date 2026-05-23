@@ -2618,6 +2618,175 @@ exp:'Problem: 50 mikroserwisów × 10 instancji = 500 miejsc z logami. 1 żądan
 },
 
 
+,
+
+// ═══════ MICROSERVICES ═══════
+{cat:'microservices',type:'single',
+q:'Retry pattern — w których przypadkach NIE należy automatycznie ponawiać wywołania?',
+opts:[
+  '503 Service Unavailable — serwis jest chwilowo przeciążony',
+  'ConnectException — sieć chwilowo niedostępna',
+  'POST /payments bez idempotency key — ponowienie może skutkować podwójnym obciążeniem',
+  'Timeout podczas odczytu (GET /products/123)'
+],
+cor:'POST /payments bez idempotency key — ponowienie może skutkować podwójnym obciążeniem',
+exp:'Retry ma sens tylko dla błędów przejściowych i idempotentnych operacji. GET jest zawsze bezpieczny. POST /payments bez idempotency key = podwójne pobranie. Zasada: retry dla: błędów sieciowych, 5xx na idempotentnych operacjach. Nigdy dla: 400 (błąd klienta), 401/403 (auth nie naprawi się sam), nieimepotentnych POST. Dodaj exponential backoff z jitterem by uniknąć thundering herd.'
+},
+{cat:'microservices',type:'single',
+q:'Bulkhead pattern — jaki problem rozwiązuje izolacja thread poolów per zależność?',
+opts:[
+  'Zapobiega przekroczeniu limitów CPU na węzłach Kubernetes przez throttlowanie wątków',
+  'Wolna zależność (np. payment-service) może wyczerpać wspólną pulę wątków i sparaliżować cały serwis — Bulkhead izoluje pulę per zależność',
+  'Redukuje liczbę połączeń do bazy danych przez connection pooling na poziomie wątków',
+  'Automatycznie skaluje liczbę wątków gdy obciążenie rośnie powyżej progu'
+],
+cor:'Wolna zależność (np. payment-service) może wyczerpać wspólną pulę wątków i sparaliżować cały serwis — Bulkhead izoluje pulę per zależność',
+exp:'"Bulkhead: Isolate resources so one slow dependency cannot starve everything else." Bez Bulkhead: 100 wątków, payment-service wolny → 80 wątków czeka na payment → inventory i email nie dostają wątku → całość wygląda na zawieszoną. Z Bulkhead: payment-pool=20, inventory-pool=20, email-pool=10 — awaria payment izoluje się w swoim poolu, reszta działa normalnie.'
+},
+{cat:'microservices',type:'single',
+q:'Dlaczego Timeout jest pierwszą linią obrony przed kaskadowymi awariami — zanim skonfigurujesz Circuit Breaker czy Bulkhead?',
+opts:[
+  'Timeout jest najtańszy obliczeniowo — dlatego wdrażamy go jako pierwszy',
+  'Bez Timeout wątek czeka w nieskończoność — Circuit Breaker i Bulkhead nie mogą zwolnić zablokowanego wątku, więc bez Timeout wszystkie inne wzorce tracą skuteczność',
+  'Timeout zapobiega atakom DDoS — musi poprzedzać zabezpieczenia logiczne',
+  'Timeout musi poprzedzać Circuit Breaker bo oba konfiguruje się razem w tej samej kolejności w Resilience4j'
+],
+cor:'Bez Timeout wątek czeka w nieskończoność — Circuit Breaker i Bulkhead nie mogą zwolnić zablokowanego wątku, więc bez Timeout wszystkie inne wzorce tracą skuteczność',
+exp:'"Without a timeout, a thread can be stuck forever — no other pattern can rescue it." Circuit Breaker liczy niepowodzenia — ale jeśli wątek nigdy nie wraca (brak timeout), CB nie dostaje sygnału failure. Bulkhead chroni pulę, ale bez timeout wątek zajmuje w niej miejsce w nieskończoność. Timeout → fail fast → wątek wraca do puli → CB dostaje sygnał → może przejść w OPEN. Kolejność: RateLimiter → CircuitBreaker → Bulkhead → Timeout → Retry.'
+},
+{cat:'microservices',type:'single',
+q:'CAP Theorem: Kafka vs Cassandra — jakie właściwości wybierają te systemy podczas partycji sieciowej?',
+opts:[
+  'Kafka: AP (zawsze odpowiada nawet ze starymi danymi); Cassandra: CP (blokuje zapisy gdy brak kworum)',
+  'Kafka: CP (preferuje spójność — zapis odrzucony gdy brak kworum); Cassandra: AP (zawsze odpowiada, może zwrócić stale dane)',
+  'Oba są CA — nie są systemami rozproszonymi w klasycznym sensie CAP',
+  'CAP nie dotyczy systemów kolejkowych — Kafka jest poza teorią CAP'
+],
+cor:'Kafka: CP (preferuje spójność — zapis odrzucony gdy brak kworum); Cassandra: AP (zawsze odpowiada, może zwrócić stale dane)',
+exp:'"P (Partition tolerance) is not optional — the real choice is CP vs AP." Kafka: lider partycji musi potwierdzić zapis od ISR replicas — jeśli brak kworum (podział sieci), zapis odrzucony. Spójność > dostępność. Cassandra: tunable consistency (ONE, QUORUM, ALL) — domyślnie woli odpowiedzieć nieaktualnym rekordem niż timeoutem. Dostępność > spójność. etcd/Zookeeper: CP (koordinacja wymaga spójności). DynamoDB: AP domyślnie, opcjonalnie strong consistency.'
+},
+{cat:'microservices',type:'single',
+q:'BASE vs ACID — która właściwość jest właściwa dla koszyka zakupowego, a która dla systemu płatności?',
+opts:[
+  'Koszyk: ACID (każda operacja na koszyku musi być atomowa); Płatności: BASE (ewentualna spójność wystarczy)',
+  'Koszyk: BASE (chwilowo nieaktualne dane są akceptowalne, dostępność ważna); Płatności: ACID (podwójne pobranie lub brak transakcji to katastrofa)',
+  'Obie domeny wymagają ACID — w mikroserwisach nie można stosować BASE',
+  'Obie domeny wymagają BASE — ACID to przestarzałe podejście monolityczne'
+],
+cor:'Koszyk: BASE (chwilowo nieaktualne dane są akceptowalne, dostępność ważna); Płatności: ACID (podwójne pobranie lub brak transakcji to katastrofa)',
+exp:'"Use ACID when you cannot tolerate inconsistency. Use BASE when availability matters more." Koszyk: użytkownik widzi koszyk sprzed 100ms — akceptowalne. Lepsza szybka odpowiedź niż lock. Płatności: partial commit = pobrano pieniądze, zamówienie nie istnieje → koszmar prawny i reputacyjny. Wymagana atomowość + durability. Bazy: Cassandra/Redis → BASE. PostgreSQL/MySQL → ACID.'
+},
+{cat:'microservices',type:'single',
+q:'Blue-Green vs Canary Deployment — jakie mają różne zastosowania?',
+opts:[
+  'Blue-Green dla małych zespołów (tańsze); Canary dla dużych firm (wymaga więcej infrastruktury)',
+  'Blue-Green: pełny ruch przełączony na v2 jednym ruchem, natychmiastowy rollback; Canary: stopniowe przekierowanie 5%→100% z małym blast radius na każdym kroku',
+  'Canary to starsza technika — Blue-Green zastępuje ją we wszystkich przypadkach',
+  'Blue-Green używa feature flags; Canary używa A/B testów — to jedyna różnica'
+],
+cor:'Blue-Green: pełny ruch przełączony na v2 jednym ruchem, natychmiastowy rollback; Canary: stopniowe przekierowanie 5%→100% z małym blast radius na każdym kroku',
+exp:'"Blue-Green: instant cutover, instant rollback. Canary: gradual rollout, small blast radius." Blue-Green: 2x infrastruktura, rollback = jedno przełączenie ruchu. Gdy coś nie gra — flip back w sekundy. Canary: v2 dostaje 5% ruchu → monitoruj błędy i latencję → jeśli OK, zwiększaj do 10%, 25%, 100%. Błąd w v2 = tylko 5% użytkowników go widzi. Wymaganie Canary: v1 i v2 muszą współistnieć → API kompatybilne wstecznie.'
+},
+{cat:'microservices',type:'single',
+q:'API Gateway — które odpowiedzialności do niego NIE należą?',
+opts:[
+  'Walidacja JWT i propagacja X-User-Id do serwisów downstream',
+  'Rate limiting requestów przychodzących',
+  'Implementacja logiki biznesowej — np. obliczanie ceny zamówienia z rabatem',
+  'Routing requestów do odpowiednich mikroserwisów na podstawie ścieżki URL'
+],
+cor:'Implementacja logiki biznesowej — np. obliczanie ceny zamówienia z rabatem',
+exp:'"API Gateway anti-pattern: God Gateway with business logic." Gateway jest warstwą infrastrukturalną — powinien być cienki (thin). Jego zadania: auth (JWT validation), rate limiting, routing, SSL termination, request/response transformation, logging/tracing. Nie: logika domenowa (rabaty, walidacja biznesowa). Logika w Gateway = nowy monolit przy innym nazwisku. BFF (Backend for Frontend) to akceptowalna agregacja dla konkretnego klienta, ale bez logiki domenowej.'
+},
+{cat:'microservices',type:'single',
+q:'Cache-Aside (Lazy Loading) — co się dzieje gdy dane w bazie zostaną zaktualizowane, a wpis w cache ma jeszcze 10 minut TTL?',
+opts:[
+  'Cache automatycznie wykrywa zmianę w DB przez CDC (Change Data Capture) i odświeża wpis',
+  'Przez 10 minut cache zwraca stale dane — ogranicza się przez explicit eviction po write lub krótszy TTL',
+  'Cache-Aside wymaga event-driven invalidation przez Kafka — bez tego nie można go poprawnie zaimplementować',
+  'Cache-Aside zawsze odczytuje z DB i jedynie cachuje wynik — nie może zwrócić starych danych'
+],
+cor:'Przez 10 minut cache zwraca stale dane — ogranicza się przez explicit eviction po write lub krótszy TTL',
+exp:'"Cache-Aside gives you stale reads — this is the fundamental trade-off." Strategia invalidacji: (1) TTL expiry — najprostsze, stale przez max TTL; (2) Explicit eviction: <code>redis.delete(key)</code> po każdym write → fresh data, dodatkowy ruch; (3) Write-through: aktualizuj cache i DB razem przy każdym write — spójna ale droższa. Wybór: katalog produktów → 5min TTL OK. Saldo konta → nie cachuj lub explicit eviction.'
+},
+{cat:'microservices',type:'single',
+q:'Cache stampede (thundering herd) — co to jest i jak temu zapobiec?',
+opts:[
+  'Cache jest zbyt mały i usuwa wpisy zbyt często (LRU eviction) — rozwiązanie: więcej pamięci RAM',
+  'Gdy TTL wpisu wygasa, tysiące requestów jednocześnie trafiają do DB — rozwiązanie: mutex/lock, probabilistic early expiration lub TTL z jitterem',
+  'Celowy atak polegający na opróżnianiu cache requestami z unikalnymi kluczami — zapobieganie: rate limiting',
+  'Wiele serwisów pisze do cache jednocześnie i nadpisują wzajemnie swoje wpisy — rozwiązanie: Redis transactions'
+],
+cor:'Gdy TTL wpisu wygasa, tysiące requestów jednocześnie trafiają do DB — rozwiązanie: mutex/lock, probabilistic early expiration lub TTL z jitterem',
+exp:'"Cache stampede: cache expires → all requests miss simultaneously → DB crushed." Przykład: 10k req/s, popularny wpis wygasa → 10k requestów idzie do DB naraz. Rozwiązania: (1) Mutex: pierwszy request blokuje i odświeża, reszta czeka — wydajne ale wymaga synchronizacji; (2) Probabilistic early expiration: losowo odśwież cache PRZED wygaśnięciem TTL; (3) Jitter: <code>TTL + random(0, 30s)</code> — klucze wygasają w różnych momentach; (4) Cache pre-warming przed deployem.'
+},
+{cat:'microservices',type:'single',
+q:'Klient wysłał POST /orders, dostał timeout i ponowił request. Jak zaprojektować API żeby uniknąć podwójnego zamówienia?',
+opts:[
+  'Użyj PUT zamiast POST — PUT jest idempotentny z definicji HTTP i nie powoduje duplikatów',
+  'Klient generuje UUID i wysyła go w nagłówku Idempotency-Key; serwer przechowuje klucz→odpowiedź i przy ponowieniu zwraca ten sam wynik bez re-wykonania logiki',
+  'Serwer sprawdza duplikaty po treści body — identyczny JSON przyszedł drugi raz → ignoruj',
+  'Rate limiting na poziomie klienta — ogranicz do 1 requestu na sekundę aby uniemożliwić ponowienia'
+],
+cor:'Klient generuje UUID i wysyła go w nagłówku Idempotency-Key; serwer przechowuje klucz→odpowiedź i przy ponowieniu zwraca ten sam wynik bez re-wykonania logiki',
+exp:'"Idempotency key: client generates UUID, server stores key→response, retries return cached result." Implementacja: w jednej DB transakcji — sprawdź klucz → jeśli istnieje zwróć poprzednią odpowiedź → jeśli nie: wykonaj logikę + zapisz klucz + odpowiedź atomicznie. TTL na kluczu (np. 24h). Stripe, PayPal wymagają tego przy każdej operacji płatniczej. Wada porównywania body: JSON musi być identyczny binarnie — nie skaluje się. PUT: semantycznie "utwórz lub zastąp zasób o danym ID" — to inna semantyka niż idempotency key.'
+},
+{cat:'microservices',type:'single',
+q:'payment-service zaczyna odpowiadać w 10s zamiast 200ms. order-service wydaje się zawieszony choć jego kod działa poprawnie. Co jest przyczyną?',
+opts:[
+  'Memory leak w order-service — GC pauzy powodują pozorny hang całego serwisu',
+  'Kaskadowa awaria: wątki order-service blokują się czekając na payment-service — bez Timeout i Bulkhead pula wątków wyczerpuje się i order-service przestaje obsługiwać jakiekolwiek requesty',
+  'Circuit Breaker jest w stanie OPEN — order-service odrzuca requesty zgodnie z konfiguracją progu błędów',
+  'Zbyt mało replik payment-service — HPA w Kubernetes powinien automatycznie dodać pody'
+],
+cor:'Kaskadowa awaria: wątki order-service blokują się czekając na payment-service — bez Timeout i Bulkhead pula wątków wyczerpuje się i order-service przestaje obsługiwać jakiekolwiek requesty',
+exp:'"Cascading failure: a slow dependency blocks threads until the caller appears hung too." Mechanizm: order-service ma 200 wątków HTTP; payment wolny → każdy request trzyma wątek przez 10s → przy 20 req/s = 200 wątków zajętych → 0 wolnych → nowe requesty czekają w kolejce → timeout po stronie klienta. order-service nie ma własnego problemu. Obrona warstwowa: Timeout(2s) → fail fast. Bulkhead(payment-pool=20) → reszta systemu działa. CircuitBreaker → po N timeout: OPEN, od razu reject. Fallback → "płatność w toku, powiadomimy".'
+},
+{cat:'microservices',type:'multi',
+q:'Saga pattern — które stwierdzenia są PRAWDZIWE? (wielokrotny wybór)',
+opts:[
+  'Compensating transaction to techniczny rollback — działa tak samo jak ROLLBACK w SQL',
+  'W Choreography Saga każdy serwis reaguje na zdarzenia i emituje własne — brak centralnego kontrolera',
+  'W Orchestration Saga Orchestrator explicite wywołuje compensation gdy krok zawiedzie',
+  'Saga gwarantuje strong consistency — dane są spójne w każdym momencie wykonania'
+],
+cor:['W Choreography Saga każdy serwis reaguje na zdarzenia i emituje własne — brak centralnego kontrolera','W Orchestration Saga Orchestrator explicite wywołuje compensation gdy krok zawiedzie'],
+exp:'(A)❌ Compensating transaction to nowa transakcja biznesowa "do przodu", nie techniczny rollback. Np. zamiast "cofnąć płatność" → "wykonaj zwrot". Może mieć efekty uboczne (email z potwierdzeniem zwrotu). (B)✅ Choreography: OrderCreated → InventoryReserved → PaymentProcessed. Luźne sprzężenie, trudniejszy debugging. (C)✅ Orchestration: Orchestrator → PaymentSvc → InventorySvc. Centralna logika, łatwiejszy monitoring. (D)❌ Saga = eventual consistency — jest okno niespójności między serwisami (np. zamówienie istnieje, płatność jeszcze nie potwierdzona).'
+},
+{cat:'microservices',type:'single',
+q:'Endpoint /search/products musi zwrócić dane z product-service, pricing-service i inventory-service. Kiedy wybrać API Composition, a kiedy CQRS Read Model?',
+opts:[
+  'Zawsze API Composition — synchroniczne wywołania są prostsze i wystarczające',
+  'API Composition gdy ruch niski i wymagana silna spójność danych w czasie rzeczywistym; CQRS Read Model gdy ruch duży, wymagana niska latencja i akceptowalna jest eventual consistency',
+  'CQRS Read Model tylko dla raportów; API Composition dla wszystkich transakcyjnych endpointów',
+  'Wybór zależy wyłącznie od liczby serwisów — do 3 serwisów: API Composition, powyżej: CQRS'
+],
+cor:'API Composition gdy ruch niski i wymagana silna spójność danych w czasie rzeczywistym; CQRS Read Model gdy ruch duży, wymagana niska latencja i akceptowalna jest eventual consistency',
+exp:'"API Composition: simple, consistent, latency=max(all deps). CQRS Read Model: fast, complex, eventually consistent." API Composition: search-svc wywołuje 3 serwisy równolegle → merge → response. Latencja = najwolniejszy z 3. Jeśli jeden serwis DOWN → search nie działa. CQRS Read Model: search-svc subskrybuje eventy ProductUpdated/PriceChanged/StockUpdated → lokalny denormalizowany store → odpowiada bez żadnych wywołań zewnętrznych. Latencja: ~1ms. Koszt: duplikacja danych + lag (cena może być z kilku sekund opóźnieniem).'
+},
+{cat:'microservices',type:'single',
+q:'analytics-service potrzebuje danych o zamówieniach z order-service. Dlaczego współdzielona baza danych to anty-wzorzec i co zamiast tego?',
+opts:[
+  'Współdzielona baza: najprostsze rozwiązanie — oba serwisy używają tego samego schematu bez synchronizacji',
+  'REST polling co minutę: analytics odpytuje order-service — niskie opóźnienie bez złożoności Kafki',
+  'Eventy przez Kafka + Outbox: order-service emituje OrderPlaced/OrderCancelled → analytics utrzymuje własny read model zoptymalizowany pod swoje zapytania',
+  'GraphQL federation: analytics subskrybuje dane z order-service przez GraphQL subscriptions'
+],
+cor:'Eventy przez Kafka + Outbox: order-service emituje OrderPlaced/OrderCancelled → analytics utrzymuje własny read model zoptymalizowany pod swoje zapytania',
+exp:'"Shared DB: the worst coupling — you share schema, lock strategy, and deployment cycle." Problemy shared DB: zmiana schematu w order-service psuje analytics; nie można deployować niezależnie; jeden slow query / lock może blokować obie aplikacje. REST polling: N-minutowy lag, wasteful (zapytania gdy nic się nie zmieniło), nie skaluje. Events + Outbox: order-service committuje zamówienie + event atomicznie do outbox table → publisher wysyła do Kafka → analytics konsumuje asynchronicznie → własny store zoptymalizowany pod analizy (np. Elasticsearch, ClickHouse).'
+},
+{cat:'microservices',type:'multi',
+q:'user-service jest wąskim gardłem — każdy inny serwis wywołuje go przy każdym requeście aby zwalidować token i pobrać profil. Które rozwiązania są poprawne? (wielokrotny wybór)',
+opts:[
+  'JWT stateless auth: serwisy weryfikują token lokalnie kluczem publicznym — zero wywołań user-service',
+  'API Gateway waliduje JWT raz i przekazuje X-User-Id / X-User-Role w headerach — serwisy ufają headerom',
+  'Skalowanie user-service poziomo (więcej podów) — usuwa bottleneck trwale bez zmiany architektury',
+  'Cache wyników w Redis (TTL 5min) w każdym serwisie — rzadsze wywołania user-service'
+],
+cor:['JWT stateless auth: serwisy weryfikują token lokalnie kluczem publicznym — zero wywołań user-service','API Gateway waliduje JWT raz i przekazuje X-User-Id / X-User-Role w headerach — serwisy ufają headerom','Cache wyników w Redis (TTL 5min) w każdym serwisie — rzadsze wywołania user-service'],
+exp:'(A)✅ Stateless JWT = zero wywołań sieciowych do weryfikacji. Ryzyko: revoked token żyje do TTL (15min). (B)✅ API Gateway jako central auth = jeden punkt walidacji, downstream trust headers, zero znajomości Vault/JWKS w serwisach. (C)❌ Skalowanie = drogie i nie usuwa problemu designu — przy każdym wzroście ruchu ten sam bottleneck wróci. (D)✅ Cache redukuje load, ale staleness: zmienione uprawnienia nadal ważne przez TTL. Najlepsza kombinacja: A + B (stateless JWT + gateway). Cache jako dodatkowe zabezpieczenie gdy JWT nie jest możliwy.'
+},
+
 ];
 
 const CAT={
@@ -2631,6 +2800,7 @@ const CAT={
   communication:{l:'📡 Communication',c:'#0284c7',b:'#0a1f2d'},
   kubernetes:{l:'🚀 Kubernetes',c:'#4f46e5',b:'#1a1650'},
   observability:{l:'📊 Observability',c:'#059669',b:'#022c22'},
+  microservices:{l:'🏗 Microservices',c:'#db2777',b:'#2d0a1e'},
 };
 
 function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
