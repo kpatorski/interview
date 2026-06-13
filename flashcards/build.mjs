@@ -18,6 +18,7 @@ const CATEGORIES = [
   { file: '9-testing.md',      id: 'test',   label: 'Testowanie' },
   { file: '10-performance.md', id: 'perf',   label: 'Performance' },
   { file: '11-system-design.md',id:'sys',    label: 'System Design' },
+  { file: '12-public-api.md',  id:'api',    label: 'Public API Design' },
 ];
 
 function stripHtmlTags(text) {

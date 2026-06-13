@@ -1675,6 +1675,137 @@
           "a": "Pytania do zadania:\n\n- **SPOF**: gdzie system padnie gdy jeden komponent zawiedzie?\n- **Skalowalność**: gdzie jest wąskie gardło przy 10x obciążeniu?\n- **Spójność**: jakie są gwarancje przy częściowej awarii (partial failure)?\n- **Obserwowalność**: jak zdiagnozuję problem o 3 w nocy?\n- **Złożoność**: czy ta złożoność jest uzasadniona wymaganiami?\n- **Reversibility**: jak łatwo cofnąć tę decyzję za rok?\n\n\"Good architecture maximizes the number of decisions NOT made\" (Uncle Bob)."
         }
       ]
+    },
+    {
+      "id": "api",
+      "label": "Public API Design",
+      "cards": [
+        {
+          "id": "api-0",
+          "q": "Jak projektować zasoby (resources) w REST API?",
+          "a": "Zasady modelowania zasobów:\n\n- **Rzeczowniki, nie czasowniki**: `/orders`, nie `/getOrders`,\n- **Hierarchia odzwierciedla relacje**: `/orders/{id}/items`,\n- **Kolekcje vs singleton**: `/orders` (lista), `/orders/{id}` (jeden),\n- **Czysty identyfikator w URL**: ID w path, filtry jako query params.\n\nHTTP verbs:\n- `GET /orders` — lista, `GET /orders/{id}` — jeden,\n- `POST /orders` — utwórz, `PUT /orders/{id}` — zamień, `PATCH /orders/{id}` — zmień część,\n- `DELETE /orders/{id}` — usuń.\n\nUnikaj czasowników w URL: `/activate` → `PATCH /accounts/{id}` z `{\"status\":\"active\"}`."
+        },
+        {
+          "id": "api-1",
+          "q": "Czym jest RFC 7807 Problem Details?",
+          "a": "RFC 7807 definiuje standard formatu błędów HTTP (`application/problem+json`):\n\n```json\n{\n  \"type\": \"https://api.example.com/errors/insufficient-funds\",\n  \"title\": \"Insufficient funds\",\n  \"status\": 400,\n  \"detail\": \"Balance 50.00 PLN is lower than requested 200.00 PLN\",\n  \"instance\": \"/orders/8f3b7c\"\n}\n```\n\nPola:\n- `type` — URI identyfikujący typ błędu (dokumentacja),\n- `title` — czytelna nazwa,\n- `detail` — konkretny opis dla tej instancji,\n- `instance` — URI konkretnego żądania.\n\nSpring Boot 6 / Spring Framework 6: `ProblemDetail` wbudowany w framework."
+        },
+        {
+          "id": "api-2",
+          "q": "Jakie są strategie wersjonowania API?",
+          "a": "**URL path** (`/v1/orders`): najczęstsze, czytelne, łatwe do routowania w API Gateway. Wada: URL powinien identyfikować zasób, nie wersję.\n\n**Header** (`API-Version: 2`): czystszy URL, trudniejszy do cache'owania i debugowania.\n\n**Content negotiation** (`Accept: application/vnd.myapi.v2+json`): REST-owo poprawny, uciążliwy w implementacji.\n\nRekomendacja dla publicznego API:\n- URL versioning (pragmatyczny, szeroka akceptacja),\n- wspieraj N-1 wersji,\n- Sunset header przy deprecation,\n- changelog i migration guide."
+        },
+        {
+          "id": "api-3",
+          "q": "Czym jest contract-first API design?",
+          "a": "Contract-first: najpierw piszesz spec OpenAPI (YAML/JSON), potem generujesz kod lub implementujesz ręcznie.\n\nZalety:\n- klienci mogą zacząć integrację zanim backend jest gotowy (mock server),\n- wymusza myślenie o API jako produkcie,\n- kontrakt jest source of truth — nie kod.\n\nCode-first: piszesz kod, springdoc-openapi generuje spec. Szybszy start, ale spec może być niespójna z intencją.\n\nDla publicznego API: contract-first zdecydowanie lepszy."
+        },
+        {
+          "id": "api-4",
+          "q": "Jak obsługiwać backward compatibility?",
+          "a": "Zmiany bezpieczne (non-breaking):\n- dodanie nowego pola w response,\n- dodanie opcjonalnego pola w request,\n- nowy endpoint,\n- nowy query param (opcjonalny).\n\nZmiany breaking:\n- usunięcie pola,\n- zmiana semantyki istniejącego pola,\n- zmiana kodu HTTP,\n- nowe wymagane pole w request.\n\nZasada Postela dla konsumenta: \"be liberal in what you accept\" — ignoruj nieznane pola w JSON.\n\nTestowanie: Consumer-Driven Contract (Pact) wykrywa breaking changes przed release.\n\n---\n\n## 2️⃣ Walidacja i obsługa błędów w Spring"
+        },
+        {
+          "id": "api-5",
+          "q": "Jak działają @Valid i Bean Validation w Spring?",
+          "a": "Bean Validation (JSR-380) to standard adnotacji do walidacji obiektów.\n\n```java\nrecord CreateOrderRequest(\n    @NotBlank String customerId,\n    @NotNull @Positive BigDecimal amount,\n    @Size(max = 3) @NotNull String currency\n) {}\n\n@PostMapping(\"/orders\")\nResponseEntity<Order> create(@Valid @RequestBody CreateOrderRequest req) { }\n```\n\nPrzy błędzie walidacji Spring rzuca `MethodArgumentNotValidException` → domyślnie 400.\n\nWłasne ograniczenia:\n```java\n@Target(FIELD) @Retention(RUNTIME) @Constraint(validatedBy = IsoDateValidator.class)\npublic @interface IsoDate { String message() default \"Invalid date\"; ... }\n```"
+        },
+        {
+          "id": "api-6",
+          "q": "Jak działa @ControllerAdvice i @ExceptionHandler?",
+          "a": "`@ControllerAdvice` to globalny handler wyjątków dla wszystkich kontrolerów.\n\n```java\n@RestControllerAdvice\npublic class GlobalExceptionHandler {\n\n    @ExceptionHandler(MethodArgumentNotValidException.class)\n    ProblemDetail handleValidation(MethodArgumentNotValidException ex) {\n        ProblemDetail pd = ProblemDetail.forStatus(400);\n        pd.setTitle(\"Validation failed\");\n        pd.setProperty(\"violations\", ex.getBindingResult().getFieldErrors()\n            .stream().map(e -> e.getField() + \": \" + e.getDefaultMessage())\n            .toList());\n        return pd;\n    }\n\n    @ExceptionHandler(EntityNotFoundException.class)\n    ProblemDetail handleNotFound(EntityNotFoundException ex) {\n        return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());\n    }\n}\n```\n\nHierarchia: bardziej szczegółowy `@ExceptionHandler` ma priorytet."
+        },
+        {
+          "id": "api-7",
+          "q": "Czym jest @Validated i czym różni się od @Valid?",
+          "a": "`@Valid` — standard JSR-380, kaskadowa walidacja (rekurencja na polach obiektu).\n\n`@Validated` — Spring-specific, obsługuje **validation groups**.\n\n```java\ninterface OnCreate {}\ninterface OnUpdate {}\n\nrecord ProductRequest(\n    @NotNull(groups = OnCreate.class) String name,\n    @NotNull(groups = {OnCreate.class, OnUpdate.class}) BigDecimal price\n) {}\n\n@PostMapping @Validated(OnCreate.class) create(@RequestBody ProductRequest req)\n@PutMapping  @Validated(OnUpdate.class) update(@RequestBody ProductRequest req)\n```\n\n`@Validated` na klasie service-owej włącza walidację parametrów metod (method-level validation via AOP).\n\n---\n\n## 3️⃣ Bezpieczeństwo API"
+        },
+        {
+          "id": "api-8",
+          "q": "Jak skonfigurować OAuth2 Resource Server w Spring Boot?",
+          "a": "Dependency: `spring-boot-starter-oauth2-resource-server`\n\n```yaml\nspring:\n  security:\n    oauth2:\n      resourceserver:\n        jwt:\n          issuer-uri: https://auth.example.com\n          # lub jwk-set-uri: https://auth.example.com/.well-known/jwks.json\n```\n\n```java\n@Bean\nSecurityFilterChain api(HttpSecurity http) throws Exception {\n    return http\n        .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))\n        .authorizeHttpRequests(auth -> auth\n            .requestMatchers(\"/actuator/health\").permitAll()\n            .anyRequest().authenticated())\n        .sessionManagement(s -> s.sessionCreationPolicy(STATELESS))\n        .csrf(AbstractHttpConfigurer::disable) // stateless API\n        .build();\n}\n```\n\nSpring weryfikuje podpis JWT przez JWKS, `exp`, `iss`, `aud`."
+        },
+        {
+          "id": "api-9",
+          "q": "Czym różni się opaque token od JWT i co to token introspection?",
+          "a": "**JWT** (self-contained): zawiera claims w payload, weryfikowany lokalnie przez podpis i JWKS. Szybki (bez sieciowego call), ale nie można go unieważnić przed `exp`.\n\n**Opaque token**: losowy string bez znaczenia. Walidacja wymaga wywołania Authorization Server (token introspection, RFC 7662).\n\n```yaml\nspring.security.oauth2.resourceserver.opaquetoken:\n  introspection-uri: https://auth.example.com/introspect\n  client-id: resource-server\n  client-secret: ${secret}\n```\n\nKiedy opaque:\n- wymagane natychmiastowe unieważnienie tokenów,\n- nie chcesz eksponować claims klientowi.\n\nHybrydowo: krótki JWT (5-15min) + refresh token dla balance."
+        },
+        {
+          "id": "api-10",
+          "q": "Jak implementować scope-based authorization w Spring Security?",
+          "a": "Scope w OAuth2 to uprawnienie do zasobu (np. `orders:read`, `orders:write`).\n\nSpring Security mapuje scope na `SCOPE_orders:read` authorities:\n\n```java\n// W HttpSecurity:\n.authorizeHttpRequests(auth -> auth\n    .requestMatchers(GET, \"/orders/**\").hasAuthority(\"SCOPE_orders:read\")\n    .requestMatchers(POST, \"/orders\").hasAuthority(\"SCOPE_orders:write\")\n    .anyRequest().authenticated())\n\n// Lub przez adnotacje:\n@PreAuthorize(\"hasAuthority('SCOPE_orders:write')\")\npublic Order createOrder(CreateOrderRequest req) { }\n```\n\nFine-grained: `@PostAuthorize(\"returnObject.userId == authentication.name\")` — sprawdza właściciela po załadowaniu."
+        },
+        {
+          "id": "api-11",
+          "q": "Jak działają API Keys i kiedy je stosować?",
+          "a": "API Key to prosty sekret (losowy string) identyfikujący klienta — zazwyczaj w nagłówku `X-API-Key` lub `Authorization: ApiKey <key>`.\n\nKiedy stosować:\n- M2M bez user context (zewnętrzny klient, partner),\n- prostsze niż OAuth2 Client Credentials,\n- kiedy nie potrzeba granular scopes.\n\nImplementacja w Spring: `OncePerRequestFilter` → wyciągnij klucz → lookup w DB/cache → ustaw `SecurityContext`.\n\nDobre praktyki:\n- przechowuj hash klucza (nie plaintext),\n- rate limit per klucz,\n- rotacja kluczy (wiele aktywnych jednocześnie w oknie rotacji),\n- audit log każdego użycia."
+        },
+        {
+          "id": "api-12",
+          "q": "Jak skonfigurować CORS w Spring Security?",
+          "a": "Dla publicznego API serwowanego z innej domeny niż frontend — CORS musi być skonfigurowany przez Spring, nie przez `@CrossOrigin` (nie działa z Spring Security).\n\n```java\n@Bean\nCorsConfigurationSource corsConfig() {\n    var config = new CorsConfiguration();\n    config.setAllowedOrigins(List.of(\"https://app.example.com\"));\n    config.setAllowedMethods(List.of(\"GET\",\"POST\",\"PUT\",\"DELETE\",\"OPTIONS\"));\n    config.setAllowedHeaders(List.of(\"Authorization\",\"Content-Type\"));\n    config.setMaxAge(3600L); // cache preflight\n\n    var source = new UrlBasedCorsConfigurationSource();\n    source.registerCorsConfiguration(\"/api/**\", config);\n    return source;\n}\n\n// W HttpSecurity:\n.cors(cors -> cors.configurationSource(corsConfig()))\n```\n\nWildcard `*` w `allowedOrigins` nie działa z `allowCredentials(true)`.\n\n---\n\n## 4️⃣ API Gateway"
+        },
+        {
+          "id": "api-13",
+          "q": "Czym różni się API Gateway od BFF?",
+          "a": "**API Gateway**: ogólny punkt wejścia dla wszystkich klientów — auth, rate limiting, routing, load balancing. Jeden gateway dla wielu klientów.\n\n**BFF (Backend For Frontend)**: dedykowany backend per typ klienta (web BFF, mobile BFF). Agreguje dane specyficznie dla potrzeb danego frontendu.\n\nProblem ogólnego gateway: każdy klient dostaje ten sam response — web chce duże dane, mobile chce małe.\n\nBFF rozwiązuje: mobile BFF zwraca uproszczony response, web BFF pełny. Kosztem: N BFF do utrzymania."
+        },
+        {
+          "id": "api-14",
+          "q": "Jakie funkcje realizuje API Gateway?",
+          "a": "**Authentication & Authorization**: weryfikacja JWT/API Key, zanim request dotrze do serwisu.\n\n**Rate Limiting**: per klient, per endpoint, ochrona przed nadużyciami.\n\n**Routing**: `/orders/**` → order-service, `/payments/**` → payment-service.\n\n**Load balancing**: rozkład między instancje.\n\n**SSL termination**: HTTPS między klientem a gateway, HTTP (lub mTLS) wewnątrz.\n\n**Request/Response transformation**: nagłówki, formaty, agregacja.\n\n**Observability**: centralne logowanie requestów, metryki, tracing injection.\n\n**Caching**: response cache dla GET.\n\nPopularne: Kong, AWS API Gateway, Azure APIM, Nginx, Spring Cloud Gateway."
+        },
+        {
+          "id": "api-15",
+          "q": "Czym jest Spring Cloud Gateway?",
+          "a": "Spring Cloud Gateway to reaktywny API Gateway oparty na Netty i Project Reactor.\n\nKonfiguracja:\n```yaml\nspring.cloud.gateway.routes:\n  - id: order-service\n    uri: lb://order-service  # service discovery\n    predicates:\n      - Path=/api/orders/**\n    filters:\n      - StripPrefix=1\n      - AddRequestHeader=X-Gateway-Source,scg\n      - name: CircuitBreaker\n        args: { name: orderCB, fallbackUri: forward:/fallback }\n      - name: RequestRateLimiter\n        args: { redis-rate-limiter.replenishRate: 100 }\n```\n\nFiltr globalny: `GlobalFilter` dla auth, correlation ID, logging.\n\nReaktywny = nie blokuje wątków przy I/O — idealny do proxy i aggregation z wieloma upstream.\n\n---\n\n## 5️⃣ Caching i idempotency dla API"
+        },
+        {
+          "id": "api-16",
+          "q": "Jak cache'ować odpowiedzi REST API?",
+          "a": "**HTTP Cache-Control**:\n- `Cache-Control: public, max-age=3600` — cache'owalne przez CDN i klienta,\n- `Cache-Control: private, max-age=300` — tylko browser cache,\n- `Cache-Control: no-store` — dane wrażliwe, nigdy nie cache'uj.\n\n**ETag + conditional GET**:\n```\nResponse: ETag: \"abc123\"\nNext request: If-None-Match: \"abc123\"\nServer: 304 Not Modified (pusta odpowiedź, zaoszczędzony bandwidth)\n```\n\n**Vary**: `Vary: Authorization` — różne cache per użytkownik.\n\n**Aplikacyjny cache** (Redis): `@Cacheable(\"orders\")` — zanim trafisz do DB.\n\nDla publicznego API: HTTP caching + CDN (CloudFront) to duże oszczędności na skali."
+        },
+        {
+          "id": "api-17",
+          "q": "Czym jest Idempotency-Key i jak go implementować?",
+          "a": "Problem: klient nie wie czy request dotarł (timeout) → powtarza POST → duplikat transakcji.\n\nRozwiązanie: klient wysyła unikalny `Idempotency-Key: <uuid>` w nagłówku.\n\n```\nPOST /payments\nIdempotency-Key: 3d9f7c82-1234-5678-abcd-ef0123456789\n```\n\nImplementacja serwera:\n1. Sprawdź Redis: czy klucz już istnieje?\n2. Jeśli tak — zwróć zapamiętaną odpowiedź.\n3. Jeśli nie — przetwórz, zapisz `{key → response}` w Redis z TTL (np. 24h).\n\nWażne: zapis do Redis powinien być atomowy z przetworzeniem (lub optimistic lock) — race condition przy równoległych requestach.\n\nStripe, Adyen, Wise — wszystkie implementują ten wzorzec.\n\n---\n\n## 6️⃣ Observability API"
+        },
+        {
+          "id": "api-18",
+          "q": "Jak logować żądania API bez ujawniania wrażliwych danych?",
+          "a": "Co logować: method, path, status, latency, correlation ID, user ID.\nCo NIE logować: hasła, tokeny, numery kart, PII w body.\n\nImplementacja przez `OncePerRequestFilter` lub `CommonsRequestLoggingFilter`:\n\n```java\nMDC.put(\"correlationId\", extractOrGenerate(request));\nMDC.put(\"userId\", extractUserId(authentication));\nlog.info(\"method={} path={} status={} ms={}\", method, path, status, duration);\nMDC.clear();\n```\n\nMaskowanie w logach:\n- `\"password\":\"***\"` — interceptor modyfikujący log body,\n- Splunk: `rex` do maskowania patterns (`\\b\\d{16}\\b` → `****`).\n\nPrawo: GDPR wymaga możliwości usunięcia PII z logów — przechowuj userId zamiast danych osobowych."
+        },
+        {
+          "id": "api-19",
+          "q": "Jak eksponować metryki API z Micrometer + Prometheus?",
+          "a": "Spring Boot Actuator + Micrometer auto-konfiguruje:\n- `http.server.requests` — count, sum, histogram per endpoint/method/status.\n\n```yaml\nmanagement:\n  endpoints.web.exposure.include: health,prometheus\n  metrics:\n    distribution:\n      percentiles-histogram.http.server.requests: true\n      slo.http.server.requests: 100ms,200ms,500ms,1s\n```\n\nCustom metryki:\n```java\n@Autowired MeterRegistry registry;\nCounter.builder(\"orders.created\").tag(\"currency\",\"PLN\").register(registry).increment();\n```\n\nGrafana dashboard: `rate(http_server_requests_seconds_count[5m])` — throughput per endpoint."
+        },
+        {
+          "id": "api-20",
+          "q": "Jakie metryki SLO definiować dla publicznego API?",
+          "a": "Typowe SLI/SLO dla REST API:\n\n**Availability**: `% żądań bez 5xx` → SLO: 99.9% (43min downtime/miesiąc).\n\n**Latency**: `p99 < 500ms` dla endpointów read, `p99 < 1s` dla write.\n\n**Error rate**: `% 4xx i 5xx` → alert gdy > 1% na 5 min window.\n\n**Throughput**: req/s jako baseline — alert gdy < 50% normy.\n\nAlerting:\n- Prometheus `ALERTS` + Alertmanager,\n- PagerDuty/OpsGenie przy breach SLO,\n- error budget burn rate alert (szybsze reakcje niż threshold).\n\n---\n\n## 7️⃣ Zaawansowane wzorce"
+        },
+        {
+          "id": "api-21",
+          "q": "Jak projektować API pod high availability?",
+          "a": "Warstwa API:\n- **Stateless** — każda instancja obsługuje każde żądanie,\n- **Session persistence** — nie przechowuj stanu w pamięci instancji,\n- **Health checks** — `/actuator/health/liveness` + `/actuator/health/readiness`,\n- **Graceful shutdown** — dokończ in-flight requests (Spring Boot: `server.shutdown=graceful`).\n\nInfrastruktura:\n- min 2 instancje w różnych AZ,\n- HPA w Kubernetes (min replicas ≥ 2),\n- PodDisruptionBudget (`maxUnavailable: 1`).\n\nCircuit breaker na downstream dependencies — API nie może padać przez wolną bazę."
+        },
+        {
+          "id": "api-22",
+          "q": "Czym jest deprecation strategy dla API?",
+          "a": "Fazy:\n1. **Announce**: ogłoszenie deprecation z datą sunset (min 6-12 miesięcy wcześniej),\n2. **Sunset header**: `Sunset: Sat, 01 Jan 2026 00:00:00 GMT` w każdej odpowiedzi deprecated endpoint,\n3. **Warning header**: `Deprecation: true; msg=\"Use /v2/orders instead\"`,\n4. **Monitor usage**: alert gdy ktoś nadal używa deprecated endpoint po sunset,\n5. **Remove**: usuń po sunset date.\n\nVersioning + deprecation = razem tworzą API lifecycle management.\n\nChangelog + migration guide muszą być dostępne zanim ogłosisz deprecation."
+        },
+        {
+          "id": "api-23",
+          "q": "Jak testować publiczne API?",
+          "a": "Warstwy testów:\n\n**Unit**: logika biznesowa, walidacja, mapowanie.\n\n**Integration** (`@SpringBootTest` + Testcontainers):\n```java\nwebTestClient.post().uri(\"/orders\")\n    .header(\"Authorization\", \"Bearer \" + validToken)\n    .bodyValue(request)\n    .exchange()\n    .expectStatus().isCreated()\n    .expectBody().jsonPath(\"$.orderId\").isNotEmpty();\n```\n\n**Contract** (Pact): sprawdzenie kontraktu z konsumentami przed każdym deploy.\n\n**Security testing**: sprawdź że `401` bez tokenu, `403` z niewystarczającymi scope, `400` dla invalid input.\n\n**Performance**: Gatling/k6 — test p99 latency i throughput pod obciążeniem."
+        },
+        {
+          "id": "api-24",
+          "q": "Jak dokumentować API przez OpenAPI 3.x?",
+          "a": "springdoc-openapi automatycznie generuje spec z kodu:\n\n```xml\n<dependency>\n  <groupId>org.springdoc</groupId>\n  <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>\n</dependency>\n```\n\nWzbogacanie spec:\n```java\n@Operation(summary = \"Place a new order\", security = @SecurityRequirement(name = \"bearer-jwt\"))\n@ApiResponse(responseCode = \"201\", description = \"Order created\")\n@ApiResponse(responseCode = \"400\", description = \"Validation failed\",\n    content = @Content(schema = @Schema(implementation = ProblemDetail.class)))\n@PostMapping(\"/orders\")\npublic ResponseEntity<OrderResponse> placeOrder(@Valid @RequestBody OrderRequest req) { }\n```\n\n`springdoc.api-docs.path=/api-docs` → Swagger UI na `/swagger-ui.html`.\n\nDla contract-first: generuj stubs z `openapi-generator-maven-plugin` zamiast pisać kontrolery ręcznie."
+        }
+      ]
     }
   ]
 }
