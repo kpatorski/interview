@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Fiszki — Interview</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f172a;--surf:#1e293b;--border:#334155;
+  --text:#e2e8f0;--muted:#64748b;--accent:#7dd3fc;
+  --green:#4ade80;--red:#f87171;--orange:#fb923c;--blue:#60a5fa;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;}
+.screen{display:none;flex-direction:column;}
+.screen.active{display:flex;}
+
+/* ── HOME ── */
+#sh{min-height:100vh;padding:20px 16px;max-width:600px;margin:0 auto;width:100%;}
+.app-title{font-size:1.5rem;font-weight:700;color:var(--accent);margin-bottom:2px;}
+.app-sub{font-size:.75rem;color:var(--muted);margin-bottom:18px;}
+.hstats{display:flex;gap:8px;margin-bottom:14px;}
+.hstat{flex:1;background:var(--surf);border:1px solid var(--border);border-radius:10px;padding:10px 8px;text-align:center;}
+.hstat .v{font-size:1.3rem;font-weight:700;}
+.hstat .l{font-size:.63rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;}
+.v.due{color:var(--orange)}.v.new{color:var(--blue)}.v.ok{color:var(--green)}
+.btn-all{width:100%;background:var(--accent);color:#0f172a;border:none;border-radius:12px;
+  padding:13px;font-size:.93rem;font-weight:700;cursor:pointer;margin-bottom:18px;}
+.btn-all:disabled{opacity:.35;cursor:default;}
+.sec-title{font-size:.67rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:8px;}
+.cat-list{display:flex;flex-direction:column;gap:7px;}
+.cat-item{background:var(--surf);border:1px solid var(--border);border-radius:12px;
+  padding:13px 15px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:border-color .15s;}
+.cat-item:hover,.cat-item:active{border-color:var(--accent);}
+.cat-item.dim{opacity:.5;}
+.cat-info{flex:1;}
+.cat-name{font-size:.9rem;font-weight:600;margin-bottom:3px;}
+.cat-meta{font-size:.7rem;color:var(--muted);}
+.badge{font-size:.68rem;font-weight:700;border-radius:20px;padding:2px 9px;white-space:nowrap;}
+.bdg-due{background:var(--orange);color:#0f172a;}
+.bdg-new{background:var(--blue);color:#0f172a;}
+.bdg-ok{background:var(--surf);border:1px solid var(--border);color:var(--muted);}
+.foot{display:flex;gap:10px;margin-top:22px;padding-bottom:16px;flex-wrap:wrap;}
+.lnk{font-size:.7rem;color:var(--muted);background:none;border:none;cursor:pointer;text-decoration:underline;}
+
+/* ── STUDY ── */
+#ss{height:100vh;height:-webkit-fill-available;}
+.sh-hdr{display:flex;align-items:center;padding:13px 15px 10px;gap:10px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.back{background:none;border:none;color:var(--accent);font-size:.88rem;cursor:pointer;padding:4px;}
+.sh-cat{font-size:.85rem;font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.sh-prog{font-size:.73rem;color:var(--muted);white-space:nowrap;}
+.prog-bar{height:3px;background:var(--border);flex-shrink:0;}
+.prog-fill{height:100%;background:var(--accent);transition:width .35s;}
+.card-area{flex:1;overflow-y:auto;padding:18px 16px 12px;display:flex;flex-direction:column;-webkit-overflow-scrolling:touch;}
+.mode-lbl{font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:10px;text-align:center;}
+.card-q{font-size:1.05rem;font-weight:600;line-height:1.65;color:var(--text);}
+.divider{border:none;border-top:1px solid var(--border);margin:16px 0;display:none;}
+.divider.show{display:block;}
+.card-a{font-size:.86rem;line-height:1.7;color:#cbd5e1;display:none;}
+.card-a.show{display:block;}
+.card-a h1,.card-a h2,.card-a h3,.card-a h4,.card-a h5,.card-a h6{color:var(--accent);font-size:.83rem;margin:11px 0 3px;}
+.card-a code{background:var(--surf);padding:1px 5px;border-radius:4px;font-family:monospace;font-size:.82em;color:#fbbf24;}
+.card-a pre{background:#0a1628;border-radius:8px;padding:11px;overflow-x:auto;margin:8px 0;}
+.card-a pre code{background:none;padding:0;font-size:.8em;color:#e2e8f0;}
+.card-a ul,.card-a ol{padding-left:18px;margin:5px 0;}
+.card-a li{margin:2px 0;}
+.card-a p{margin:5px 0;}
+.card-a strong{color:var(--text);}
+.card-a em{color:#a5b4c8;font-style:italic;}
+.card-a hr{border:none;border-top:1px solid var(--border);margin:9px 0;}
+.card-a blockquote{border-left:3px solid var(--accent);padding-left:11px;color:var(--muted);margin:7px 0;}
+.flip-btn{background:var(--surf);border:1px solid var(--border);color:var(--accent);
+  border-radius:12px;padding:13px;font-size:.88rem;font-weight:600;cursor:pointer;
+  margin-top:auto;width:100%;}
+.flip-btn:hover{border-color:var(--accent);}
+
+/* ── RATING BAR ── */
+.rating-bar{display:none;padding:10px 12px 14px;gap:7px;border-top:1px solid var(--border);flex-shrink:0;}
+.rating-bar.show{display:flex;}
+.rbtn{flex:1;border:none;border-radius:10px;padding:10px 3px;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:1px;}
+.rbtn .rn{font-size:.75rem;font-weight:700;}
+.rbtn .ri{font-size:.6rem;opacity:.75;}
+.r1{background:#2d0a0a;color:var(--red);border:1px solid var(--red);}
+.r2{background:#271305;color:var(--orange);border:1px solid var(--orange);}
+.r3{background:#0d2818;color:var(--green);border:1px solid var(--green);}
+.r4{background:#0c1a2e;color:var(--blue);border:1px solid var(--blue);}
+
+/* ── DONE ── */
+#sd{align-items:center;justify-content:center;text-align:center;
+  min-height:100vh;padding:40px 20px;max-width:480px;margin:0 auto;width:100%;}
+.done-ico{font-size:2.8rem;margin-bottom:10px;}
+.done-title{font-size:1.35rem;font-weight:700;margin-bottom:6px;}
+.done-sub{font-size:.8rem;color:var(--muted);margin-bottom:22px;}
+.done-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;max-width:300px;margin:0 auto 26px;}
+.dstat{background:var(--surf);border:1px solid var(--border);border-radius:10px;padding:12px;}
+.dstat .dv{font-size:1.45rem;font-weight:700;}
+.dstat .dl{font-size:.63rem;color:var(--muted);text-transform:uppercase;}
+.btn-home{background:var(--surf);border:1px solid var(--border);color:var(--text);
+  border-radius:12px;padding:11px 26px;font-size:.88rem;font-weight:600;cursor:pointer;}
+
+/* ── DIALOG ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);display:none;
+  align-items:center;justify-content:center;padding:20px;z-index:100;}
+.overlay.show{display:flex;}
+.dlg{background:var(--surf);border:1px solid var(--border);border-radius:16px;
+  padding:24px;max-width:320px;width:100%;}
+.dlg h3{font-size:.97rem;margin-bottom:8px;}
+.dlg p{font-size:.8rem;color:var(--muted);margin-bottom:16px;line-height:1.5;}
+.dlg-btns{display:flex;gap:8px;}
+.dlg-btns button{flex:1;padding:10px;border-radius:8px;font-size:.83rem;font-weight:600;cursor:pointer;border:none;}
+.btn-cancel{background:var(--border);color:var(--text);}
+.btn-confirm{background:var(--red);color:white;}
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div id="sh" class="screen active">
+  <div class="app-title">🎯 Fiszki</div>
+  <div class="app-sub">kpatorski/interview · spaced repetition</div>
+  <div class="hstats">
+    <div class="hstat"><div class="v due" id="s-due">0</div><div class="l">Do dziś</div></div>
+    <div class="hstat"><div class="v new" id="s-new">0</div><div class="l">Nowe</div></div>
+    <div class="hstat"><div class="v ok" id="s-ok">0</div><div class="l">Poznane</div></div>
+  </div>
+  <button class="btn-all" id="btn-all" onclick="startStudy('__all__')">📚 Ucz się zaległych</button>
+  <div class="sec-title">Kategorie</div>
+  <div class="cat-list" id="cat-list"><div style="color:var(--muted);text-align:center;padding:20px;">Ładowanie…</div></div>
+  <div class="foot">
+    <button class="lnk" onclick="exportProgress()">⬇ Eksportuj postęp</button>
+    <button class="lnk" onclick="document.getElementById('imp').click()">⬆ Importuj postęp</button>
+    <button class="lnk" onclick="showDlg()">🗑 Resetuj postęp</button>
+  </div>
+  <input id="imp" type="file" accept=".json" style="display:none" onchange="handleImport(event)">
+</div>
+
+<!-- STUDY -->
+<div id="ss" class="screen">
+  <div class="sh-hdr">
+    <button class="back" onclick="goHome()">← Wróć</button>
+    <div class="sh-cat" id="ss-cat"></div>
+    <div class="sh-prog" id="ss-prog"></div>
+  </div>
+  <div class="prog-bar"><div class="prog-fill" id="ss-fill" style="width:0%"></div></div>
+  <div class="card-area" id="card-area">
+    <div class="mode-lbl" id="ss-mode"></div>
+    <div class="card-q" id="ss-q"></div>
+    <hr class="divider" id="ss-div">
+    <div class="card-a" id="ss-a"></div>
+    <button class="flip-btn" id="ss-flip" onclick="flipCard()">👁 Pokaż odpowiedź</button>
+  </div>
+  <div class="rating-bar" id="ss-rate">
+    <button class="rbtn r1" onclick="rate(1)"><span class="rn">Znowu</span><span class="ri" id="ri1"></span></button>
+    <button class="rbtn r2" onclick="rate(2)"><span class="rn">Trudne</span><span class="ri" id="ri2"></span></button>
+    <button class="rbtn r3" onclick="rate(3)"><span class="rn">Dobrze</span><span class="ri" id="ri3"></span></button>
+    <button class="rbtn r4" onclick="rate(4)"><span class="rn">Łatwe</span><span class="ri" id="ri4"></span></button>
+  </div>
+</div>
+
+<!-- DONE -->
+<div id="sd" class="screen">
+  <div class="done-ico">🎉</div>
+  <div class="done-title">Sesja zakończona!</div>
+  <div class="done-sub" id="sd-sub"></div>
+  <div class="done-grid">
+    <div class="dstat"><div class="dv" id="ds-tot"></div><div class="dl">Razem</div></div>
+    <div class="dstat"><div class="dv" id="ds-ok" style="color:var(--green)"></div><div class="dl">Dobrze/Łatwe</div></div>
+    <div class="dstat"><div class="dv" id="ds-hd" style="color:var(--orange)"></div><div class="dl">Trudne</div></div>
+    <div class="dstat"><div class="dv" id="ds-ag" style="color:var(--red)"></div><div class="dl">Znowu</div></div>
+  </div>
+  <button class="btn-home" onclick="goHome()">← Powrót do kategorii</button>
+</div>
+
+<!-- RESET DIALOG -->
+<div class="overlay" id="dlg">
+  <div class="dlg">
+    <h3>Resetuj cały postęp?</h3>
+    <p>Usuwa postęp wszystkich fiszek. Tej operacji nie można cofnąć.</p>
+    <div class="dlg-btns">
+      <button class="btn-cancel" onclick="hideDlg()">Anuluj</button>
+      <button class="btn-confirm" onclick="resetProgress()">Usuń</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── Data & state ─────────────────────────────────────────────────────────────
+let DATA = null;
+let PROG = {};
+const STORAGE_KEY = 'fc-progress-v1';
+const MAX_NEW = 20;
+
+let queue = [], failed = [], qIdx = 0, flipped = false;
+let stats = { tot:0, ag:0, hd:0, ok:0, ez:0 };
+let curCat = null;
+
+// ─── Persistence ──────────────────────────────────────────────────────────────
+function loadProg() {
+  try { PROG = JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}'); } catch { PROG = {}; }
+}
+function saveProg() { localStorage.setItem(STORAGE_KEY, JSON.stringify(PROG)); }
+
+function exportProgress() {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(PROG,null,2)],{type:'application/json'}));
+  a.download = `fiszki-postep-${today()}.json`;
+  a.click();
+}
+function handleImport(e) {
+  const f = e.target.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    try {
+      PROG = JSON.parse(ev.target.result);
+      saveProg(); renderHome();
+      alert('Postęp załadowany pomyślnie!');
+    } catch { alert('Błąd: nieprawidłowy plik JSON'); }
+  };
+  r.readAsText(f);
+  e.target.value = '';
+}
+function showDlg() { document.getElementById('dlg').classList.add('show'); }
+function hideDlg() { document.getElementById('dlg').classList.remove('show'); }
+function resetProgress() { PROG = {}; saveProg(); hideDlg(); renderHome(); }
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+function today() { return new Date().toISOString().slice(0,10); }
+function addDays(d,n) {
+  const dt = new Date(d); // ISO date string → UTC midnight
+  dt.setUTCDate(dt.getUTCDate()+n);
+  return dt.toISOString().slice(0,10);
+}
+function isNew(id) { return !PROG[id]; }
+function isDue(id) { const s=PROG[id]; return s&&s.due<=today(); }
+
+// ─── SM-2 ─────────────────────────────────────────────────────────────────────
+function sm2(id, r) {
+  let {interval:iv=0,ease:ef=2.5,reps=0,lapses=0} = PROG[id]||{};
+  if (r===1) {          // Again
+    iv=1; ef=Math.max(1.3,ef-0.2); lapses++; reps=0;
+  } else if (r===2) {   // Hard
+    iv=Math.max(1,Math.ceil((iv||1)*1.2)); ef=Math.max(1.3,ef-0.15); reps++;
+  } else if (r===3) {   // Good
+    iv = reps===0?1 : reps===1?6 : Math.round(iv*ef); reps++;
+  } else {              // Easy
+    iv = reps===0?4 : reps===1?10 : Math.round(iv*ef*1.3);
+    ef=Math.min(3.0,ef+0.15); reps++;
+  }
+  PROG[id]={interval:iv,ease:ef,due:addDays(today(),iv),reps,lapses};
+  saveProg();
+}
+
+function preview(id, r) {
+  let {interval:iv=0,ease:ef=2.5,reps=0} = PROG[id]||{};
+  let d;
+  if (r===1) d=1;
+  else if (r===2) d=Math.max(1,Math.ceil((iv||1)*1.2));
+  else if (r===3) d=reps===0?1:reps===1?6:Math.round(iv*ef);
+  else            d=reps===0?4:reps===1?10:Math.round(iv*ef*1.3);
+  return d===1?'<1d':`${d}d`;
+}
+
+// ─── Home ─────────────────────────────────────────────────────────────────────
+function renderHome() {
+  if (!DATA) return;
+  let totDue=0, totNew=0, totOk=0;
+  const list = document.getElementById('cat-list');
+  list.innerHTML='';
+
+  for (const cat of DATA.categories) {
+    let due=0, nw=0, ok=0;
+    for (const c of cat.cards) {
+      if (isNew(c.id)) nw++;
+      else if (isDue(c.id)) due++;
+      else ok++;
+    }
+    totDue+=due; totNew+=nw; totOk+=ok;
+
+    const el = document.createElement('div');
+    el.className='cat-item'+(due===0&&nw===0?' dim':'');
+    el.onclick=()=>startStudy(cat.id);
+
+    let badge;
+    if (due>0) badge=`<span class="badge bdg-due">${due} do dziś</span>`;
+    else if (nw>0) badge=`<span class="badge bdg-new">${nw} nowych</span>`;
+    else badge=`<span class="badge bdg-ok">✓ gotowe</span>`;
+
+    el.innerHTML=`<div class="cat-info"><div class="cat-name">${cat.label}</div>`+
+      `<div class="cat-meta">${ok}/${cat.cards.length} poznanych</div></div>${badge}`;
+    list.appendChild(el);
+  }
+
+  document.getElementById('s-due').textContent=totDue;
+  document.getElementById('s-new').textContent=totNew;
+  document.getElementById('s-ok').textContent=totOk;
+
+  const btn=document.getElementById('btn-all');
+  const hasDue=totDue>0||totNew>0;
+  btn.disabled=!hasDue;
+  btn.textContent=totDue>0?`📚 Ucz się zaległych (${totDue})`
+    :totNew>0?`📚 Zacznij naukę (${totNew} nowych)`
+    :`✓ Nic do nauki na dziś`;
+}
+
+// ─── Study session ────────────────────────────────────────────────────────────
+function shuffle(a) {
+  for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+
+function buildQueue(catId) {
+  let all=[];
+  if (catId==='__all__') DATA.categories.forEach(c=>all.push(...c.cards));
+  else { const c=DATA.categories.find(x=>x.id===catId); if(c) all=c.cards; }
+  const due=shuffle(all.filter(c=>isDue(c.id)));
+  const nw=shuffle(all.filter(c=>isNew(c.id))).slice(0,MAX_NEW);
+  return [...due,...nw];
+}
+
+function startStudy(catId) {
+  curCat=catId;
+  queue=buildQueue(catId); failed=[]; qIdx=0;
+  stats={tot:0,ag:0,hd:0,ok:0,ez:0};
+
+  if (!queue.length) { alert('Brak fiszek do nauki na dziś!'); return; }
+
+  let lbl='Wszystkie kategorie';
+  if (catId!=='__all__') { const c=DATA.categories.find(x=>x.id===catId); if(c) lbl=c.label; }
+  document.getElementById('ss-cat').textContent=lbl;
+
+  showScreen('ss'); showCard();
+}
+
+function curCard() {
+  if (qIdx<queue.length) return queue[qIdx];
+  if (failed.length) { queue=[...failed]; failed=[]; qIdx=0; return queue[0]; }
+  return null;
+}
+
+function showCard() {
+  const card=curCard(); if (!card) { showDone(); return; }
+  flipped=false;
+
+  const done=stats.tot;
+  const remaining=queue.length-qIdx+failed.length;
+  const total=done+remaining;
+  document.getElementById('ss-prog').textContent=`${done}/${total}`;
+  document.getElementById('ss-fill').style.width=(total?done/total*100:0)+'%';
+
+  document.getElementById('ss-q').textContent=card.q;
+  document.getElementById('ss-a').innerHTML='';
+  document.getElementById('ss-a').classList.remove('show');
+  document.getElementById('ss-div').classList.remove('show');
+  document.getElementById('ss-mode').textContent=isNew(card.id)?'🆕 Nowa fiszka':'🔁 Powtórka';
+  document.getElementById('ss-flip').style.display='block';
+  document.getElementById('ss-rate').classList.remove('show');
+  document.getElementById('card-area').scrollTop=0;
+}
+
+function flipCard() {
+  if (flipped) return; flipped=true;
+  const card=curCard(); if (!card) return;
+  document.getElementById('ss-a').innerHTML=renderMd(card.a);
+  document.getElementById('ss-a').classList.add('show');
+  document.getElementById('ss-div').classList.add('show');
+  document.getElementById('ss-flip').style.display='none';
+  document.getElementById('ss-rate').classList.add('show');
+  [1,2,3,4].forEach(r=>document.getElementById('ri'+r).textContent=preview(card.id,r));
+}
+
+function rate(r) {
+  const card=curCard(); if (!card) return;
+  sm2(card.id,r); stats.tot++;
+  if (r===1){stats.ag++;failed.push(card);}
+  else if (r===2) stats.hd++;
+  else if (r===3) stats.ok++;
+  else            stats.ez++;
+  qIdx++;
+  if (qIdx>=queue.length) {
+    if (failed.length){queue=[...failed];failed=[];qIdx=0;}
+    else {showDone();return;}
+  }
+  showCard();
+}
+
+function showDone() {
+  const pct=stats.tot?Math.round((stats.ok+stats.ez)/stats.tot*100):0;
+  document.getElementById('sd-sub').textContent=`Skuteczność: ${pct}%`;
+  document.getElementById('ds-tot').textContent=stats.tot;
+  document.getElementById('ds-ok').textContent=stats.ok+stats.ez;
+  document.getElementById('ds-hd').textContent=stats.hd;
+  document.getElementById('ds-ag').textContent=stats.ag;
+  showScreen('sd'); renderHome();
+}
+
+// ─── Markdown renderer ────────────────────────────────────────────────────────
+function escH(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function inline(s){
+  // strip HTML spans, keep inner text
+  s=s.replace(/<span[^>]*>([^<]*)<\/span>/g,'$1');
+  // process inline markdown
+  s=s.replace(/\*\*([^*\n]+)\*\*/g,'<strong>$1</strong>');
+  s=s.replace(/\*([^*\n]+)\*/g,'<em>$1</em>');
+  s=s.replace(/`([^`\n]+)`/g,'<code>$1</code>');
+  s=s.replace(/~~([^~]+)~~/g,'<del>$1</del>');
+  return s;
+}
+
+function renderMd(md) {
+  const lines=md.split('\n');
+  let out='', inCode=false, codeLines=[], listType=null;
+
+  const closeLists=()=>{if(listType){out+=`</${listType}>`;listType=null;}};
+
+  for (let i=0;i<lines.length;i++) {
+    const raw=lines[i];
+    const t=raw.trim();
+
+    if (t.startsWith('```')) {
+      if (!inCode){closeLists();inCode=true;codeLines=[];}
+      else{out+=`<pre><code>${escH(codeLines.join('\n'))}</code></pre>`;inCode=false;}
+      continue;
+    }
+    if (inCode){codeLines.push(raw);continue;}
+
+    // heading
+    const hm=t.match(/^(#{1,6})\s+(.+)$/);
+    if (hm){closeLists();const l=Math.min(hm[1].length+1,6);out+=`<h${l}>${inline(hm[2])}</h${l}>`;continue;}
+
+    // hr
+    if (/^---+$/.test(t)){closeLists();out+='<hr>';continue;}
+
+    // blockquote
+    if (t.startsWith('> ')){closeLists();out+=`<blockquote>${inline(t.slice(2))}</blockquote>`;continue;}
+
+    // unordered list
+    const ul=raw.match(/^(\s*)[-*]\s+(.+)$/);
+    if (ul){
+      if (listType!=='ul'){closeLists();out+='<ul>';listType='ul';}
+      out+=`<li>${inline(ul[2])}</li>`;continue;
+    }
+
+    // ordered list
+    const ol=raw.match(/^(\s*)\d+\.\s+(.+)$/);
+    if (ol){
+      if (listType!=='ol'){closeLists();out+='<ol>';listType='ol';}
+      out+=`<li>${inline(ol[2])}</li>`;continue;
+    }
+
+    // empty
+    if (!t){closeLists();continue;}
+
+    // paragraph
+    closeLists();
+    out+=`<p>${inline(t)}</p>`;
+  }
+
+  closeLists();
+  if (inCode&&codeLines.length) out+=`<pre><code>${escH(codeLines.join('\n'))}</code></pre>`;
+  return out;
+}
+
+// ─── Screen management ────────────────────────────────────────────────────────
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+function goHome(){showScreen('sh');renderHome();}
+
+// ─── Boot ─────────────────────────────────────────────────────────────────────
+loadProg();
+fetch('./data.json')
+  .then(r=>r.json())
+  .then(d=>{DATA=d;renderHome();})
+  .catch(()=>{
+    document.getElementById('cat-list').innerHTML=
+      '<p style="color:var(--red);text-align:center;padding:20px">Błąd ładowania data.json</p>';
+  });
+</script>
+</body>
+</html>

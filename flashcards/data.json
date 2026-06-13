@@ -1,0 +1,1025 @@
+{
+  "categories": [
+    {
+      "id": "jvm",
+      "label": "Java / JVM",
+      "cards": [
+        {
+          "id": "jvm-0",
+          "q": "Czym jest JVM i z jakich głównych obszarów pamięci się składa?",
+          "a": "JVM (Java Virtual Machine) to środowisko uruchomieniowe, które:\n- wykonuje bytecode (.class),\n- zarządza pamięcią,\n- zarządza wątkami,\n- zapewnia izolację i bezpieczeństwo.\n\nGłówne obszary pamięci:\n\n🔸 **Heap**\n- Współdzielony między wątkami.\n- Przechowuje obiekty i ich pola.\n- Zarządzany przez Garbage Collector.\n- Podzielony na:\n  - Young Generation (Eden + Survivor)\n  - Old Generation\n\n🔸 **Stack (dla każdego wątku osobny)**\n- Przechowuje:\n  - zmienne lokalne,\n  - referencje do obiektów,\n  - ramki metod (stack frames).\n- Zarządzany automatycznie (LIFO).\n- Nie podlega GC.\n\n🔸 **3️⃣ Metaspace**\n- Przechowuje metadane klas.\n- Zastąpił PermGen od Java 8.\n- Alokowany w pamięci natywnej (poza heapem).\n\n🔸 **4️⃣ PC Register**\n- Wskaźnik aktualnie wykonywanej instrukcji dla wątku.\n\n🔸 **5️⃣ Native Method Stack**\n- Dla metod natywnych (JNI)."
+        },
+        {
+          "id": "jvm-1",
+          "q": "Czym jest Java Memory Model (JMM)?",
+          "a": "JMM to specyfikacja opisująca:\n\n- jak wątki widzą zmiany w pamięci,\n- jakie operacje mogą być reorderyzowane przez kompilator/JIT/CPU,\n- kiedy zmiany są widoczne między wątkami.\n\nJMM definiuje:\n- reguły widoczności,\n- reguły synchronizacji,\n- relację happens-before.\n\nBez JMM kod wielowątkowy byłby nieprzewidywalny."
+        },
+        {
+          "id": "jvm-2",
+          "q": "Co to jest reordering i dlaczego jest problemem?",
+          "a": "Reordering to zmiana kolejności instrukcji przez:\n- kompilator,\n- JIT,\n- CPU (out-of-order execution).\n\nJeśli inny wątek odczyta zmienne między operacjami, może zobaczyć niespójny stan.\n\nDlatego potrzebujemy:\n- synchronized,\n- volatile,\n- locków,\n- atomics."
+        },
+        {
+          "id": "jvm-3",
+          "q": "Czym jest relacja happens-before?",
+          "a": "Happens-before to gwarancja JMM mówiąca:\n\n> Jeśli operacja A happens-before operacji B, to wszystkie zmiany pamięci wykonane przez A są widoczne dla B.\n\nPrzykłady:\n\n- Zakończenie metody synchronized happens-before wejście do synchronized na tym samym monitorze.\n- Zapis do zmiennej volatile happens-before jej odczyt.\n- Wywołanie start() happens-before kod w nowym wątku.\n- Zakończenie wątku happens-before join()."
+        },
+        {
+          "id": "jvm-4",
+          "q": "Czym różni się visibility od atomicity?",
+          "a": "###### ✅ Visibility (widoczność)\n\nCzy zmiana dokonana przez jeden wątek jest widoczna dla innego.\n\nZapewniają:\n- volatile\n- synchronized\n- locki\n\n###### ✅ Atomicity (niepodzielność)\n\nCzy operacja wykona się w całości, bez możliwości przerwania.\n\nNp operacja i++ nie jest atomowa, ponieważ składa się z:\n1. odczytu\n2. inkrementacji\n3. zapisu\n\nAtomowość zapewniają:\n- synchronized\n- Lock\n- klasy Atomic*\n- CAS (Compare-And-Swap)"
+        },
+        {
+          "id": "jvm-5",
+          "q": "Czym jest Escape Analysis?",
+          "a": "Escape Analysis to optymalizacja JIT.\n\nSprawdza, czy obiekt nie \"ucieka\" poza metodę (nie jest zwracany ani przekazywany dalej).\n\nJeśli nie ucieka:\n- może zostać zaalokowany na stosie zamiast na heapie,\n- może zostać wyeliminowany (scalar replacement),\n- może zostać usunięta synchronizacja (lock elision)."
+        },
+        {
+          "id": "jvm-6",
+          "q": "Jak działa ClassLoader?",
+          "a": "ClassLoader:\n- ładuje klasy do JVM,\n- zamienia bytecode na obiekt klasy.\n\nHierarchia:\n1. Bootstrap ClassLoader\n2. Platform ClassLoader\n3. Application ClassLoader\n\nDziała w modelu parent-first — najpierw pyta rodzica, jeśli rodzic nie znajdzie klasy, ładuje ją sam."
+        },
+        {
+          "id": "jvm-7",
+          "q": "Czym jest JIT?",
+          "a": "JIT (Just-In-Time compiler):\n- kompiluje bytecode do natywnego kodu maszynowego podczas działania programu,\n- optymalizuje \"gorące\" fragmenty kodu (hot spots).\n\nOptymalizacje obejmują:\n- inlining,\n- loop unrolling,\n- escape analysis,\n- dead code elimination."
+        },
+        {
+          "id": "jvm-8",
+          "q": "Jak działa Garbage Collector w skrócie?",
+          "a": "GC usuwa obiekty, do których nie ma referencji.\n\nGłówne etapy:\n1. Mark — oznaczenie obiektów osiągalnych\n2. Sweep — usunięcie nieosiągalnych\n3. Compact — defragmentacja\n\nNowoczesne GC:\n- G1\n- ZGC\n- Shenandoah\n\n\n---\n\n## 2️⃣ Współbieżność (Concurrency)"
+        },
+        {
+          "id": "jvm-9",
+          "q": "Jak działa `synchronized` w JVM?",
+          "a": "`synchronized` używa monitora (monitor lock) przypisanego do obiektu.\n\nKażdy obiekt w Javie posiada nagłówek (object header), który zawiera informacje o stanie blokady.\n\n###### Co dzieje się przy wejściu do bloku synchronized?\n\n1. Wątek próbuje przejąć monitor.\n2. Jeśli monitor jest wolny — zostaje właścicielem.\n3. Jeśli zajęty — wątek przechodzi w stan BLOCKED.\n4. Po wyjściu z bloku monitor jest zwalniany.\n\n###### Gwarancje:\n- Mutual exclusion (tylko jeden wątek naraz).\n- Visibility (flush do pamięci głównej przy wyjściu).\n- Relacja happens-before między unlock → lock."
+        },
+        {
+          "id": "jvm-10",
+          "q": "Czym jest `volatile` i co dokładnie gwarantuje?",
+          "a": "`volatile` zapewnia:\n\n1️⃣ Visibility — zapis trafia bezpośrednio do pamięci głównej, a odczyt zawsze pobiera aktualną wartość.\n\n2️⃣ Zakaz reordering wokół zmiennej volatile.\n\nNie zapewnia atomicity dla operacji złożonych (np. i++).\n\nJVM generuje instrukcje z barierami pamięci (memory barriers), które wymuszają synchronizację cache CPU."
+        },
+        {
+          "id": "jvm-11",
+          "q": "Dlaczego `i++` nie jest bezpieczne wielowątkowo?",
+          "a": "Operacja `i++` składa się z:\n1. read\n2. increment\n3. write\n\nDwa wątki mogą odczytać tę samą wartość i nadpisać się nawzajem (lost update).\n\nRozwiązania:\n- synchronized\n- AtomicInteger\n- Lock"
+        },
+        {
+          "id": "jvm-12",
+          "q": "Czym jest CAS (Compare-And-Swap)?",
+          "a": "CAS to atomowa instrukcja procesora wykonująca operację:\n\nJeśli currentValue == expectedValue → ustaw newValue.\nW przeciwnym razie operacja się nie powiedzie.\n\nOperacja jest niepodzielna na poziomie CPU.\n\nW Javie używana przez:\n- AtomicInteger\n- ConcurrentHashMap\n- Struktury lock-free"
+        },
+        {
+          "id": "jvm-13",
+          "q": "Jak działają klasy Atomic*?",
+          "a": "Np. AtomicInteger:\n- przechowuje wartość jako volatile,\n- używa CAS w pętli retry.\n\nSchemat działania:\n1. Odczytaj aktualną wartość.\n2. Oblicz nową wartość.\n3. Spróbuj wykonać CAS.\n4. Jeśli się nie uda — powtórz.\n\nTo jest podejście lock-free."
+        },
+        {
+          "id": "jvm-14",
+          "q": "Czym różni się ReentrantLock od synchronized?",
+          "a": "ReentrantLock oferuje:\n- tryLock()\n- lockInterruptibly()\n- możliwość ustawienia fairness\n- condition variables\n\n`synchronized`:\n- prostszy w użyciu\n- automatycznie zwalnia lock przy wyjątku\n\nOba zapewniają mutual exclusion i visibility."
+        },
+        {
+          "id": "jvm-15",
+          "q": "Czym jest deadlock?",
+          "a": "Deadlock to sytuacja, gdy dwa lub więcej wątków czekają na zasoby trzymane przez siebie nawzajem.\n\nWarunki deadlocka:\n1. Mutual exclusion\n2. Hold and wait\n3. No preemption\n4. Circular wait"
+        },
+        {
+          "id": "jvm-16",
+          "q": "Czym jest livelock?",
+          "a": "Wątki nie są zablokowane, ale stale reagują na siebie i nie wykonują postępu."
+        },
+        {
+          "id": "jvm-17",
+          "q": "Czym jest starvation?",
+          "a": "Wątek nigdy nie otrzymuje zasobu, ponieważ inne wątki są preferowane."
+        },
+        {
+          "id": "jvm-18",
+          "q": "Czym jest False Sharing?",
+          "a": "False sharing występuje, gdy dwie zmienne modyfikowane przez różne wątki znajdują się w tej samej cache line CPU.\n\nPowoduje to częstą synchronizację cache między rdzeniami i spadek wydajności.\n\nRozwiązania:\n- padding\n- adnotacja @Contended (z odpowiednią flagą JVM)"
+        },
+        {
+          "id": "jvm-19",
+          "q": "Jaki jest cykl życia wątku w Javie?",
+          "a": "Stany wątku (Thread.State):\n\n1. NEW — wątek utworzony, ale nieuruchomiony.\n2. RUNNABLE — gotowy do wykonania lub wykonywany przez CPU.\n3. BLOCKED — oczekuje na monitor (np. wejście do synchronized).\n4. WAITING — czeka bez limitu czasu (np. wait(), join()).\n5. TIMED_WAITING — czeka przez określony czas (sleep(), wait(timeout)).\n6. TERMINATED — zakończył wykonanie.\n\nMetoda start() powoduje przejście z NEW do RUNNABLE."
+        },
+        {
+          "id": "jvm-20",
+          "q": "Dlaczego nie powinniśmy tworzyć wątków ręcznie (new Thread)?",
+          "a": "Tworzenie wątków jest kosztowne:\n- alokacja pamięci stosu,\n- rejestracja w systemie operacyjnym,\n- przełączanie kontekstu (context switching).\n\nTworzenie wielu krótkotrwałych wątków prowadzi do:\n- wysokiego narzutu systemowego,\n- spadku wydajności,\n- ryzyka OutOfMemoryError.\n\nDlatego stosuje się pule wątków."
+        },
+        {
+          "id": "jvm-21",
+          "q": "Czym jest ExecutorService?",
+          "a": "ExecutorService to interfejs zarządzający wykonywaniem zadań asynchronicznych.\n\nOddziela:\n- tworzenie wątków,\n- zarządzanie nimi,\n- wykonywanie zadań.\n\nPozwala:\n- submit() — zwraca Future,\n- execute() — bez zwracania wyniku,\n- shutdown() — inicjuje zamknięcie,\n- shutdownNow() — próbuje przerwać wątki."
+        },
+        {
+          "id": "jvm-22",
+          "q": "Jak działa ThreadPoolExecutor?",
+          "a": "ThreadPoolExecutor zarządza pulą wątków według parametrów:\n\n1. corePoolSize — minimalna liczba wątków.\n2. maximumPoolSize — maksymalna liczba wątków.\n3. keepAliveTime — czas utrzymywania nadmiarowych wątków.\n4. workQueue — kolejka zadań.\n\nSchemat działania:\n\n1. Jeśli liczba aktywnych wątków < corePoolSize → tworzony nowy wątek.\n2. Jeśli osiągnięto corePoolSize → zadanie trafia do kolejki.\n3. Jeśli kolejka pełna i liczba wątków < maximumPoolSize → tworzony nowy wątek.\n4. Jeśli osiągnięto maximumPoolSize i kolejka pełna → uruchamiany RejectedExecutionHandler."
+        },
+        {
+          "id": "jvm-23",
+          "q": "Jakie są typowe implementacje ExecutorService?",
+          "a": "- newFixedThreadPool(n) — stała liczba wątków.\n- newCachedThreadPool() — dynamiczna liczba wątków, brak ograniczenia (może być niebezpieczne).\n- newSingleThreadExecutor() — jeden wątek.\n- newScheduledThreadPool(n) — zadania cykliczne/opóźnione.\n\nW środowisku produkcyjnym zaleca się jawne konfigurowanie ThreadPoolExecutor."
+        },
+        {
+          "id": "jvm-24",
+          "q": "Czym jest ForkJoinPool i do czego służy?",
+          "a": "ForkJoinPool to specjalizowana pula wątków zaprojektowana do zadań dzielonych rekurencyjnie (divide-and-conquer).\n\nKluczowe cechy:\n- Używa algorytmu work-stealing.\n- Każdy wątek posiada własną dwukierunkową kolejkę (deque).\n- Jeśli wątek kończy swoje zadania — \"kradnie\" zadania z końca kolejki innego wątku.\n\nDzięki temu minimalizuje bezczynność wątków i poprawia wykorzystanie CPU.\n\nUżywany przez:\n- Parallel Stream\n- CompletableFuture (domyślnie commonPool)"
+        },
+        {
+          "id": "jvm-25",
+          "q": "Czym jest work-stealing?",
+          "a": "Work-stealing to strategia równoważenia obciążenia:\n\n- Wątek wykonuje zadania ze swojej kolejki (LIFO — dla lepszej lokalności cache).\n- Jeśli nie ma zadań — kradnie z innego wątku (FIFO — z końca kolejki).\n\nZmniejsza contention na wspólnej kolejce i poprawia skalowalność."
+        },
+        {
+          "id": "jvm-26",
+          "q": "Czym jest CompletableFuture?",
+          "a": "CompletableFuture to rozszerzenie Future pozwalające na:\n- asynchroniczne przetwarzanie,\n- łączenie operacji w pipeline,\n- obsługę wyjątków,\n- kompozycję wielu zadań.\n\nRóżnice względem Future:\n- Future jest blokujące (get()).\n- CompletableFuture umożliwia non-blocking chaining (thenApply, thenCompose).\n\nPrzykłady metod:\n- supplyAsync()\n- thenApply()\n- thenCompose()\n- thenCombine()\n- exceptionally()"
+        },
+        {
+          "id": "jvm-27",
+          "q": "Czym różni się thenApply od thenCompose?",
+          "a": "thenApply:\n- Przekształca wynik synchronizacyjnie.\n- Jeśli zwraca CompletableFuture — powstaje zagnieżdżenie (CompletableFuture<CompletableFuture<T>>).\n\nthenCompose:\n- Służy do spłaszczania zagnieżdżonych future.\n- Analogiczny do flatMap w Stream API."
+        },
+        {
+          "id": "jvm-28",
+          "q": "Co oznacza blocking vs non-blocking?",
+          "a": "Blocking:\n- Wątek czeka na zakończenie operacji.\n- CPU może być bezczynne.\n- Przykład: Future.get().\n\nNon-blocking:\n- Wątek nie czeka.\n- Rejestruje callback i wykonuje inne zadania.\n- Przykład: CompletableFuture.thenApply().\n\nNon-blocking poprawia skalowalność przy operacjach IO."
+        },
+        {
+          "id": "jvm-29",
+          "q": "Czym jest backpressure?",
+          "a": "Backpressure to mechanizm kontroli przepływu danych między producentem a konsumentem.\n\nProblem:\n- Producent generuje dane szybciej niż konsument je przetwarza.\n- Może to prowadzić do przepełnienia pamięci.\n\nRozwiązania:\n- Ograniczone kolejki (bounded queue).\n- Odrzucanie zadań.\n- Reactive Streams (request(n)).\n\nW kontekście ThreadPoolExecutor:\n- Ograniczenie workQueue zapobiega niekontrolowanemu wzrostowi pamięci.\n\n\n---\n\n## 3️⃣ Kolekcje i Struktury Danych"
+        },
+        {
+          "id": "jvm-30",
+          "q": "Jak działa HashMap krok po kroku?",
+          "a": "1. Obliczany jest hashCode() klucza.\n2. Hash jest mieszany (bit spreading), aby lepiej rozłożyć bity.\n3. Na podstawie hasha wyliczany jest indeks w tablicy: (n - 1) & hash.\n4. Jeśli bucket jest pusty → tworzony nowy Node.\n5. Jeśli kolizja:\n   - porównanie equals(),\n   - jeśli klucz istnieje → nadpisanie wartości,\n   - jeśli nie → dodanie do listy lub drzewa.\n\nOd Java 8:\n- Jeśli w bucket jest ≥ 8 elementów → lista zamieniana na Red-Black Tree.\n- Jeśli liczba spadnie < 6 → powrót do listy.\n\nResize następuje po przekroczeniu threshold = capacity × loadFactor."
+        },
+        {
+          "id": "jvm-31",
+          "q": "Dlaczego equals() i hashCode() muszą być spójne?",
+          "a": "Kontrakt:\n\n1. Jeśli a.equals(b) == true → a.hashCode() == b.hashCode().\n2. Jeśli hashCode różne → obiekty na pewno różne.\n\nJeśli złamiemy kontrakt:\n- HashMap może nie znaleźć klucza,\n- dane mogą zostać \"zgubione\".\n\nTypowy błąd: nadpisanie equals bez hashCode."
+        },
+        {
+          "id": "jvm-32",
+          "q": "Czym jest loadFactor i dlaczego ma znaczenie?",
+          "a": "loadFactor określa, przy jakim zapełnieniu nastąpi resize.\n\nDomyślnie: 0.75.\n\n- Niższy loadFactor → mniej kolizji, większe zużycie pamięci.\n- Wyższy loadFactor → więcej kolizji, mniejsza pamięć."
+        },
+        {
+          "id": "jvm-33",
+          "q": "Czym jest Red-Black Tree?",
+          "a": "Red-Black Tree to samobalansujące drzewo binarne.\n\nWłaściwości:\n1. Każdy węzeł jest czerwony lub czarny.\n2. Korzeń jest czarny.\n3. Czerwony węzeł nie może mieć czerwonego dziecka.\n4. Każda ścieżka do liścia ma tę samą liczbę czarnych węzłów.\n\nZapewnia operacje w czasie O(log n)."
+        },
+        {
+          "id": "jvm-34",
+          "q": "Czym różni się HashMap od ConcurrentHashMap?",
+          "a": "HashMap:\n- Nie jest thread-safe.\n- Może wejść w nieskończoną pętlę przy równoległym resize (Java < 8).\n\nConcurrentHashMap:\n- Thread-safe bez globalnego locka.\n- Używa CAS i synchronizacji na poziomie bucket.\n- Brak segmentów od Java 8 (wcześniej segment-based locking).\n\nOperacje odczytu są w większości bezblokujące."
+        },
+        {
+          "id": "jvm-35",
+          "q": "Co to jest segment-based locking?",
+          "a": "W starszych wersjach ConcurrentHashMap (Java 7):\n- Mapa była podzielona na segmenty.\n- Każdy segment miał własny lock.\n- Zmniejszało to contention względem jednego globalnego locka.\n\nOd Java 8 zastąpione synchronizacją na bucket."
+        },
+        {
+          "id": "jvm-36",
+          "q": "Czym jest CopyOnWriteArrayList?",
+          "a": "CopyOnWriteArrayList:\n- Przy każdej modyfikacji tworzy nową kopię tablicy.\n- Odczyty są bezblokujące.\n\nDobre dla:\n- wielu odczytów,\n- rzadkich zapisów.\n\nKosztowne przy częstych modyfikacjach."
+        },
+        {
+          "id": "jvm-37",
+          "q": "Jakie są złożoności czasowe (Big-O) podstawowych kolekcji?",
+          "a": "HashMap:\n- get/put: O(1) średnio, O(log n) przy drzewie.\n\nArrayList:\n- get: O(1)\n- add (na końcu): O(1) amortyzowane\n- insert/remove w środku: O(n)\n\nLinkedList:\n- get: O(n)\n- add/remove na początku: O(1)\n\nTreeMap:\n- get/put: O(log n)\n\n\n---\n\n## 4️⃣ Stream API"
+        },
+        {
+          "id": "jvm-38",
+          "q": "Czym jest lazy evaluation w Stream API?",
+          "a": "Lazy evaluation oznacza, że operacje pośrednie (intermediate operations) nie są wykonywane od razu.\n\nSą wykonywane dopiero, gdy pojawi się operacja terminalna (np. collect, forEach, reduce).\n\nPozwala to na:\n- optymalizację przetwarzania,\n- przetwarzanie elementów \"na żądanie\",\n- łączenie operacji w jeden pipeline."
+        },
+        {
+          "id": "jvm-39",
+          "q": "Czym różnią się operacje stateless i stateful?",
+          "a": "Stateless:\n- Nie zależą od innych elementów.\n- Przykład: map, filter.\n- Łatwe do równoległego przetwarzania.\n\nStateful:\n- Wymagają wiedzy o innych elementach.\n- Przykład: sorted, distinct.\n- Wymagają buforowania danych.\n\nOperacje stateful są droższe i trudniejsze do zrównoleglenia."
+        },
+        {
+          "id": "jvm-40",
+          "q": "Czym różni się map od flatMap?",
+          "a": "map:\n- Przekształca element na inny element.\n- 1 → 1\n\nflatMap:\n- Przekształca element na strumień elementów.\n- 1 → N\n- Spłaszcza wynik.\n\nflatMap jest odpowiednikiem flatMap z programowania funkcyjnego."
+        },
+        {
+          "id": "jvm-41",
+          "q": "Dlaczego funkcja w reduce musi być asocjacyjna?",
+          "a": "Operacja asocjacyjna spełnia warunek:\n\n(a op b) op c = a op (b op c)\n\nW parallel stream:\n- Dane są dzielone na części.\n- Wyniki częściowe są łączone w dowolnej kolejności.\n\nJeśli operacja nie jest asocjacyjna — wynik może być niepoprawny."
+        },
+        {
+          "id": "jvm-42",
+          "q": "Czym jest Spliterator?",
+          "a": "Spliterator to iterator zaprojektowany do przetwarzania równoległego.\n\nPosiada metodę trySplit(), która:\n- dzieli dane na części,\n- umożliwia przetwarzanie równoległe.\n\nDefiniuje charakterystyki:\n- SIZED\n- ORDERED\n- DISTINCT\n- SORTED\n- IMMUTABLE\n\nStream używa Spliterator do podziału pracy w parallel stream."
+        },
+        {
+          "id": "jvm-43",
+          "q": "Dlaczego parallel stream może być niebezpieczny?",
+          "a": "Problemy:\n\n1. Side effects — współdzielony mutowalny stan może powodować race condition.\n2. Operacje stateful są kosztowne.\n3. Małe kolekcje — narzut przewyższa zysk.\n4. Współdzielenie ForkJoinPool commonPool — może blokować inne zadania.\n\nParallel stream jest dobry dla:\n- dużych, CPU-bound operacji,\n- operacji asocjacyjnych,\n- braku efektów ubocznych."
+        },
+        {
+          "id": "jvm-44",
+          "q": "Dlaczego efekty uboczne (side effects) łamią parallel stream?",
+          "a": "Side effect to modyfikacja współdzielonego stanu.\n\nW parallel stream:\n- Elementy są przetwarzane równolegle.\n- Brak synchronizacji prowadzi do race condition.\n\nPrzykład niepoprawny:\n\nlist.parallelStream().forEach(e -> sharedList.add(e));\n\nPoprawne podejście:\n- collect(Collectors.toList())\n\nStream powinien być funkcjonalny i bez efektów ubocznych."
+        },
+        {
+          "id": "jvm-45",
+          "q": "Czym różni się forEach od forEachOrdered?",
+          "a": "forEach:\n- Nie gwarantuje kolejności w parallel stream.\n- Szybszy.\n\nforEachOrdered:\n- Zachowuje kolejność źródła.\n- Może ograniczać równoległość.\n\nW sequential stream działają identycznie.\n\n\n---\n\n## 5️⃣ Typy, OOP i Generics"
+        },
+        {
+          "id": "jvm-46",
+          "q": "Czym jest type erasure w Generics?",
+          "a": "Type erasure oznacza, że informacje o typach generycznych są usuwane w czasie kompilacji.\n\nPrzykład:\nList<String> i List<Integer> w runtime są widziane jako List.\n\nKonsekwencje:\n- Brak informacji o typie w runtime.\n- Nie można tworzyć new T().\n- Nie można tworzyć tablic generycznych (new T[]).\n\nKompilator dodaje casty w bytecode, aby zachować bezpieczeństwo typów."
+        },
+        {
+          "id": "jvm-47",
+          "q": "Czym jest covariance i contravariance?",
+          "a": "Covariance — pozwala używać typu bardziej szczegółowego.\n\nList<? extends Number>\n- Można czytać jako Number.\n- Nie można bezpiecznie dodawać elementów.\n\nContravariance — pozwala używać typu bardziej ogólnego.\n\nList<? super Integer>\n- Można dodawać Integer.\n- Odczyt jako Object.\n\nZasada PECS:\n- Producer → extends\n- Consumer → super"
+        },
+        {
+          "id": "jvm-48",
+          "q": "Dlaczego immutable objects są bezpieczne wielowątkowo?",
+          "a": "Obiekt immutable:\n- Nie zmienia stanu po konstrukcji.\n- Wszystkie pola final.\n- Brak setterów.\n\nGwarancje:\n- Brak race condition.\n- Bezpieczne publikowanie (safe publication), jeśli pola są final.\n\nImmutable upraszcza concurrency."
+        },
+        {
+          "id": "jvm-49",
+          "q": "Czym różni się equals od ==?",
+          "a": "== porównuje referencje (czy to ten sam obiekt).\n\nequals porównuje logiczną równość (zawartość).\n\nDla klas własnych należy nadpisać equals i hashCode."
+        },
+        {
+          "id": "jvm-50",
+          "q": "Czym jest record w Javie?",
+          "a": "record to skrócona forma klasy immutable.\n\nAutomatycznie generuje:\n- konstruktor,\n- equals,\n- hashCode,\n- toString,\n- gettery.\n\nRecord jest final i przeznaczony do przechowywania danych."
+        },
+        {
+          "id": "jvm-51",
+          "q": "Czym są sealed classes?",
+          "a": "Sealed class ogranicza, które klasy mogą ją rozszerzać.\n\nPrzykład:\nsealed class Shape permits Circle, Square {}\n\nPozwala:\n- kontrolować hierarchię dziedziczenia,\n- ułatwiać exhaustive switch."
+        },
+        {
+          "id": "jvm-52",
+          "q": "Kiedy Optional jest dobrym pomysłem, a kiedy złym?",
+          "a": "Dobry:\n- jako typ zwracany z metody.\n- aby uniknąć null.\n\nZły:\n- jako pole w encji.\n- jako parametr metody.\n- w serializacji.\n\nOptional nie jest zamiennikiem każdego null."
+        },
+        {
+          "id": "jvm-53",
+          "q": "Czym są value-based classes?",
+          "a": "Value-based class:\n- Reprezentuje wartość, nie tożsamość.\n- Nie należy polegać na referencyjnej równości (==).\n\nPrzykład: Integer, Optional.\n\nW przyszłości Project Valhalla wprowadzi value types bez narzutu obiektowego.\n\n\n\n---\n\n## 6️⃣ IO / NIO"
+        },
+        {
+          "id": "jvm-54",
+          "q": "Czym różni się IO od NIO?",
+          "a": "IO (java.io):\n- Model strumieniowy (InputStream/OutputStream).\n- Operacje blokujące.\n- Jeden wątek na jedno połączenie.\n\nNIO (java.nio):\n- Kanały (Channel) i bufory (Buffer).\n- Możliwość trybu non-blocking.\n- Selector pozwala obsługiwać wiele połączeń jednym wątkiem.\n\nNIO jest bardziej skalowalne przy dużej liczbie połączeń."
+        },
+        {
+          "id": "jvm-55",
+          "q": "Czym jest Channel?",
+          "a": "Channel to dwukierunkowe połączenie do źródła danych.\n\nPrzykłady:\n- FileChannel\n- SocketChannel\n- ServerSocketChannel\n\nWspółpracuje z Buffer."
+        },
+        {
+          "id": "jvm-56",
+          "q": "Czym jest Buffer?",
+          "a": "Buffer to kontener na dane z polami:\n- capacity — maksymalny rozmiar,\n- position — aktualna pozycja,\n- limit — granica odczytu/zapisu.\n\nTryb zapisu → flip() → tryb odczytu."
+        },
+        {
+          "id": "jvm-57",
+          "q": "Czym jest Selector?",
+          "a": "Selector pozwala jednemu wątkowi monitorować wiele kanałów.\n\nDziała poprzez:\n- rejestrowanie kanałów,\n- sprawdzanie gotowości do operacji (read, write, accept).\n\nUmożliwia model event-driven."
+        },
+        {
+          "id": "jvm-58",
+          "q": "Czym jest memory-mapped file?",
+          "a": "Memory-mapped file (MappedByteBuffer):\n- Mapuje plik bezpośrednio do pamięci.\n- OS zarządza synchronizacją z dyskiem.\n\nZalety:\n- Szybki dostęp do dużych plików.\n- Brak kopiowania danych między buforami.\n\nWady:\n- Trudniejsze zarządzanie pamięcią.\n\n---\n\n## 7️⃣ Wyjątki i API Design"
+        },
+        {
+          "id": "jvm-59",
+          "q": "Czym różnią się checked i unchecked exceptions?",
+          "a": "Checked:\n- Muszą być zadeklarowane lub obsłużone.\n- Reprezentują sytuacje, które można przewidzieć.\n\nUnchecked (RuntimeException):\n- Nie wymagają deklaracji.\n- Reprezentują błędy programistyczne.\n\nW nowoczesnym kodzie preferuje się unchecked."
+        },
+        {
+          "id": "jvm-60",
+          "q": "Czym jest exception wrapping?",
+          "a": "Exception wrapping polega na opakowaniu niższego wyjątku w wyższy:\n\nthrow new CustomException(\"msg\", cause);\n\nPozwala:\n- zachować stack trace,\n- oddzielić warstwy aplikacji."
+        },
+        {
+          "id": "jvm-61",
+          "q": "Czym są suppressed exceptions?",
+          "a": "Powstają przy try-with-resources.\n\nJeśli:\n- wyjątek wystąpi w bloku try,\n- oraz podczas zamykania zasobu,\n\nWyjątek z close() jest suppressed i dostępny przez getSuppressed()."
+        },
+        {
+          "id": "jvm-62",
+          "q": "Czym jest defensive copying?",
+          "a": "Defensive copying polega na tworzeniu kopii mutowalnych obiektów przekazywanych do klasy.\n\nChroni przed:\n- niekontrolowaną modyfikacją stanu.\n\nStosowane w klasach immutable."
+        },
+        {
+          "id": "jvm-63",
+          "q": "Jak projektować dobre API?",
+          "a": "Zasady:\n- Minimalna powierzchnia publiczna.\n- Brak null (Optional lub wyjątek).\n- Immutable gdy możliwe.\n- Spójne nazewnictwo.\n- Jasne kontrakty (JavaDoc).\n- Nie ujawniać implementacji.\n\nDobre API jest łatwe do użycia i trudne do użycia błędnie."
+        }
+      ]
+    },
+    {
+      "id": "spring",
+      "label": "Spring Boot",
+      "cards": [
+        {
+          "id": "spring-0",
+          "q": "Czym jest IoC (Inversion of Control)?",
+          "a": "Inversion of Control oznacza odwrócenie kontroli nad tworzeniem i zarządzaniem zależnościami.\n\nZamiast:\n- Klasa sama tworzy swoje zależności (new Service()),\n\nTo:\n- Kontener (Spring) tworzy obiekty i wstrzykuje je do klas.\n\nKorzyści:\n- Luźne powiązania (loose coupling),\n- Łatwiejsze testowanie,\n- Możliwość podmiany implementacji."
+        },
+        {
+          "id": "spring-1",
+          "q": "Czym jest Dependency Injection?",
+          "a": "Dependency Injection to mechanizm dostarczania zależności do klasy z zewnątrz.\n\nRodzaje:\n- Constructor injection (zalecane),\n- Setter injection,\n- Field injection (niezalecane).\n\nConstructor injection:\n- Zapewnia immutability zależności,\n- Ułatwia testowanie,\n- Wymusza kompletność obiektu."
+        },
+        {
+          "id": "spring-2",
+          "q": "Jak działa kontener Springa krok po kroku?",
+          "a": "1. Odczyt konfiguracji (@Configuration, @ComponentScan).\n2. Rejestracja definicji beanów (BeanDefinition).\n3. Tworzenie instancji beanów.\n4. Wstrzykiwanie zależności.\n5. Wywołanie callbacków (np. @PostConstruct).\n6. Bean gotowy do użycia.\n\nSpring używa refleksji do tworzenia i łączenia obiektów."
+        },
+        {
+          "id": "spring-3",
+          "q": "Jakie są scope beanów?",
+          "a": "- singleton (domyślny) — jedna instancja na kontekst.\n- prototype — nowa instancja przy każdym pobraniu.\n- request — jedna instancja na request HTTP.\n- session — jedna instancja na sesję.\n- application — jedna instancja na aplikację webową.\n\nSingleton w Springu ≠ Singleton w sensie wzorca projektowego (jest per ApplicationContext)."
+        },
+        {
+          "id": "spring-4",
+          "q": "Czym jest lifecycle beana?",
+          "a": "Etapy:\n1. Instancja.\n2. Wstrzyknięcie zależności.\n3. BeanPostProcessor (before).\n4. @PostConstruct.\n5. Bean gotowy.\n6. Przy zamknięciu kontekstu — @PreDestroy.\n\nBeanPostProcessor umożliwia modyfikację beanów (np. tworzenie proxy)."
+        },
+        {
+          "id": "spring-5",
+          "q": "Czym jest @Primary i @Qualifier?",
+          "a": "Jeśli istnieje wiele implementacji interfejsu:\n\n@Primary — wskazuje domyślny bean.\n@Qualifier — pozwala wybrać konkretną implementację.\n\nZapobiega NoUniqueBeanDefinitionException.\n\n\n---\n\n## 2️⃣ @Transactional (Mechanizm Transakcji)"
+        },
+        {
+          "id": "spring-6",
+          "q": "Jak działa @Transactional pod spodem?",
+          "a": "@Transactional działa poprzez AOP.\n\nSpring:\n1. Tworzy proxy dla beana (JDK dynamic proxy lub CGLIB).\n2. Proxy przechwytuje wywołanie metody.\n3. Otwiera transakcję (PlatformTransactionManager).\n4. Wywołuje metodę.\n5. Commit lub rollback w zależności od wyniku.\n\nJeśli metoda jest wywołana bezpośrednio (self-invocation) — proxy nie jest używane i transakcja nie zadziała."
+        },
+        {
+          "id": "spring-7",
+          "q": "Kiedy @Transactional NIE działa?",
+          "a": "- Metoda private.\n- Metoda final (przy CGLIB ograniczenia proxy).\n- Wywołanie self-invocation.\n- Bean niezarządzany przez Spring.\n- Brak skonfigurowanego TransactionManager."
+        },
+        {
+          "id": "spring-8",
+          "q": "Jak działają propagacje transakcji?",
+          "a": "Propagation określa zachowanie przy wywołaniu metody wewnątrz istniejącej transakcji.\n\nREQUIRED (domyślne):\n- Dołącza do istniejącej lub tworzy nową.\n\nREQUIRES_NEW:\n- Zawsze tworzy nową transakcję.\n- Zawiesza obecną.\n\nMANDATORY:\n- Wymaga istniejącej transakcji.\n- Jeśli brak → wyjątek.\n\nSUPPORTS:\n- Działa w transakcji jeśli istnieje.\n- Jeśli nie → bez transakcji.\n\nNOT_SUPPORTED:\n- Zawiesza istniejącą transakcję.\n\nNEVER:\n- Jeśli istnieje transakcja → wyjątek.\n\nNESTED:\n- Tworzy savepoint (jeśli wspierane przez DB)."
+        },
+        {
+          "id": "spring-9",
+          "q": "Jakie są poziomy izolacji?",
+          "a": "READ_UNCOMMITTED:\n- Możliwe dirty reads.\n\nREAD_COMMITTED:\n- Brak dirty reads.\n- Możliwe non-repeatable reads.\n\nREPEATABLE_READ:\n- Brak dirty i non-repeatable reads.\n- Możliwe phantom reads.\n\nSERIALIZABLE:\n- Najwyższa izolacja.\n- Zachowuje się jak wykonanie sekwencyjne.\n- Najmniej wydajny.\n\nDirty read — odczyt niezatwierdzonych danych.\nNon-repeatable read — ten sam rekord zwraca różne wartości.\nPhantom read — nowe rekordy pojawiają się w wyniku tego samego zapytania."
+        },
+        {
+          "id": "spring-10",
+          "q": "Kiedy rollback NIE nastąpi?",
+          "a": "Domyślnie rollback następuje tylko dla RuntimeException i Error.\n\nNie nastąpi dla:\n- Checked exception (chyba że rollbackFor ustawione).\n- Jeśli wyjątek został złapany i nie rzucony dalej.\n\nMożna wymusić rollback:\n@Transactional(rollbackFor = Exception.class)"
+        },
+        {
+          "id": "spring-11",
+          "q": "Czym jest TransactionManager?",
+          "a": "PlatformTransactionManager zarządza cyklem życia transakcji.\n\nImplementacje:\n- DataSourceTransactionManager (JDBC).\n- JpaTransactionManager (JPA).\n- JtaTransactionManager (rozproszone transakcje).\n\nOdpowiada za:\n- begin,\n- commit,\n- rollback,\n- zarządzanie zasobami (Connection).\n\n\n---\n\n## 3️⃣ Spring AOP"
+        },
+        {
+          "id": "spring-12",
+          "q": "Czym jest AOP (Aspect-Oriented Programming)?",
+          "a": "AOP pozwala wydzielić logikę przekrojową (cross-cutting concerns), taką jak:\n- transakcje,\n- logowanie,\n- bezpieczeństwo,\n- cache.\n\nZamiast umieszczać ją w każdej metodzie — definiuje się aspekt."
+        },
+        {
+          "id": "spring-13",
+          "q": "Jak działa AOP w Springu?",
+          "a": "Spring AOP działa w oparciu o proxy.\n\n1. Tworzony jest proxy beana.\n2. Proxy przechwytuje wywołanie metody.\n3. Wykonywana jest logika aspektu (np. @Around).\n4. Wywoływana jest metoda docelowa.\n\nSpring AOP działa tylko na metodach publicznych beanów zarządzanych przez Spring."
+        },
+        {
+          "id": "spring-14",
+          "q": "Czym różni się JDK Dynamic Proxy od CGLIB?",
+          "a": "JDK Dynamic Proxy:\n- Tworzy proxy na podstawie interfejsu.\n- Wymaga, aby bean implementował interfejs.\n\nCGLIB:\n- Tworzy klasę dziedziczącą po klasie docelowej.\n- Może działać bez interfejsu.\n- Nie może proxy'ować metod final.\n\nSpring domyślnie używa:\n- JDK proxy, jeśli istnieje interfejs,\n- CGLIB w przeciwnym razie."
+        },
+        {
+          "id": "spring-15",
+          "q": "Czym jest weaving?",
+          "a": "Weaving to proces wstrzykiwania aspektów do kodu.\n\nRodzaje:\n- Compile-time weaving (AspectJ).\n- Load-time weaving.\n- Runtime weaving (Spring proxy).\n\nSpring używa runtime weaving przez proxy."
+        },
+        {
+          "id": "spring-16",
+          "q": "Jakie są typy advice?",
+          "a": "- @Before — przed metodą.\n- @After — po metodzie (zawsze).\n- @AfterReturning — po sukcesie.\n- @AfterThrowing — po wyjątku.\n- @Around — otacza metodę (najbardziej elastyczne).\n\n@Around pozwala kontrolować wywołanie proceed()."
+        },
+        {
+          "id": "spring-17",
+          "q": "Czym jest pointcut?",
+          "a": "Pointcut definiuje, które metody mają być objęte aspektem.\n\nPrzykład:\nexecution(* com.example.service.*.*(..))\n\nMoże bazować na:\n- pakiecie,\n- nazwie metody,\n- adnotacji.\n\nPointcut + Advice = Aspect.\n\n\n---\n\n## 🚀 4️⃣ Spring Boot"
+        },
+        {
+          "id": "spring-18",
+          "q": "Czym jest auto-configuration w Spring Boot?",
+          "a": "Auto-configuration to mechanizm automatycznego konfigurowania beanów na podstawie:\n- obecności klas w classpath,\n- właściwości konfiguracyjnych,\n- istniejących beanów.\n\nSpring Boot:\n1. Skanuje plik META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports.\n2. Rejestruje klasy konfiguracyjne.\n3. Warunkowo tworzy beany.\n\nPozwala to uruchomić aplikację bez ręcznej konfiguracji infrastruktury."
+        },
+        {
+          "id": "spring-19",
+          "q": "Czym są adnotacje @Conditional?",
+          "a": "@Conditional pozwala tworzyć bean tylko jeśli spełniony jest warunek.\n\nNajczęstsze warianty:\n- @ConditionalOnClass\n- @ConditionalOnMissingBean\n- @ConditionalOnProperty\n- @ConditionalOnWebApplication\n\nMechanizm ten jest fundamentem auto-config."
+        },
+        {
+          "id": "spring-20",
+          "q": "Czym jest starter w Spring Boot?",
+          "a": "Starter to zestaw zależności (dependency descriptor), który:\n- agreguje biblioteki,\n- dodaje odpowiednie auto-config.\n\nPrzykład:\n- spring-boot-starter-web\n- spring-boot-starter-data-jpa\n\nUłatwia konfigurację poprzez konwencję zamiast konfiguracji."
+        },
+        {
+          "id": "spring-21",
+          "q": "Czym różni się ApplicationContext od WebApplicationContext?",
+          "a": "ApplicationContext:\n- Ogólny kontener beanów.\n\nWebApplicationContext:\n- Rozszerza ApplicationContext.\n- Dodaje wsparcie dla środowiska web (ServletContext).\n\nW aplikacjach web tworzony jest kontekst webowy."
+        },
+        {
+          "id": "spring-22",
+          "q": "Jak działa binding właściwości (@ConfigurationProperties)?",
+          "a": "@ConfigurationProperties pozwala mapować właściwości z application.yml na obiekt.\n\nMechanizm:\n- Spring odczytuje konfigurację.\n- Tworzy bean.\n- Wstrzykuje wartości przez setter lub konstruktor.\n\nZalety:\n- Typowanie.\n- Walidacja.\n- Lepsza organizacja konfiguracji."
+        },
+        {
+          "id": "spring-23",
+          "q": "Czym są profile w Spring?",
+          "a": "Profile pozwalają aktywować różne konfiguracje zależnie od środowiska.\n\nAktywacja:\n- spring.profiles.active\n- @Profile(\"dev\")\n\nUmożliwiają separację konfiguracji dev/test/prod."
+        },
+        {
+          "id": "spring-24",
+          "q": "Czym jest Spring Boot Actuator?",
+          "a": "Actuator dostarcza endpointy monitorujące aplikację.\n\nPrzykłady:\n- /actuator/health\n- /actuator/metrics\n- /actuator/env\n- /actuator/info\n\nPozwala monitorować:\n- stan aplikacji,\n- metryki,\n- konfigurację.\n\nCzęsto używany z Prometheus.\n\n\n---\n\n## 🔐 5️⃣ Spring Security"
+        },
+        {
+          "id": "spring-25",
+          "q": "Jak działa Spring Security wewnętrznie?",
+          "a": "Spring Security działa jako łańcuch filtrów (Security Filter Chain).\n\n1. Żądanie HTTP trafia do serwera.\n2. Przechodzi przez kolejne filtry (np. authentication, authorization).\n3. Jeśli uwierzytelnienie się powiedzie — tworzony jest Authentication.\n4. Obiekt Authentication trafia do SecurityContext.\n\nSecurityContext przechowywany jest w ThreadLocal (SecurityContextHolder)."
+        },
+        {
+          "id": "spring-26",
+          "q": "Czym różni się Authentication od Authorization?",
+          "a": "Authentication (uwierzytelnienie):\n- Kim jesteś?\n- Weryfikacja tożsamości (login/hasło, token).\n\nAuthorization (autoryzacja):\n- Co możesz zrobić?\n- Sprawdzenie uprawnień (role, authorities).\n\nAuthentication poprzedza Authorization."
+        },
+        {
+          "id": "spring-27",
+          "q": "Czym jest SecurityContext?",
+          "a": "SecurityContext przechowuje informacje o aktualnie uwierzytelnionym użytkowniku.\n\nZawiera:\n- principal (użytkownik),\n- credentials,\n- authorities.\n\nDomyślnie przechowywany w ThreadLocal."
+        },
+        {
+          "id": "spring-28",
+          "q": "Jak działa JWT w Spring Security?",
+          "a": "JWT (JSON Web Token):\n- Token zawiera zakodowane dane użytkownika.\n- Składa się z header.payload.signature.\n\nProces:\n1. Użytkownik się loguje.\n2. Serwer generuje podpisany token.\n3. Klient wysyła token w nagłówku Authorization.\n4. Serwer weryfikuje podpis i tworzy Authentication.\n\nJWT jest stateless — serwer nie przechowuje sesji."
+        },
+        {
+          "id": "spring-29",
+          "q": "Czym jest OAuth2?",
+          "a": "OAuth2 to protokół autoryzacji.\n\nRole:\n- Resource Owner\n- Client\n- Authorization Server\n- Resource Server\n\nFlow (np. Authorization Code):\n1. Przekierowanie do Authorization Server.\n2. Użytkownik się loguje.\n3. Client otrzymuje authorization code.\n4. Wymienia go na access token.\n\nSpring Security może działać jako Resource Server lub OAuth2 Client."
+        },
+        {
+          "id": "spring-30",
+          "q": "Czym jest CSRF i jak Spring go chroni?",
+          "a": "CSRF (Cross-Site Request Forgery):\n- Atak polegający na wysłaniu żądania w imieniu użytkownika bez jego wiedzy.\n\nSpring generuje CSRF token:\n- Musi być dołączony do żądań modyfikujących (POST/PUT/DELETE).\n- Weryfikowany po stronie serwera.\n\nW aplikacjach stateless (JWT) często wyłączany."
+        },
+        {
+          "id": "spring-31",
+          "q": "Czym jest CORS?",
+          "a": "CORS (Cross-Origin Resource Sharing):\n- Mechanizm przeglądarki kontrolujący dostęp między domenami.\n\nSerwer musi zwrócić odpowiednie nagłówki:\n- Access-Control-Allow-Origin\n- Access-Control-Allow-Methods\n\nSpring pozwala konfigurować CORS globalnie lub per endpoint."
+        },
+        {
+          "id": "spring-32",
+          "q": "Jak bezpiecznie przechowywać hasła?",
+          "a": "Hasła nie powinny być szyfrowane, lecz haszowane.\n\nAlgorytmy:\n- bcrypt\n- argon2\n- scrypt\n\nCechy:\n- Salt (losowa wartość).\n- Koszt obliczeniowy (work factor).\n\nSpring Security dostarcza PasswordEncoder."
+        }
+      ]
+    },
+    {
+      "id": "db",
+      "label": "Bazy Danych / JPA",
+      "cards": [
+        {
+          "id": "db-0",
+          "q": "Czym jest ACID?",
+          "a": "ACID to cztery właściwości transakcji:\n\nAtomicity (Atomowość)\n- Transakcja wykonuje się w całości albo wcale.\n- W przypadku błędu następuje rollback.\n\nConsistency (Spójność)\n- Po zakończeniu transakcji dane spełniają wszystkie ograniczenia (constraints, reguły biznesowe).\n\nIsolation (Izolacja)\n- Równoległe transakcje nie powinny wpływać na siebie w sposób łamiący spójność.\n\nDurability (Trwałość)\n- Po commit dane są zapisane trwale (np. w WAL — Write-Ahead Log)."
+        },
+        {
+          "id": "db-1",
+          "q": "Czym są poziomy izolacji i jakie anomalie eliminują?",
+          "a": "READ_UNCOMMITTED\n- Pozwala na dirty reads (odczyt niezatwierdzonych danych).\n\nREAD_COMMITTED\n- Brak dirty reads.\n- Możliwe non-repeatable reads.\n\nREPEATABLE_READ\n- Brak dirty reads.\n- Brak non-repeatable reads.\n- Możliwe phantom reads.\n\nSERIALIZABLE\n- Najwyższa izolacja.\n- Eliminuje wszystkie powyższe anomalie.\n- Najmniej wydajny.\n\nAnomalie:\n- Dirty read — odczyt danych, które mogą zostać wycofane.\n- Non-repeatable read — ten sam rekord zwraca różne wartości.\n- Phantom read — nowe rekordy pojawiają się w zakresie zapytania."
+        },
+        {
+          "id": "db-2",
+          "q": "Czym jest optimistic locking?",
+          "a": "Optimistic locking zakłada, że konflikt jest rzadki.\n\nMechanizm:\n- Wiersz posiada pole version.\n- Przy update sprawdzana jest wersja.\n- Jeśli zmieniła się — wyjątek (OptimisticLockException).\n\nBrak blokad na poziomie bazy."
+        },
+        {
+          "id": "db-3",
+          "q": "Czym jest pessimistic locking?",
+          "a": "Pessimistic locking zakłada, że konflikt jest prawdopodobny.\n\nMechanizm:\n- SELECT ... FOR UPDATE\n- Wiersz jest blokowany.\n- Inne transakcje czekają.\n\nWiększe bezpieczeństwo, mniejsza skalowalność."
+        },
+        {
+          "id": "db-4",
+          "q": "Czym jest indeks i jak działa B-Tree?",
+          "a": "Indeks to struktura danych przyspieszająca wyszukiwanie.\n\nB-Tree:\n- Samobalansujące drzewo.\n- Każdy węzeł zawiera wiele kluczy.\n- Wyszukiwanie w czasie O(log n).\n\nIndeks przyspiesza SELECT, ale spowalnia INSERT/UPDATE."
+        },
+        {
+          "id": "db-5",
+          "q": "Czym jest execution plan?",
+          "a": "Execution plan to plan wykonania zapytania generowany przez optimizer.\n\nZawiera:\n- sposób użycia indeksów,\n- join strategy (nested loop, hash join),\n- koszt operacji.\n\nAnalizowany przez EXPLAIN."
+        },
+        {
+          "id": "db-6",
+          "q": "Czym jest connection pool?",
+          "a": "Connection pool zarządza pulą połączeń do bazy.\n\nZamiast tworzyć połączenie przy każdym zapytaniu:\n- połączenia są utrzymywane i ponownie wykorzystywane.\n\nNajpopularniejszy: HikariCP.\n\nParametry:\n- maximumPoolSize\n- connectionTimeout\n- idleTimeout\n\nZmniejsza koszt tworzenia połączeń.\n\n\n---\n\n## 2️⃣ JPA Internals"
+        },
+        {
+          "id": "db-7",
+          "q": "Czym jest Persistence Context?",
+          "a": "Persistence Context to kontekst zarządzania encjami przez EntityManager.\n\nZawiera:\n- zarządzane encje (managed entities),\n- mechanizm śledzenia zmian,\n- cache pierwszego poziomu.\n\nKażda encja w kontekście ma tylko jedną reprezentację (identity guarantee)."
+        },
+        {
+          "id": "db-8",
+          "q": "Jakie są stany encji w JPA?",
+          "a": "1. Transient — nowa encja, niezarządzana.\n2. Managed — zarządzana przez Persistence Context.\n3. Detached — była zarządzana, ale kontekst został zamknięty.\n4. Removed — oznaczona do usunięcia.\n\nTylko encje Managed podlegają dirty checking."
+        },
+        {
+          "id": "db-9",
+          "q": "Czym jest 1st level cache?",
+          "a": "1st level cache to cache w ramach Persistence Context.\n\nCechy:\n- Domyślnie włączony.\n- Unikalna instancja encji na klucz.\n- Zapobiega wielokrotnym zapytaniom do DB w jednej transakcji.\n\nJest powiązany z EntityManager."
+        },
+        {
+          "id": "db-10",
+          "q": "Czym jest dirty checking?",
+          "a": "Dirty checking to mechanizm automatycznego wykrywania zmian w encjach.\n\nProces:\n1. Przy załadowaniu encji tworzony jest snapshot.\n2. Przy flush porównywany jest aktualny stan z snapshotem.\n3. Jeśli są różnice — generowany jest UPDATE.\n\nDziała tylko dla encji Managed."
+        },
+        {
+          "id": "db-11",
+          "q": "Czym jest flush?",
+          "a": "Flush synchronizuje stan Persistence Context z bazą danych.\n\nNie oznacza commit.\n\nMoże nastąpić:\n- automatycznie przed zapytaniem JPQL,\n- przy commit,\n- ręcznie (entityManager.flush())."
+        },
+        {
+          "id": "db-12",
+          "q": "Czym jest N+1 problem?",
+          "a": "N+1 występuje gdy:\n- Pobieramy listę encji (1 zapytanie),\n- Dla każdej wykonywane jest osobne zapytanie (N zapytań).\n\nPowód:\n- Lazy loading relacji.\n\nRozwiązania:\n- JOIN FETCH\n- EntityGraph\n- Batch fetching"
+        },
+        {
+          "id": "db-13",
+          "q": "Czym różni się FetchType.LAZY od EAGER?",
+          "a": "LAZY:\n- Relacja ładowana przy pierwszym użyciu.\n- Domyślne dla @OneToMany.\n\nEAGER:\n- Relacja ładowana od razu.\n- Może powodować nadmiarowe zapytania.\n\nEAGER często prowadzi do problemów wydajnościowych."
+        },
+        {
+          "id": "db-14",
+          "q": "Czym jest LazyInitializationException?",
+          "a": "Występuje gdy:\n- Próbujemy odczytać relację LAZY,\n- Po zamknięciu Persistence Context.\n\nTypowy przypadek:\n- Dostęp do relacji poza transakcją.\n\nRozwiązania:\n- DTO projection,\n- JOIN FETCH,\n- OpenSessionInView (niezalecane w architekturze czystej).\n\n\n---\n\n## 3️⃣ SQL vs NoSQL i Architektoniczne Aspekty Danych"
+        },
+        {
+          "id": "db-15",
+          "q": "Czym jest normalizacja i denormalizacja?",
+          "a": "Normalizacja:\n- Proces organizowania danych w celu eliminacji redundancji.\n- Dane podzielone na wiele tabel.\n- Spójność i mniejsze ryzyko anomalii aktualizacji.\n\nDenormalizacja:\n- Celowe wprowadzanie redundancji.\n- Mniej joinów.\n- Lepsza wydajność odczytu kosztem spójności i większej złożoności zapisu.\n\nSystemy OLTP → zwykle normalizacja.\nSystemy analityczne / read-heavy → często denormalizacja."
+        },
+        {
+          "id": "db-16",
+          "q": "Czym jest twierdzenie CAP?",
+          "a": "CAP mówi, że w systemie rozproszonym można mieć maksymalnie dwie z trzech cech:\n\nConsistency — wszystkie węzły widzą te same dane w tym samym czasie.\nAvailability — każdy request otrzymuje odpowiedź.\nPartition Tolerance — system działa mimo podziałów sieci.\n\nW praktyce w systemach rozproszonych zawsze zakładamy Partition Tolerance.\n\nWybór jest więc między:\n- CP (Consistency + Partition Tolerance)\n- AP (Availability + Partition Tolerance)"
+        },
+        {
+          "id": "db-17",
+          "q": "Czym różni się SQL od NoSQL?",
+          "a": "SQL:\n- Relacyjny model danych.\n- Silna spójność.\n- Transakcje ACID.\n- Schemat zdefiniowany z góry.\n\nNoSQL:\n- Dokumentowe, klucz-wartość, kolumnowe, grafowe.\n- Często eventual consistency.\n- Elastyczny schemat.\n- Łatwiejsze skalowanie poziome.\n\nSQL lepszy dla:\n- złożonych relacji,\n- transakcji finansowych.\n\nNoSQL lepszy dla:\n- dużej skali,\n- dynamicznych struktur danych,\n- systemów event-driven."
+        },
+        {
+          "id": "db-18",
+          "q": "Czym jest eventual consistency?",
+          "a": "Eventual consistency oznacza, że:\n- System może chwilowo zwracać niespójne dane,\n- Ale ostatecznie wszystkie repliki się zsynchronizują.\n\nTypowe w systemach AP.\n\nWymaga projektowania systemu z myślą o:\n- idempotency,\n- retry,\n- mechanizmach kompensacji."
+        },
+        {
+          "id": "db-19",
+          "q": "Czym jest replikacja?",
+          "a": "Replikacja to kopiowanie danych na wiele węzłów.\n\nRodzaje:\n- Master-Slave (Primary-Replica).\n- Multi-Master.\n\nZalety:\n- Większa dostępność.\n- Skalowanie odczytu.\n\nWady:\n- Opóźnienia synchronizacji."
+        },
+        {
+          "id": "db-20",
+          "q": "Czym jest sharding?",
+          "a": "Sharding to podział danych między wiele węzłów według klucza (shard key).\n\nCel:\n- Skalowanie zapisu.\n- Skalowanie pojemności.\n\nWyzwania:\n- Wybór shard key.\n- Migracja shardów.\n- Zapytania cross-shard."
+        },
+        {
+          "id": "db-21",
+          "q": "Jak skalować bazę danych?",
+          "a": "Vertical scaling:\n- Więcej CPU/RAM.\n- Ograniczony przez sprzęt.\n\nHorizontal scaling:\n- Replikacja (read scaling).\n- Sharding (write scaling).\n\nW systemach o dużej skali często łączy się oba podejścia."
+        }
+      ]
+    },
+    {
+      "id": "arch",
+      "label": "Architektura",
+      "cards": [
+        {
+          "id": "arch-0",
+          "q": "Czym jest Separation of Concerns?",
+          "a": "Separation of Concerns (SoC) oznacza rozdzielenie systemu na części odpowiedzialne za różne aspekty.\n\nPrzykłady warstw:\n- Warstwa prezentacji\n- Warstwa aplikacyjna\n- Warstwa domenowa\n- Warstwa infrastruktury\n\nCelem jest:\n- mniejsza złożoność,\n- większa testowalność,\n- łatwiejsza wymiana technologii."
+        },
+        {
+          "id": "arch-1",
+          "q": "Czym jest Dependency Inversion Principle?",
+          "a": "Dependency Inversion Principle (DIP):\n\n- Moduły wysokiego poziomu nie powinny zależeć od modułów niskiego poziomu.\n- Oba powinny zależeć od abstrakcji.\n\nPrzykład:\n- Serwis biznesowy zależy od interfejsu Repozytorium.\n- Implementacja repozytorium zależy od bazy danych.\n\nZmniejsza sprzężenie i ułatwia testowanie.\n\n---\n\n## 2️⃣ Clean / Hexagonal / Onion"
+        },
+        {
+          "id": "arch-2",
+          "q": "Czym jest Clean Architecture?",
+          "a": "Clean Architecture dzieli system na warstwy koncentryczne:\n\n- Entities (logika biznesowa)\n- Use Cases\n- Interface Adapters\n- Frameworks & Drivers\n\nZasada:\n- Zależności skierowane do środka.\n- Rdzeń domeny nie zna frameworków."
+        },
+        {
+          "id": "arch-3",
+          "q": "Czym jest Hexagonal Architecture?",
+          "a": "Hexagonal (Ports & Adapters):\n\n- Domena w centrum.\n- Porty (interfejsy) definiują komunikację.\n- Adaptery implementują porty.\n\nPozwala oddzielić:\n- logikę biznesową,\n- technologię (DB, HTTP, messaging)."
+        },
+        {
+          "id": "arch-4",
+          "q": "Czym jest Onion Architecture?",
+          "a": "Onion Architecture:\n- Warstwy koncentryczne.\n- Rdzeń domenowy w środku.\n- Zależności skierowane do środka.\n\nPodobna do Clean i Hexagonal — różni się nazewnictwem i akcentem.\n\n---\n\n## 3️⃣ Domain-Driven Design (DDD)"
+        },
+        {
+          "id": "arch-5",
+          "q": "Czym jest Bounded Context?",
+          "a": "Bounded Context to granica modelu domenowego.\n\nW obrębie kontekstu:\n- Model ma jednoznaczne znaczenie.\n\nMiędzy kontekstami:\n- Możliwe różne definicje tego samego pojęcia.\n\nUłatwia modularność i skalowanie organizacyjne."
+        },
+        {
+          "id": "arch-6",
+          "q": "Czym jest Aggregate?",
+          "a": "Aggregate to klaster encji traktowany jako jedna jednostka spójności.\n\nCechy:\n- Ma Aggregate Root.\n- Tylko Root jest dostępny z zewnątrz.\n- Spójność utrzymywana w obrębie agregatu.\n\nTransakcje powinny obejmować jeden agregat."
+        },
+        {
+          "id": "arch-7",
+          "q": "Czym jest CQRS?",
+          "a": "CQRS (Command Query Responsibility Segregation):\n\n- Oddziela operacje zapisu (Command) od odczytu (Query).\n\nZalety:\n- Możliwość optymalizacji odczytu i zapisu niezależnie.\n- Lepsza skalowalność.\n\nWady:\n- Większa złożoność."
+        },
+        {
+          "id": "arch-8",
+          "q": "Czym jest Event Sourcing?",
+          "a": "Event Sourcing:\n- Stan systemu przechowywany jako sekwencja zdarzeń.\n- Aktualny stan rekonstruowany przez odtworzenie zdarzeń.\n\nZalety:\n- Pełna historia.\n- Audytowalność.\n\nWyzwania:\n- Migracje eventów.\n- Złożoność.\n\n---\n\n## 4️⃣ Modularność i Skalowanie"
+        },
+        {
+          "id": "arch-9",
+          "q": "Czym jest Modular Monolith?",
+          "a": "Modular Monolith:\n- Jedna aplikacja.\n- Silna modularność wewnętrzna.\n- Wyraźne granice między modułami.\n\nZalety:\n- Prostota wdrożenia.\n- Brak kosztów sieciowych.\n\nMoże być etapem przed mikroserwisami."
+        },
+        {
+          "id": "arch-10",
+          "q": "Jak podejmować decyzje architektoniczne?",
+          "a": "Architektura to kompromisy.\n\nNależy analizować:\n- Skalowalność\n- Złożoność\n- Koszt utrzymania\n- Wymagania niefunkcjonalne\n\nNie istnieje jedna \"najlepsza\" architektura — zależy od kontekstu."
+        }
+      ]
+    },
+    {
+      "id": "micro",
+      "label": "Mikroserwisy",
+      "cards": [
+        {
+          "id": "micro-0",
+          "q": "Jak wyznaczać granice mikroserwisów?",
+          "a": "Granice mikroserwisów powinny wynikać z domeny biznesowej, nie z podziału technicznego.\n\nTypowe podejścia:\n- Bounded Context (DDD) jako granica serwisu.\n- Wysoka spójność wewnątrz serwisu, niskie sprzężenie między serwisami.\n\nZły znak:\n- Silne transakcje rozproszone.\n- Wspólna baza danych między serwisami."
+        },
+        {
+          "id": "micro-1",
+          "q": "Synchroniczna vs asynchroniczna komunikacja — kiedy co?",
+          "a": "Synchroniczna (HTTP/gRPC):\n- Prostota.\n- Natychmiastowa odpowiedź.\n- Ryzyko propagacji awarii i większa latencja.\n\nAsynchroniczna (Kafka/RabbitMQ):\n- Luźniejsze powiązania.\n- Lepsza odporność.\n- Eventual consistency.\n- Większa złożoność (idempotency, retry, ordering).\n\nW praktyce często miesza się oba podejścia."
+        },
+        {
+          "id": "micro-2",
+          "q": "Czym jest API Gateway?",
+          "a": "API Gateway to punkt wejścia do systemu mikroserwisów.\n\nFunkcje:\n- routing,\n- auth,\n- rate limiting,\n- agregacja danych,\n- observability.\n\nZaleta:\n- klient nie musi znać topologii mikroserwisów.\n\nRyzyko:\n- single point of failure (trzeba skalować i zabezpieczać).\n\n---\n\n## 2️⃣ Odporność i Stabilność"
+        },
+        {
+          "id": "micro-3",
+          "q": "Czym jest Circuit Breaker?",
+          "a": "Circuit Breaker chroni system przed kaskadową awarią.\n\nStany:\n- Closed — ruch przechodzi.\n- Open — ruch blokowany, szybka porażka (fail fast).\n- Half-open — testowe requesty.\n\nStosowany przy komunikacji synchronicznej."
+        },
+        {
+          "id": "micro-4",
+          "q": "Czym jest retry i jakie są ryzyka?",
+          "a": "Retry to ponawianie żądania po błędzie.\n\nRyzyka:\n- powielanie operacji (brak idempotency),\n- retry storm (wiele usług retry jednocześnie),\n- wzrost obciążenia i pogorszenie awarii.\n\nDobre praktyki:\n- exponential backoff,\n- jitter,\n- limit prób,\n- idempotency key."
+        },
+        {
+          "id": "micro-5",
+          "q": "Czym jest idempotency i jak ją osiągnąć?",
+          "a": "Idempotency oznacza, że wielokrotne wykonanie tej samej operacji daje ten sam efekt.\n\nPrzykład:\n- PUT jest idempotentny,\n- POST zwykle nie.\n\nTechniki:\n- Idempotency-Key przechowywany po stronie serwera,\n- deduplikacja komunikatów,\n- naturalny klucz biznesowy.\n\n---\n\n## 3️⃣ Spójność w systemie rozproszonym"
+        },
+        {
+          "id": "micro-6",
+          "q": "Czym jest Saga?",
+          "a": "Saga to wzorzec realizacji transakcji rozproszonej przez sekwencję lokalnych transakcji.\n\nKażdy krok ma akcję kompensacyjną.\n\nRodzaje:\n- Orchestrated saga — centralny orchestrator.\n- Choreographed saga — serwisy reagują na eventy."
+        },
+        {
+          "id": "micro-7",
+          "q": "Czym jest Outbox Pattern?",
+          "a": "Outbox Pattern rozwiązuje problem atomowości między:\n- zapisem do bazy,\n- publikacją eventu.\n\nMechanizm:\n1. Zapis danych i eventu w tej samej transakcji w DB (tabela outbox).\n2. Osobny proces publikuje eventy do brokera.\n3. Eventy są oznaczane jako wysłane.\n\nZapobiega utracie eventów."
+        },
+        {
+          "id": "micro-8",
+          "q": "Dlaczego współdzielona baza danych między mikroserwisami jest problemem?",
+          "a": "Współdzielona baza:\n- zwiększa sprzężenie,\n- wymusza wspólne wdrożenia,\n- utrudnia niezależną ewolucję schematu,\n- zwiększa ryzyko blokad i konfliktów.\n\nZasada: Database per service.\n\n---\n\n## 4️⃣ Obserwowalność"
+        },
+        {
+          "id": "micro-9",
+          "q": "Czym jest observability w mikroserwisach?",
+          "a": "Observability to zdolność zrozumienia stanu systemu na podstawie sygnałów.\n\nTrzy filary:\n- Logs (najlepiej structured)\n- Metrics (np. Prometheus)\n- Traces (distributed tracing)\n\nBez observability mikroserwisy są trudne w utrzymaniu."
+        }
+      ]
+    },
+    {
+      "id": "comm",
+      "label": "Komunikacja",
+      "cards": [
+        {
+          "id": "comm-0",
+          "q": "Co oznacza idempotency w HTTP i które metody są idempotentne?",
+          "a": "Idempotency oznacza, że wielokrotne wykonanie tego samego requestu daje ten sam efekt końcowy.\n\nMetody idempotentne:\n- GET\n- PUT\n- DELETE (efekt końcowy ten sam: zasób usunięty)\n- HEAD\n- OPTIONS\n\nMetody nie-idempotentne:\n- POST (zwykle tworzy nowy zasób przy każdym wywołaniu).\n\nIdempotency jest kluczowa dla retry."
+        },
+        {
+          "id": "comm-1",
+          "q": "Jakie są najważniejsze klasy kodów HTTP i jak ich używać?",
+          "a": "2xx — sukces\n- 200 OK\n- 201 Created\n- 204 No Content\n\n3xx — przekierowania\n- 301/302\n\n4xx — błąd klienta\n- 400 Bad Request\n- 401 Unauthorized (brak uwierzytelnienia)\n- 403 Forbidden (brak uprawnień)\n- 404 Not Found\n- 409 Conflict\n\n5xx — błąd serwera\n- 500 Internal Server Error\n- 503 Service Unavailable\n\nPoprawne statusy zwiększają czytelność API i ułatwiają integracje."
+        },
+        {
+          "id": "comm-2",
+          "q": "Czym jest caching w HTTP?",
+          "a": "Caching pozwala ograniczyć liczbę requestów i poprawić wydajność.\n\nMechanizmy:\n- Cache-Control\n- ETag + If-None-Match\n- Last-Modified + If-Modified-Since\n\nETag pozwala na walidację wersji zasobu (304 Not Modified).\n\n---\n\n## 2️⃣ gRPC"
+        },
+        {
+          "id": "comm-3",
+          "q": "Czym jest gRPC i kiedy jest lepsze od REST?",
+          "a": "gRPC:\n- Protokół RPC oparty o HTTP/2.\n- Używa Protobuf.\n- Wspiera streaming.\n\nLepsze niż REST gdy:\n- potrzebujemy niskiej latencji,\n- komunikacja serwis-serwis,\n- silne kontrakty typów,\n- streaming.\n\nREST częściej dla komunikacji z frontendem (łatwiejsze debugowanie i kompatybilność).\n\n---\n\n## 3️⃣ Messaging: Kafka vs RabbitMQ"
+        },
+        {
+          "id": "comm-4",
+          "q": "Kafka vs RabbitMQ — kluczowe różnice",
+          "a": "Kafka:\n- Log zdarzeń (append-only).\n- Konsumenci trzymają offset.\n- Bardzo dobre do streamingu i dużej skali.\n\nRabbitMQ:\n- Klasyczna kolejka.\n- Broker zarządza dostarczaniem.\n- Dobre do task queue i routing.\n\nKafka świetna do event-driven i audytu.\nRabbitMQ świetny do work distribution."
+        },
+        {
+          "id": "comm-5",
+          "q": "Co oznacza at-least-once, at-most-once, exactly-once delivery?",
+          "a": "At-most-once:\n- Wiadomość może zginąć.\n- Nigdy nie będzie duplikatu.\n\nAt-least-once:\n- Wiadomość nie zginie.\n- Mogą pojawić się duplikaty.\n\nExactly-once:\n- Brak utraty i brak duplikatów.\n\nW praktyce exactly-once jest trudne i zwykle osiąga się je przez:\n- idempotency,\n- deduplikację,\n- transakcyjność brokera/producenta."
+        },
+        {
+          "id": "comm-6",
+          "q": "Jak radzić sobie z duplikatami wiadomości?",
+          "a": "Ponieważ at-least-once jest częste, system powinien tolerować duplikaty.\n\nTechniki:\n- deduplikacja po messageId / idempotency key,\n- \"upsert\" zamiast \"insert\",\n- przechowywanie historii przetworzonych eventów."
+        },
+        {
+          "id": "comm-7",
+          "q": "Czym jest ordering i dlaczego jest trudny?",
+          "a": "Ordering oznacza zachowanie kolejności zdarzeń.\n\nWyzwania:\n- partycje w Kafka — ordering jest gwarantowany tylko w obrębie partycji.\n- równoległe konsumpcje.\n\nRozwiązanie:\n- klucz partycji oparty o agregat (np. aggregateId).\n\n---\n\n## 4️⃣ Schema Evolution"
+        },
+        {
+          "id": "comm-8",
+          "q": "Czym jest schema evolution?",
+          "a": "Schema evolution to zmiana formatu danych bez psucia kompatybilności.\n\nDobre praktyki:\n- dodawanie pól jako opcjonalne,\n- unikanie zmiany znaczenia pól,\n- wersjonowanie kontraktów.\n\nProtobuf/Avro wspierają kompatybilne zmiany lepiej niż \"goły\" JSON."
+        }
+      ]
+    },
+    {
+      "id": "devops",
+      "label": "DevOps / Kubernetes",
+      "cards": [
+        {
+          "id": "devops-0",
+          "q": "Czym jest kontener (Docker) i czym różni się od VM?",
+          "a": "Kontener:\n- Izoluje procesy na poziomie systemu operacyjnego (namespaces, cgroups).\n- Współdzieli kernel z hostem.\n- Jest lekki i szybko startuje.\n\nVM:\n- Wirtualizuje sprzęt.\n- Każda VM ma własny system operacyjny.\n- Jest cięższa i wolniej startuje.\n\nKontenery są lepsze do skalowania aplikacji, VM częściej do silnej izolacji."
+        },
+        {
+          "id": "devops-1",
+          "q": "Co powinno znaleźć się w dobrym Dockerfile dla aplikacji Java?",
+          "a": "Dobre praktyki:\n- Multi-stage build (osobno build i runtime).\n- Użycie lekkiego obrazu runtime (np. JRE zamiast JDK).\n- Uruchamianie jako non-root.\n- Stabilne warstwy (kopiuj najpierw pliki zależności, potem kod).\n- Parametry JVM dostosowane do kontenera (pamięć, GC).\n\nCel: mały obraz, szybki build, bezpieczeństwo.\n\n---\n\n## 2️⃣ CI/CD"
+        },
+        {
+          "id": "devops-2",
+          "q": "Czym jest CI/CD i jakie są typowe etapy pipeline?",
+          "a": "CI (Continuous Integration):\n- Częste integrowanie zmian.\n- Automatyczne budowanie i testy.\n\nCD (Continuous Delivery/Deployment):\n- Automatyczne dostarczanie na środowiska.\n- Deployment — automatyczne wdrożenie na produkcję.\n\nTypowe etapy:\n- build\n- unit tests\n- static analysis (np. Sonar)\n- integration tests (np. Testcontainers)\n- package (jar/docker)\n- deploy\n\n---\n\n## 3️⃣ Monitoring i Observability"
+        },
+        {
+          "id": "devops-3",
+          "q": "Czym różni się monitoring od observability?",
+          "a": "Monitoring:\n- Sprawdza znane metryki i alertuje na znane problemy.\n\nObservability:\n- Umożliwia diagnozę nieznanych problemów na podstawie sygnałów.\n\nTrzy filary observability:\n- Logs\n- Metrics\n- Traces"
+        },
+        {
+          "id": "devops-4",
+          "q": "Co to jest structured logging i dlaczego jest ważny?",
+          "a": "Structured logging to logowanie w formacie maszynowo czytelnym (np. JSON), z polami:\n- timestamp\n- level\n- message\n- traceId\n- spanId\n- userId / requestId\n\nUłatwia:\n- filtrowanie,\n- agregację,\n- korelację logów w systemach rozproszonych."
+        },
+        {
+          "id": "devops-5",
+          "q": "Czym jest distributed tracing?",
+          "a": "Distributed tracing śledzi przebieg jednego requestu przez wiele usług.\n\nPojęcia:\n- Trace — całe żądanie end-to-end.\n- Span — pojedynczy krok (np. HTTP call, DB query).\n\nWymaga propagacji:\n- traceId\n- spanId\n\nPozwala diagnozować:\n- wąskie gardła,\n- opóźnienia,\n- błędy w komunikacji.\n\n---\n\n## 4️⃣ Health Checks i Deploy"
+        },
+        {
+          "id": "devops-6",
+          "q": "Czym różni się liveness od readiness?",
+          "a": "Liveness:\n- Czy aplikacja żyje (nie zawiesiła się)?\n- Jeśli nie — restart.\n\nReadiness:\n- Czy aplikacja jest gotowa przyjmować ruch?\n- Jeśli nie — wyłączenie z load balancera (bez restartu).\n\nW Kubernetes są to osobne probe."
+        },
+        {
+          "id": "devops-7",
+          "q": "Blue/Green vs Canary — czym się różnią?",
+          "a": "Blue/Green:\n- Dwa środowiska: stare (blue) i nowe (green).\n- Przełączenie ruchu na green.\n- Szybki rollback przez powrót na blue.\n\nCanary:\n- Nowa wersja dostaje mały procent ruchu.\n- Stopniowe zwiększanie.\n- Pozwala wykryć problemy zanim dotkną wszystkich.\n\n---\n\n## 5️⃣ Skalowanie"
+        },
+        {
+          "id": "devops-8",
+          "q": "Horizontal vs Vertical scaling — różnice i konsekwencje",
+          "a": "Vertical scaling:\n- Większa maszyna (CPU/RAM).\n- Proste, ale ma limit sprzętowy.\n\nHorizontal scaling:\n- Więcej instancji.\n- Wymaga stateless aplikacji lub zewnętrznego stanu.\n- Lepsza dostępność i skalowalność.\n\nW praktyce preferuje się horizontal scaling."
+        }
+      ]
+    },
+    {
+      "id": "sec",
+      "label": "Bezpieczeństwo",
+      "cards": [
+        {
+          "id": "sec-0",
+          "q": "Czym różni się szyfrowanie od haszowania?",
+          "a": "Szyfrowanie:\n- Proces odwracalny.\n- Używa klucza do zaszyfrowania i odszyfrowania danych.\n- Stosowane do ochrony poufności (np. TLS).\n\nHaszowanie:\n- Proces nieodwracalny.\n- Generuje skrót o stałej długości.\n- Stosowane do przechowywania haseł.\n\nHasło nie powinno być szyfrowane — powinno być haszowane."
+        },
+        {
+          "id": "sec-1",
+          "q": "Czym jest salt i dlaczego jest ważny?",
+          "a": "Salt to losowa wartość dodawana do hasła przed haszowaniem.\n\nZapobiega:\n- atakom rainbow table,\n- identycznym hashom dla tych samych haseł.\n\nKażde hasło powinno mieć unikalny salt.\n\n---\n\n## 2️⃣ TLS i Transport"
+        },
+        {
+          "id": "sec-2",
+          "q": "Jak działa TLS w skrócie?",
+          "a": "TLS zapewnia poufność i integralność komunikacji.\n\nProces:\n1. Handshake.\n2. Wymiana kluczy (asymetryczna kryptografia).\n3. Ustalenie klucza symetrycznego.\n4. Szyfrowana komunikacja.\n\nChroni przed:\n- podsłuchem,\n- modyfikacją danych.\n\n---\n\n## 3️⃣ OWASP i Najczęstsze Ataki"
+        },
+        {
+          "id": "sec-3",
+          "q": "Czym jest SQL Injection?",
+          "a": "SQL Injection to wstrzyknięcie złośliwego kodu SQL do zapytania.\n\nPrzyczyna:\n- Konkatenacja stringów zamiast parametrów.\n\nZapobieganie:\n- PreparedStatement,\n- ORM,\n- walidacja danych."
+        },
+        {
+          "id": "sec-4",
+          "q": "Czym jest XSS?",
+          "a": "XSS (Cross-Site Scripting):\n- Wstrzyknięcie złośliwego skryptu do strony.\n\nRodzaje:\n- Stored\n- Reflected\n- DOM-based\n\nZapobieganie:\n- Escaping danych,\n- CSP (Content Security Policy)."
+        },
+        {
+          "id": "sec-5",
+          "q": "Czym jest CSRF?",
+          "a": "CSRF (Cross-Site Request Forgery):\n- Wysłanie żądania w imieniu zalogowanego użytkownika bez jego wiedzy.\n\nOchrona:\n- CSRF token,\n- SameSite cookies.\n\n---\n\n## 4️⃣ Autoryzacja i Dostęp"
+        },
+        {
+          "id": "sec-6",
+          "q": "Czym jest RBAC vs ABAC?",
+          "a": "RBAC (Role-Based Access Control):\n- Uprawnienia przypisane do ról.\n\nABAC (Attribute-Based Access Control):\n- Decyzja na podstawie atrybutów (rola, czas, lokalizacja).\n\nABAC daje większą elastyczność kosztem złożoności."
+        },
+        {
+          "id": "sec-7",
+          "q": "Jak zabezpieczać sekrety w systemie?",
+          "a": "Nie powinny być:\n- w kodzie,\n- w repozytorium,\n- w obrazach Docker.\n\nPowinny być:\n- w Secret Manager (Vault, AWS Secrets Manager),\n- w zmiennych środowiskowych,\n- rotowane cyklicznie.\n\nZasada: najmniejsze możliwe uprawnienia (least privilege)."
+        }
+      ]
+    },
+    {
+      "id": "test",
+      "label": "Testowanie",
+      "cards": [
+        {
+          "id": "test-0",
+          "q": "Czym różni się test jednostkowy od integracyjnego?",
+          "a": "Test jednostkowy (unit test):\n- Testuje pojedynczą klasę lub metodę.\n- Izoluje zależności (mocki, stuby).\n- Szybki i deterministyczny.\n\nTest integracyjny:\n- Testuje współpracę komponentów.\n- Może używać prawdziwej bazy, brokera, kontekstu Spring.\n- Wolniejszy, ale bliższy rzeczywistości."
+        },
+        {
+          "id": "test-1",
+          "q": "Czym jest test end-to-end (E2E)?",
+          "a": "Test E2E testuje cały system jako całość.\n\n- Obejmuje warstwę HTTP, bazę danych, integracje.\n- Symuluje zachowanie użytkownika.\n- Najbardziej realistyczny, ale najwolniejszy i najbardziej kruchy.\n\n---\n\n## 2️⃣ Mockowanie i Izolacja"
+        },
+        {
+          "id": "test-2",
+          "q": "Czym jest mock, stub i spy?",
+          "a": "Mock:\n- Obiekt symulujący zachowanie zależności.\n- Pozwala weryfikować interakcje.\n\nStub:\n- Zwraca z góry ustalone dane.\n- Nie weryfikuje interakcji.\n\nSpy:\n- Częściowo prawdziwy obiekt.\n- Pozwala nadpisać wybrane metody."
+        },
+        {
+          "id": "test-3",
+          "q": "Kiedy mockowanie jest złym pomysłem?",
+          "a": "- Gdy test staje się testem implementacji zamiast zachowania.\n- Gdy mockujemy zbyt wiele zależności.\n- Gdy test jest kruchy przy refaktorze.\n\nPreferować testowanie zachowania, nie implementacji.\n\n---\n\n## 3️⃣ Testy Integracyjne i Środowisko"
+        },
+        {
+          "id": "test-4",
+          "q": "Czym jest Testcontainers i dlaczego jest użyteczny?",
+          "a": "Testcontainers pozwala uruchomić prawdziwe zależności (DB, Kafka) w Dockerze podczas testów.\n\nZalety:\n- Realne środowisko.\n- Brak zależności od lokalnej konfiguracji.\n- Reproducibility."
+        },
+        {
+          "id": "test-5",
+          "q": "Czym jest Contract Testing?",
+          "a": "Contract Testing weryfikuje zgodność między serwisami.\n\n- Consumer definiuje kontrakt.\n- Provider musi go spełniać.\n\nZapobiega breaking changes w mikroserwisach.\n\n---\n\n## 4️⃣ Zaawansowane Techniki"
+        },
+        {
+          "id": "test-6",
+          "q": "Czym jest TDD?",
+          "a": "TDD (Test-Driven Development):\n\n1. Napisz test.\n2. Napisz minimalny kod, by test przeszedł.\n3. Refaktor.\n\nCel:\n- Lepszy design.\n- Większa pewność zmian."
+        },
+        {
+          "id": "test-7",
+          "q": "Czym jest property-based testing?",
+          "a": "Property-based testing polega na testowaniu ogólnych właściwości funkcji zamiast konkretnych przypadków.\n\nPrzykład:\n- Funkcja sortująca powinna zwracać listę uporządkowaną rosnąco.\n\nGenerowane są losowe dane wejściowe."
+        },
+        {
+          "id": "test-8",
+          "q": "Czym jest mutation testing?",
+          "a": "Mutation testing sprawdza jakość testów poprzez wprowadzanie małych zmian w kodzie (mutacje).\n\nJeśli testy nie wykryją zmiany — są niewystarczające.\n\nPozwala ocenić skuteczność testów, nie tylko ich pokrycie."
+        }
+      ]
+    },
+    {
+      "id": "perf",
+      "label": "Performance",
+      "cards": [
+        {
+          "id": "perf-0",
+          "q": "Czym różni się latency od throughput?",
+          "a": "Latency:\n- Czas obsługi pojedynczego żądania.\n- Mierzona np. w milisekundach.\n\nThroughput:\n- Liczba obsłużonych żądań w jednostce czasu.\n- Mierzona np. w requests/second.\n\nSystem może mieć:\n- niską latency i niski throughput,\n- wysoką latency i wysoki throughput.\n\nOptymalizacja zależy od wymagań biznesowych."
+        },
+        {
+          "id": "perf-1",
+          "q": "Czym jest bottleneck i jak go znaleźć?",
+          "a": "Bottleneck to element systemu ograniczający wydajność całości.\n\nMoże to być:\n- CPU,\n- baza danych,\n- I/O,\n- lock contention,\n- sieć.\n\nIdentyfikacja:\n- Profilowanie CPU,\n- analiza metryk,\n- distributed tracing,\n- analiza GC.\n\nOptymalizuje się wąskie gardło, nie wszystko naraz.\n\n---\n\n## 2️⃣ JVM Profilowanie"
+        },
+        {
+          "id": "perf-2",
+          "q": "Czym jest heap dump i kiedy go używać?",
+          "a": "Heap dump to zrzut pamięci heap w danym momencie.\n\nUżywany do:\n- analizy wycieków pamięci,\n- identyfikacji dużych obiektów,\n- analizy referencji.\n\nNarzędzia:\n- VisualVM\n- Eclipse MAT"
+        },
+        {
+          "id": "perf-3",
+          "q": "Czym jest thread dump?",
+          "a": "Thread dump pokazuje stan wszystkich wątków.\n\nUżywany do:\n- analizy deadlock,\n- blokad,\n- wysokiego zużycia CPU.\n\nZawiera stack trace każdego wątku."
+        },
+        {
+          "id": "perf-4",
+          "q": "Jak działa Garbage Collection i kiedy może być problemem?",
+          "a": "GC usuwa nieosiągalne obiekty.\n\nProblem gdy:\n- długie pauzy (Stop-The-World),\n- zbyt częste kolekcje,\n- wysokie allocation rate.\n\nRozwiązania:\n- zmiana GC (G1, ZGC),\n- tuning heap size,\n- zmniejszenie tworzenia obiektów.\n\n---\n\n## 3️⃣ Analiza Algorytmiczna"
+        },
+        {
+          "id": "perf-5",
+          "q": "Dlaczego Big-O jest ważne w systemach backendowych?",
+          "a": "Big-O opisuje złożoność algorytmu względem rozmiaru danych.\n\nPrzykład:\n- O(1) — stały czas,\n- O(log n) — logarytmiczny,\n- O(n) — liniowy,\n- O(n²) — kwadratowy.\n\nPrzy dużej skali różnice stają się krytyczne.\n\n---\n\n## 4️⃣ Load Testing"
+        },
+        {
+          "id": "perf-6",
+          "q": "Czym jest load testing i czym różni się od stress testing?",
+          "a": "Load testing:\n- Test przy oczekiwanym obciążeniu.\n- Sprawdza czy system spełnia SLA.\n\nStress testing:\n- Test powyżej zakładanego obciążenia.\n- Sprawdza jak system zachowuje się przy przeciążeniu.\n\nCelem jest poznanie granic systemu i jego zachowania w awarii."
+        }
+      ]
+    },
+    {
+      "id": "sys",
+      "label": "System Design",
+      "cards": [
+        {
+          "id": "sys-0",
+          "q": "Czym są trade-offs w architekturze?",
+          "a": "Każda decyzja architektoniczna to kompromis między:\n- wydajnością,\n- skalowalnością,\n- złożonością,\n- kosztem utrzymania,\n- czasem dostarczenia.\n\nNie istnieje rozwiązanie idealne — istnieje rozwiązanie najlepsze w danym kontekście.\n\nArchitekt powinien jasno rozumieć konsekwencje wyborów."
+        },
+        {
+          "id": "sys-1",
+          "q": "Jak rozumieć CAP w praktyce projektowej?",
+          "a": "W systemach rozproszonych Partition Tolerance jest obowiązkowe.\n\nPozostaje wybór między:\n- Consistency (CP)\n- Availability (AP)\n\nSystem finansowy → preferuje CP.\nSystem social media → często AP.\n\nProjekt musi uwzględniać konsekwencje chwilowej niespójności.\n\n---\n\n## 2️⃣ Projektowanie pod Skalę"
+        },
+        {
+          "id": "sys-2",
+          "q": "Czym jest skalowalność funkcjonalna vs techniczna?",
+          "a": "Skalowalność techniczna:\n- Więcej instancji, więcej zasobów.\n\nSkalowalność funkcjonalna:\n- Możliwość rozwijania systemu bez eksplozji złożoności.\n- Modularność, bounded contexts.\n\nObie są kluczowe dla systemów długowiecznych."
+        },
+        {
+          "id": "sys-3",
+          "q": "Czym jest latency budget?",
+          "a": "Latency budget to maksymalny czas odpowiedzi systemu rozłożony na komponenty.\n\nPrzykład:\n- API ma 300ms SLA.\n- DB może użyć 100ms.\n- Zewnętrzny serwis 80ms.\n- Reszta to logika.\n\nPomaga kontrolować zależności i unikać kaskadowych opóźnień.\n\n---\n\n## 3️⃣ Projektowanie na Awarię"
+        },
+        {
+          "id": "sys-4",
+          "q": "Co oznacza \"design for failure\"?",
+          "a": "W systemach rozproszonych zakładamy, że:\n- sieć zawiedzie,\n- serwis zawiedzie,\n- baza zawiedzie.\n\nSystem powinien:\n- degradować się łagodnie (graceful degradation),\n- mieć timeouty,\n- mieć retry z ograniczeniami,\n- stosować circuit breaker."
+        },
+        {
+          "id": "sys-5",
+          "q": "Czym jest graceful degradation?",
+          "a": "Graceful degradation oznacza, że przy awarii części systemu:\n- system nadal działa,\n- ale z ograniczoną funkcjonalnością.\n\nPrzykład:\n- brak rekomendacji, ale działa koszyk zakupowy.\n\n---\n\n## 4️⃣ Backpressure i Przepływ Danych"
+        },
+        {
+          "id": "sys-6",
+          "q": "Czym jest backpressure na poziomie systemowym?",
+          "a": "Backpressure to kontrola przepływu danych między komponentami.\n\nBez backpressure:\n- kolejki rosną,\n- pamięć się wyczerpuje,\n- system się zapada.\n\nMechanizmy:\n- bounded queues,\n- rate limiting,\n- reactive streams (request(n)).\n\n---\n\n## 5️⃣ Failure Modes i Analiza Ryzyka"
+        },
+        {
+          "id": "sys-7",
+          "q": "Jak analizować failure modes systemu?",
+          "a": "Należy zidentyfikować:\n- pojedyncze punkty awarii (SPOF),\n- zależności zewnętrzne,\n- operacje długotrwałe,\n- miejsca blokad.\n\nStosowane techniki:\n- Chaos engineering,\n- testy awarii,\n- analiza scenariuszy (\"what if\").\n\nCelem jest zwiększenie odporności systemu.\n\n---\n\n## 6️⃣ Myślenie Długoterminowe"
+        },
+        {
+          "id": "sys-8",
+          "q": "Jak podejmować decyzje technologiczne długoterminowo?",
+          "a": "Należy brać pod uwagę:\n- dojrzałość technologii,\n- wsparcie społeczności,\n- koszt utrzymania,\n- łatwość rekrutacji,\n- vendor lock-in.\n\nNajlepsza technologia to taka, którą zespół potrafi utrzymać przez lata."
+        }
+      ]
+    }
+  ]
+}
