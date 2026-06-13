@@ -426,3 +426,51 @@ Horizontal scaling:
 
 W systemach o dużej skali często łączy się oba podejścia.
 
+---
+
+#### 🔹 23. Czym jest WAL (Write-Ahead Log)?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+WAL to technika, w której każda zmiana jest najpierw zapisywana do logu sekwencyjnego, zanim trafi do właściwych plików danych.
+
+Zapewnia:
+- trwałość (Durability) — nawet przy crashu dane są odtwarzalne,
+- atomowość — rollback przez odczyt logu,
+- podstawę dla replikacji (streaming WAL do replik).
+
+PostgreSQL, MySQL (binlog) i większość baz używa tej techniki.
+
+---
+
+#### 🔹 24. Czym są read replicas i kiedy je stosować?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+Read replica to kopia bazy danych synchronizowana asynchronicznie z primary.
+
+Zastosowania:
+- odciążenie primary od zapytań analitycznych,
+- skalowanie odczytu (read-heavy workloads),
+- backup i raportowanie.
+
+Wyzwania:
+- replication lag — replika może być nieaktualna,
+- nie nadają się do odczytów wymagających świeżych danych (np. po zapisie).
+
+---
+
+#### 🔹 25. Jak prawidłowo skonfigurować connection pool?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+Connection pool utrzymuje gotowe połączenia do bazy — tworzenie połączenia TCP jest kosztowne.
+
+Kluczowe parametry (np. HikariCP):
+- `maximumPoolSize` — max liczba połączeń (zazwyczaj: liczba CPU * 2 + dyski),
+- `minimumIdle` — minimalna liczba bezczynnych połączeń,
+- `connectionTimeout` — jak długo czekać na wolne połączenie,
+- `idleTimeout` — jak długo trzymać bezczynne połączenie.
+
+Zbyt duży pool ≠ lepiej: baza ma limity, a zbyt wiele połączeń powoduje context switching po stronie bazy.
+

@@ -210,3 +210,226 @@ Należy analizować:
 
 Nie istnieje jedna "najlepsza" architektura — zależy od kontekstu.
 
+---
+
+#### 🔹 12. Czym jest Open/Closed Principle?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+OCP: klasa powinna być otwarta na rozszerzenie, zamknięta na modyfikację.
+
+Praktycznie:
+- nowe zachowanie dodajemy przez nowe implementacje interfejsów lub dziedziczenie,
+- nie modyfikujemy istniejącego, przetestowanego kodu.
+
+Narzędzia: polimorfizm, strategia, dekorator.
+
+---
+
+#### 🔹 13. Czym jest Liskov Substitution Principle?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+LSP: obiekt podklasy musi dać się użyć wszędzie tam, gdzie używana jest klasa bazowa, bez zmiany poprawności programu.
+
+Naruszenie LSP:
+- podklasa wyrzuca wyjątek zamiast realizować kontrakt,
+- podklasa osłabia warunki wstępne lub wzmacnia warunki końcowe.
+
+Dobry test: czy możesz podmienić implementację bez zmiany kodu klienckiego?
+
+---
+
+#### 🔹 14. Czym jest Interface Segregation Principle?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+ISP: lepiej mieć wiele małych, wyspecjalizowanych interfejsów niż jeden duży.
+
+Problem z grubym interfejsem:
+- implementacje muszą dostarczyć metody, które nie mają sensu w ich kontekście,
+- zmiany w jednej metodzie wpływają na wszystkich implementatorów.
+
+---
+
+#### 🔹 15. Czym różni się Value Object od Entity?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+Entity:
+- ma unikalną tożsamość (ID),
+- równość oparta na ID,
+- ma cykl życia i może się mutować.
+
+Value Object:
+- nie ma tożsamości,
+- równość oparta na wartościach pól,
+- niemutowalny,
+- przykłady: Money, Address, Email.
+
+VO są bezpieczne wielowątkowo i eliminują błędy związane z tożsamością.
+
+---
+
+#### 🔹 16. Czym jest Domain Event?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+Domain Event to zdarzenie opisujące coś, co wydarzyło się w domenie biznesowej.
+
+Cechy:
+- nazwa w czasie przeszłym: `OrderPlaced`, `PaymentReceived`,
+- niesie dane istotne biznesowo,
+- jest niemutowalny.
+
+Zastosowania:
+- dekoupling między agregatami,
+- integracja między Bounded Contexts,
+- podstawa Event Sourcing.
+
+---
+
+#### 🔹 17. Czym jest Anti-Corruption Layer (ACL)?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+ACL to warstwa tłumacząca model zewnętrznego systemu na wewnętrzny model domeny.
+
+Cel:
+- ochrona domeny przed „zanieczyszczeniem" pojęciami obcych systemów,
+- izolacja zmiany — gdy zewnętrzny API się zmieni, zmieniamy tylko ACL.
+
+Typowe miejsca: integracje z legacy systemami, zewnętrznymi API, innymi Bounded Contexts.
+
+---
+
+#### 🔹 18. Czym jest wzorzec Repository?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+Repository to abstrakcja kolekcji agregatu, ukrywająca szczegóły persistencji.
+
+Kontrakt domenowy:
+```
+interface OrderRepository {
+    Order findById(OrderId id);
+    void save(Order order);
+}
+```
+
+Domena nie wie nic o JPA, SQL ani o bazie danych — to zadanie implementacji.
+Pozwala testować logikę domenową bez bazy danych (in-memory implementation).
+
+---
+
+#### 🔹 19. Czym różni się Application Service od Domain Service?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+Domain Service:
+- zawiera logikę domenową, która nie należy do żadnego agregatu,
+- operuje na obiektach domenowych,
+- jest bezstanowy,
+- przykład: `PricingService.calculateDiscount(order, customer)`.
+
+Application Service:
+- orkiestruje przypadek użycia (use case),
+- koordynuje: załaduj z repo → wykonaj logikę → zapisz → opublikuj event,
+- nie zawiera logiki biznesowej — deleguje do domeny,
+- zna infrastrukturę (transakcje, eventy).
+
+---
+
+#### 🔹 20. Czym jest wzorzec Strangler Fig?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+Strangler Fig to strategia stopniowej migracji legacy systemu.
+
+Proces:
+1. Nowe funkcjonalności buduj w nowym systemie.
+2. Stopniowo przenoś istniejące moduły.
+3. Legacy system kurczy się aż zniknie.
+
+Kluczowe: facade/proxy przed starym systemem przekierowuje ruch do nowego.
+
+Alternatywa dla Big Bang rewrite, który prawie zawsze kończy się katastrofą.
+
+---
+
+#### 🔹 21. Czym jest Anemic Domain Model i dlaczego to anty-wzorzec?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+Anemic Domain Model: klasy domenowe zawierają tylko pola i gettery/settery. Cała logika biznesowa jest w serwisach.
+
+Problemy:
+- brak enkapsulacji — każdy może naruszyć niezmienniki,
+- logika rozproszona, trudna do znalezienia,
+- klasy domenowe stają się Data Transfer Object.
+
+Poprawne podejście: agregaty i encje zawierają logikę i chronią swoje niezmienniki metodami.
+
+---
+
+#### 🔹 22. Co to jest Cohesion i Coupling?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+Cohesion (spójność):
+- Ile rzeczy w module naprawdę do siebie należy.
+- Wysoka spójność = moduł ma jedną, wyraźną odpowiedzialność.
+
+Coupling (sprzężenie):
+- Jak mocno moduły zależą od siebie.
+- Niskie sprzężenie = zmiana jednego modułu nie wymaga zmian innych.
+
+Cel: **wysokie cohesion, niskie coupling**.
+
+---
+
+#### 🔹 23. Czym jest Architecture Decision Record (ADR)?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+ADR to krótki dokument opisujący decyzję architektoniczną: kontekst, rozważane opcje, wybór i konsekwencje.
+
+Format (Markdown):
+- **Status**: Accepted / Deprecated
+- **Kontekst**: dlaczego decyzja była potrzebna
+- **Decyzja**: co zdecydowano
+- **Konsekwencje**: co zyskujemy, co tracimy
+
+ADR-y żyją w repo razem z kodem — pozwalają przyszłym deweloperom zrozumieć *dlaczego*, nie tylko *co*.
+
+---
+
+#### 🔹 24. Czym są Feature Flags i do czego służą?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+Feature Flag to przełącznik umożliwiający włączanie/wyłączanie funkcjonalności bez deploy.
+
+Zastosowania:
+- trunk-based development — merge nieukończonej funkcji za flagą,
+- canary release — włącz dla % użytkowników,
+- A/B testy,
+- kill switch dla awarii.
+
+Ryzyko: akumulacja starych flag tworzy dług techniczny — flagi wymagają regularnego czyszczenia.
+
+---
+
+#### 🔹 25. Czym jest Shared Kernel?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+Shared Kernel to fragment modelu domenowego współdzielony przez dwa lub więcej Bounded Contexts.
+
+Cechy:
+- zmiana wymaga zgody wszystkich właścicieli,
+- minimalizować — duży Shared Kernel to ukryta zależność,
+- alternatywa: ACL lub własne kopie danych z mapowaniem.
+
+Shared Kernel jest uzasadniony tylko gdy koszt synchronizacji jest niższy niż koszt duplikacji.
+

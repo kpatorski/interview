@@ -610,6 +610,21 @@
           "id": "db-21",
           "q": "Jak skalować bazę danych?",
           "a": "Vertical scaling:\n- Więcej CPU/RAM.\n- Ograniczony przez sprzęt.\n\nHorizontal scaling:\n- Replikacja (read scaling).\n- Sharding (write scaling).\n\nW systemach o dużej skali często łączy się oba podejścia."
+        },
+        {
+          "id": "db-22",
+          "q": "Czym jest WAL (Write-Ahead Log)?",
+          "a": "WAL to technika, w której każda zmiana jest najpierw zapisywana do logu sekwencyjnego, zanim trafi do właściwych plików danych.\n\nZapewnia:\n- trwałość (Durability) — nawet przy crashu dane są odtwarzalne,\n- atomowość — rollback przez odczyt logu,\n- podstawę dla replikacji (streaming WAL do replik).\n\nPostgreSQL, MySQL (binlog) i większość baz używa tej techniki."
+        },
+        {
+          "id": "db-23",
+          "q": "Czym są read replicas i kiedy je stosować?",
+          "a": "Read replica to kopia bazy danych synchronizowana asynchronicznie z primary.\n\nZastosowania:\n- odciążenie primary od zapytań analitycznych,\n- skalowanie odczytu (read-heavy workloads),\n- backup i raportowanie.\n\nWyzwania:\n- replication lag — replika może być nieaktualna,\n- nie nadają się do odczytów wymagających świeżych danych (np. po zapisie)."
+        },
+        {
+          "id": "db-24",
+          "q": "Jak prawidłowo skonfigurować connection pool?",
+          "a": "Connection pool utrzymuje gotowe połączenia do bazy — tworzenie połączenia TCP jest kosztowne.\n\nKluczowe parametry (np. HikariCP):\n- `maximumPoolSize` — max liczba połączeń (zazwyczaj: liczba CPU * 2 + dyski),\n- `minimumIdle` — minimalna liczba bezczynnych połączeń,\n- `connectionTimeout` — jak długo czekać na wolne połączenie,\n- `idleTimeout` — jak długo trzymać bezczynne połączenie.\n\nZbyt duży pool ≠ lepiej: baza ma limity, a zbyt wiele połączeń powoduje context switching po stronie bazy."
         }
       ]
     },
@@ -671,6 +686,76 @@
           "id": "arch-10",
           "q": "Jak podejmować decyzje architektoniczne?",
           "a": "Architektura to kompromisy.\n\nNależy analizować:\n- Skalowalność\n- Złożoność\n- Koszt utrzymania\n- Wymagania niefunkcjonalne\n\nNie istnieje jedna \"najlepsza\" architektura — zależy od kontekstu."
+        },
+        {
+          "id": "arch-11",
+          "q": "Czym jest Open/Closed Principle?",
+          "a": "OCP: klasa powinna być otwarta na rozszerzenie, zamknięta na modyfikację.\n\nPraktycznie:\n- nowe zachowanie dodajemy przez nowe implementacje interfejsów lub dziedziczenie,\n- nie modyfikujemy istniejącego, przetestowanego kodu.\n\nNarzędzia: polimorfizm, strategia, dekorator."
+        },
+        {
+          "id": "arch-12",
+          "q": "Czym jest Liskov Substitution Principle?",
+          "a": "LSP: obiekt podklasy musi dać się użyć wszędzie tam, gdzie używana jest klasa bazowa, bez zmiany poprawności programu.\n\nNaruszenie LSP:\n- podklasa wyrzuca wyjątek zamiast realizować kontrakt,\n- podklasa osłabia warunki wstępne lub wzmacnia warunki końcowe.\n\nDobry test: czy możesz podmienić implementację bez zmiany kodu klienckiego?"
+        },
+        {
+          "id": "arch-13",
+          "q": "Czym jest Interface Segregation Principle?",
+          "a": "ISP: lepiej mieć wiele małych, wyspecjalizowanych interfejsów niż jeden duży.\n\nProblem z grubym interfejsem:\n- implementacje muszą dostarczyć metody, które nie mają sensu w ich kontekście,\n- zmiany w jednej metodzie wpływają na wszystkich implementatorów."
+        },
+        {
+          "id": "arch-14",
+          "q": "Czym różni się Value Object od Entity?",
+          "a": "Entity:\n- ma unikalną tożsamość (ID),\n- równość oparta na ID,\n- ma cykl życia i może się mutować.\n\nValue Object:\n- nie ma tożsamości,\n- równość oparta na wartościach pól,\n- niemutowalny,\n- przykłady: Money, Address, Email.\n\nVO są bezpieczne wielowątkowo i eliminują błędy związane z tożsamością."
+        },
+        {
+          "id": "arch-15",
+          "q": "Czym jest Domain Event?",
+          "a": "Domain Event to zdarzenie opisujące coś, co wydarzyło się w domenie biznesowej.\n\nCechy:\n- nazwa w czasie przeszłym: `OrderPlaced`, `PaymentReceived`,\n- niesie dane istotne biznesowo,\n- jest niemutowalny.\n\nZastosowania:\n- dekoupling między agregatami,\n- integracja między Bounded Contexts,\n- podstawa Event Sourcing."
+        },
+        {
+          "id": "arch-16",
+          "q": "Czym jest Anti-Corruption Layer (ACL)?",
+          "a": "ACL to warstwa tłumacząca model zewnętrznego systemu na wewnętrzny model domeny.\n\nCel:\n- ochrona domeny przed „zanieczyszczeniem\" pojęciami obcych systemów,\n- izolacja zmiany — gdy zewnętrzny API się zmieni, zmieniamy tylko ACL.\n\nTypowe miejsca: integracje z legacy systemami, zewnętrznymi API, innymi Bounded Contexts."
+        },
+        {
+          "id": "arch-17",
+          "q": "Czym jest wzorzec Repository?",
+          "a": "Repository to abstrakcja kolekcji agregatu, ukrywająca szczegóły persistencji.\n\nKontrakt domenowy:\n```\ninterface OrderRepository {\n    Order findById(OrderId id);\n    void save(Order order);\n}\n```\n\nDomena nie wie nic o JPA, SQL ani o bazie danych — to zadanie implementacji.\nPozwala testować logikę domenową bez bazy danych (in-memory implementation)."
+        },
+        {
+          "id": "arch-18",
+          "q": "Czym różni się Application Service od Domain Service?",
+          "a": "Domain Service:\n- zawiera logikę domenową, która nie należy do żadnego agregatu,\n- operuje na obiektach domenowych,\n- jest bezstanowy,\n- przykład: `PricingService.calculateDiscount(order, customer)`.\n\nApplication Service:\n- orkiestruje przypadek użycia (use case),\n- koordynuje: załaduj z repo → wykonaj logikę → zapisz → opublikuj event,\n- nie zawiera logiki biznesowej — deleguje do domeny,\n- zna infrastrukturę (transakcje, eventy)."
+        },
+        {
+          "id": "arch-19",
+          "q": "Czym jest wzorzec Strangler Fig?",
+          "a": "Strangler Fig to strategia stopniowej migracji legacy systemu.\n\nProces:\n1. Nowe funkcjonalności buduj w nowym systemie.\n2. Stopniowo przenoś istniejące moduły.\n3. Legacy system kurczy się aż zniknie.\n\nKluczowe: facade/proxy przed starym systemem przekierowuje ruch do nowego.\n\nAlternatywa dla Big Bang rewrite, który prawie zawsze kończy się katastrofą."
+        },
+        {
+          "id": "arch-20",
+          "q": "Czym jest Anemic Domain Model i dlaczego to anty-wzorzec?",
+          "a": "Anemic Domain Model: klasy domenowe zawierają tylko pola i gettery/settery. Cała logika biznesowa jest w serwisach.\n\nProblemy:\n- brak enkapsulacji — każdy może naruszyć niezmienniki,\n- logika rozproszona, trudna do znalezienia,\n- klasy domenowe stają się Data Transfer Object.\n\nPoprawne podejście: agregaty i encje zawierają logikę i chronią swoje niezmienniki metodami."
+        },
+        {
+          "id": "arch-21",
+          "q": "Co to jest Cohesion i Coupling?",
+          "a": "Cohesion (spójność):\n- Ile rzeczy w module naprawdę do siebie należy.\n- Wysoka spójność = moduł ma jedną, wyraźną odpowiedzialność.\n\nCoupling (sprzężenie):\n- Jak mocno moduły zależą od siebie.\n- Niskie sprzężenie = zmiana jednego modułu nie wymaga zmian innych.\n\nCel: **wysokie cohesion, niskie coupling**."
+        },
+        {
+          "id": "arch-22",
+          "q": "Czym jest Architecture Decision Record (ADR)?",
+          "a": "ADR to krótki dokument opisujący decyzję architektoniczną: kontekst, rozważane opcje, wybór i konsekwencje.\n\nFormat (Markdown):\n- **Status**: Accepted / Deprecated\n- **Kontekst**: dlaczego decyzja była potrzebna\n- **Decyzja**: co zdecydowano\n- **Konsekwencje**: co zyskujemy, co tracimy\n\nADR-y żyją w repo razem z kodem — pozwalają przyszłym deweloperom zrozumieć *dlaczego*, nie tylko *co*."
+        },
+        {
+          "id": "arch-23",
+          "q": "Czym są Feature Flags i do czego służą?",
+          "a": "Feature Flag to przełącznik umożliwiający włączanie/wyłączanie funkcjonalności bez deploy.\n\nZastosowania:\n- trunk-based development — merge nieukończonej funkcji za flagą,\n- canary release — włącz dla % użytkowników,\n- A/B testy,\n- kill switch dla awarii.\n\nRyzyko: akumulacja starych flag tworzy dług techniczny — flagi wymagają regularnego czyszczenia."
+        },
+        {
+          "id": "arch-24",
+          "q": "Czym jest Shared Kernel?",
+          "a": "Shared Kernel to fragment modelu domenowego współdzielony przez dwa lub więcej Bounded Contexts.\n\nCechy:\n- zmiana wymaga zgody wszystkich właścicieli,\n- minimalizować — duży Shared Kernel to ukryta zależność,\n- alternatywa: ACL lub własne kopie danych z mapowaniem.\n\nShared Kernel jest uzasadniony tylko gdy koszt synchronizacji jest niższy niż koszt duplikacji."
         }
       ]
     },
@@ -727,6 +812,81 @@
           "id": "micro-9",
           "q": "Czym jest observability w mikroserwisach?",
           "a": "Observability to zdolność zrozumienia stanu systemu na podstawie sygnałów.\n\nTrzy filary:\n- Logs (najlepiej structured)\n- Metrics (np. Prometheus)\n- Traces (distributed tracing)\n\nBez observability mikroserwisy są trudne w utrzymaniu."
+        },
+        {
+          "id": "micro-10",
+          "q": "Czym jest Service Mesh?",
+          "a": "Service Mesh to warstwa infrastruktury zarządzająca komunikacją między serwisami, niezależna od kodu aplikacji.\n\nRealizuje:\n- mTLS (szyfrowanie i autentykacja serwis-do-serwisu),\n- circuit breaker, retry, timeout — bez kodu w aplikacji,\n- distributed tracing i metryki ruchu,\n- traffic management (canary, weight-based routing).\n\nPopularne implementacje: Istio, Linkerd.\nSidecar proxy (np. Envoy) obok każdego poda przejmuje cały ruch."
+        },
+        {
+          "id": "micro-11",
+          "q": "Czym jest Service Discovery?",
+          "a": "Service Discovery to mechanizm dynamicznego znajdowania adresów serwisów w środowisku, gdzie instancje się zmieniają.\n\nClient-side discovery:\n- klient pyta rejestr (np. Eureka), dostaje listę instancji, sam wybiera.\n\nServer-side discovery:\n- klient wysyła żądanie do load balancera/DNS, który przekierowuje.\n\nW Kubernetes: DNS-based discovery przez Service objects (ClusterIP)."
+        },
+        {
+          "id": "micro-12",
+          "q": "Czym jest Bulkhead Pattern?",
+          "a": "Bulkhead (gródź) to izolacja zasobów między grupami serwisów, żeby awaria jednej grupy nie wyczerpała zasobów całego systemu.\n\nPrzykład:\n- osobna pula wątków dla każdego downstream service,\n- jeśli serwis A przestaje odpowiadać, jego pula blokuje się, ale inne serwisy działają normalnie.\n\nRealizacja: Resilience4j `Bulkhead`, Hystrix `ThreadPoolBulkhead`."
+        },
+        {
+          "id": "micro-13",
+          "q": "Czym jest Rate Limiting i jak go implementować?",
+          "a": "Rate Limiting ogranicza liczbę żądań klienta w czasie, chroniąc system przed przeciążeniem i nadużyciami.\n\nAlgorytmy:\n- **Token Bucket** — klient ma \"wiadro\" tokenów, każde żądanie zużywa token, tokeny regenerują się z czasem,\n- **Leaky Bucket** — żądania wchodzą z dowolną szybkością, wypływają jednostajnie,\n- **Fixed/Sliding Window** — licznik resetowany w oknie czasowym.\n\nImplementacja: Redis (INCR + EXPIRE), API Gateway (Kong, Nginx), Resilience4j `RateLimiter`."
+        },
+        {
+          "id": "micro-14",
+          "q": "Jak wersjonować API w mikroserwisach?",
+          "a": "Opcje wersjonowania:\n- **URL path**: `/api/v1/orders` — najprostsze, czytelne,\n- **Header**: `Accept: application/vnd.api+json;version=2`,\n- **Query param**: `?version=2`.\n\nDobre praktyki:\n- obsługuj co najmniej jedną poprzednią wersję,\n- deprecate przez nagłówek (`Deprecation: true`),\n- consumer-driven contracts (Pact) pomagają wykryć breaking changes."
+        },
+        {
+          "id": "micro-15",
+          "q": "Czym jest wzorzec Choreography vs Orchestration w Sadze?",
+          "a": "Orchestration:\n- centralny orchestrator (serwis lub workflow engine) wydaje polecenia każdemu serwisowi,\n- łatwiej debugować, ale orchestrator staje się wąskim gardłem i punktem sprzężenia.\n\nChoreography:\n- każdy serwis reaguje na eventy i emituje kolejne,\n- luźniejsze powiązania, ale trudniejsze do śledzenia przepływu.\n\nW praktyce: małe sagas → choreography; złożone, wieloetapowe → orchestration (np. Temporal, Camunda)."
+        },
+        {
+          "id": "micro-16",
+          "q": "Jak zapewnić mTLS między serwisami?",
+          "a": "mTLS (mutual TLS) — obie strony uwierzytelniają się certyfikatami.\n\nRealizacja:\n- Service Mesh (Istio) — automatycznie, sidecar zarządza certyfikatami,\n- manualnie — PKI, certyfikaty rotowane (Vault PKI Secrets Engine).\n\nZapewnia: szyfrowanie + autentykację serwis-do-serwisu bez tokenu w nagłówku.\nWażne przy zero-trust networking."
+        },
+        {
+          "id": "micro-17",
+          "q": "Czym jest Distributed Configuration?",
+          "a": "Distributed Configuration to centralny magazyn konfiguracji dla wszystkich serwisów, zamiast plików per instancja.\n\nNarzędzia:\n- Spring Cloud Config (Git-backed),\n- HashiCorp Consul KV,\n- AWS Parameter Store / Secrets Manager,\n- Kubernetes ConfigMap.\n\nProblemy do rozwiązania:\n- hot reload konfiguracji bez restartu,\n- wersjonowanie i audyt zmian,\n- separacja sekretów od konfiguracji."
+        },
+        {
+          "id": "micro-18",
+          "q": "Jak testować mikroserwisy?",
+          "a": "Piramida testów w mikroserwisach:\n\n- **Unit** — logika domenowa w izolacji,\n- **Integration** — serwis + baza + broker (Testcontainers),\n- **Contract** — weryfikacja kontraktów między serwisami (Pact),\n- **E2E** — rzadko, tylko dla krytycznych ścieżek.\n\nUnikać: testowanie kilku serwisów razem w pełnym środowisku — zbyt kruche i wolne."
+        },
+        {
+          "id": "micro-19",
+          "q": "Kiedy mikroserwisy to zły wybór?",
+          "a": "Mikroserwisy dodają złożoność operacyjną — warto je wybrać tylko gdy:\n- organizacja jest wystarczająco duża (Conway's Law),\n- masz dojrzałe DevOps i observability,\n- domeny są jasno rozdzielone.\n\nZłe sygnały:\n- mały zespół (< 5 osób),\n- nieznana domena (za wcześnie na granice),\n- brak Kubernetes/CI/CD.\n\n\"Start with a monolith, extract when the pain is real.\""
+        },
+        {
+          "id": "micro-20",
+          "q": "Co to jest Conway's Law?",
+          "a": "\"Organizacje projektują systemy odzwierciedlające ich strukturę komunikacyjną.\"\n\nPraktyczna implikacja:\n- jeśli masz 3 zespoły, dostaniesz 3-częściowy system,\n- granice serwisów powinny pokrywać się z granicami własności zespołów.\n\nInverse Conway Maneuver: najpierw zaprojektuj pożądaną architekturę, potem dostosuj strukturę zespołów."
+        },
+        {
+          "id": "micro-21",
+          "q": "Czym jest Dead Letter Queue (DLQ)?",
+          "a": "DLQ to kolejka, do której trafiają wiadomości, których konsument nie był w stanie przetworzyć po N próbach.\n\nZastosowania:\n- izolacja \"trujących\" wiadomości (poison pill),\n- analiza błędów bez blokowania głównej kolejki,\n- ręczne reprocessing po naprawie błędu.\n\nObowiązkowy element każdego produkcyjnego systemu event-driven."
+        },
+        {
+          "id": "micro-22",
+          "q": "Jak obsługiwać distributed tracing w mikroserwisach?",
+          "a": "Każde żądanie otrzymuje `traceId` (unikalny dla całego przepływu) i `spanId` (dla każdego kroku).\n\nPropagacja:\n- przez nagłówki HTTP: `traceparent` (W3C standard),\n- przez nagłówki Kafka,\n- automatycznie przez instrumentację (Micrometer Tracing, OpenTelemetry).\n\nStack: OpenTelemetry → Jaeger / Zipkin / Tempo."
+        },
+        {
+          "id": "micro-23",
+          "q": "Czym jest timeout propagation i dlaczego jest ważne?",
+          "a": "Timeout propagation oznacza przekazywanie pozostałego czasu na odpowiedź przez łańcuch serwisów.\n\nProblem bez propagacji:\n- Serwis A ma timeout 1s.\n- Woła B z timeout 2s i C z timeout 2s.\n- W efekcie A może czekać dłużej niż jego własny timeout, blokując zasoby.\n\nRozwiązanie: gRPC deadline propagation, `Context` z deadlinem, nagłówki `X-Request-Timeout`."
+        },
+        {
+          "id": "micro-24",
+          "q": "Czym jest Event-Driven Architecture?",
+          "a": "EDA to styl architektoniczny, w którym komponenty komunikują się przez emisję i konsumpcję zdarzeń, bez bezpośrednich wywołań.\n\nZalety:\n- luźne powiązania — producent nie zna konsumentów,\n- skalowalność — konsumenci skalują niezależnie,\n- naturalny audit log.\n\nWyzwania:\n- eventual consistency,\n- trudniejsze debugowanie przepływu,\n- schema evolution.\n\nDobre do: integracji, pipeline'ów danych, systemów opartych o domenę."
         }
       ]
     },
@@ -778,6 +938,86 @@
           "id": "comm-8",
           "q": "Czym jest schema evolution?",
           "a": "Schema evolution to zmiana formatu danych bez psucia kompatybilności.\n\nDobre praktyki:\n- dodawanie pól jako opcjonalne,\n- unikanie zmiany znaczenia pól,\n- wersjonowanie kontraktów.\n\nProtobuf/Avro wspierają kompatybilne zmiany lepiej niż \"goły\" JSON."
+        },
+        {
+          "id": "comm-9",
+          "q": "Czym jest Richardson Maturity Model?",
+          "a": "Model opisuje stopnie \"dojrzałości\" REST API:\n\n- **Level 0** — jeden endpoint, różne operacje przez parametry,\n- **Level 1** — osobne zasoby (resources) jako oddzielne URL-e,\n- **Level 2** — HTTP verbs (GET, POST, PUT, DELETE) do wyrażania operacji,\n- **Level 3** — HATEOAS: odpowiedź zawiera linki do kolejnych możliwych akcji.\n\nWiększość \"REST\" API w praktyce jest na poziomie 2."
+        },
+        {
+          "id": "comm-10",
+          "q": "WebSocket vs SSE vs Long Polling — kiedy co?",
+          "a": "**WebSocket**:\n- pełny duplex (klient i serwer mogą nadawać jednocześnie),\n- stałe połączenie TCP,\n- do: chaty, real-time collaboration, gry.\n\n**SSE (Server-Sent Events)**:\n- serwer pushuje zdarzenia do klienta przez HTTP,\n- simplex (tylko serwer → klient),\n- automatyczne reconnect, łatwe w implementacji.\n\n**Long Polling**:\n- klient trzyma otwarty request do momentu pojawienia się danych,\n- kompatybilne z każdym serwerem HTTP,\n- duże narzuty na połączenia."
+        },
+        {
+          "id": "comm-11",
+          "q": "Czym jest GraphQL i jakie są jego wady i zalety?",
+          "a": "GraphQL to język zapytań do API gdzie klient określa dokładnie jakich danych potrzebuje.\n\nZalety:\n- brak over-fetching i under-fetching,\n- jeden endpoint,\n- silnie typowany schemat.\n\nWady:\n- N+1 problem (DataLoader jako rozwiązanie),\n- trudniejszy caching (nie GET),\n- złożoność autoryzacji per field,\n- learning curve.\n\nDobre do: BFF (Backend For Frontend), złożone frontendowe wymagania."
+        },
+        {
+          "id": "comm-12",
+          "q": "Czym jest Webhook i czym różni się od pollingu?",
+          "a": "Webhook: zewnętrzny system wysyła HTTP POST na zarejestrowany URL gdy zajdzie zdarzenie.\n\nPolling: aplikacja cyklicznie pyta zewnętrzny system o zmiany.\n\nWebhook — bardziej efektywny (brak pustych odpowiedzi), ale wymaga publicznego URL i obsługi retry po stronie nadawcy.\n\nWażne przy odbiorze webhooków:\n- weryfikacja sygnatury (HMAC),\n- idempotent processing (duplikaty),\n- szybka odpowiedź 200 + przetwarzanie asynchroniczne."
+        },
+        {
+          "id": "comm-13",
+          "q": "Czym jest API Pagination i jakie są strategie?",
+          "a": "**Offset pagination** (`?page=2&size=20`):\n- prosta w implementacji,\n- problemy: przy modyfikacjach danych strony się \"przesuwają\", wolna dla dużych offsetów.\n\n**Cursor/keyset pagination** (`?after=lastId`):\n- kursor wskazuje na konkretny rekord (ID lub timestamp),\n- stabilna przy zmianach danych, wydajna (INDEX range scan),\n- trudniejsza w implementacji.\n\nCursor to standard dla API produkcyjnych przy dużych zbiorach."
+        },
+        {
+          "id": "comm-14",
+          "q": "Czym jest Content Negotiation?",
+          "a": "Mechanizm HTTP pozwalający klientowi i serwerowi uzgodnić format danych.\n\nKlient wysyła:\n- `Accept: application/json` — oczekiwany format odpowiedzi,\n- `Content-Type: application/json` — format wysyłanego ciała.\n\nSerwer odpowiada `Content-Type` wskazującym wybrany format lub `406 Not Acceptable`.\n\nPozwala serwerowi obsługiwać JSON, XML, Protobuf z tego samego endpointu."
+        },
+        {
+          "id": "comm-15",
+          "q": "Czym jest Correlation ID?",
+          "a": "Correlation ID (też: Request ID, Trace ID) to unikalny identyfikator propagowany przez cały łańcuch wywołań.\n\nCel:\n- powiązanie logów z różnych serwisów w jeden przepływ,\n- diagnostyka błędów w systemach rozproszonych.\n\nImplementacja:\n- generowany na wejściu (API Gateway lub pierwszy serwis),\n- propagowany w nagłówkach HTTP (`X-Correlation-ID`, `traceparent`),\n- dołączany do każdego logu (MDC w SLF4J)."
+        },
+        {
+          "id": "comm-16",
+          "q": "HTTP/2 vs HTTP/1.1 — kluczowe różnice",
+          "a": "HTTP/2 wprowadza:\n- **multiplexing** — wiele requestów przez jedno połączenie TCP bez head-of-line blocking,\n- **header compression** (HPACK) — mniejszy narzut na powtarzające się nagłówki,\n- **server push** — serwer może wysłać zasoby zanim klient zapyta,\n- binarny protokół zamiast tekstowego.\n\ngRPC wymaga HTTP/2. Dla REST typowo HTTP/1.1 jest wystarczający, ale HTTP/2 poprawia wydajność przy dużej liczbie requestów."
+        },
+        {
+          "id": "comm-17",
+          "q": "Protobuf vs JSON vs Avro — kiedy co?",
+          "a": "**JSON**: czytelny dla człowieka, szeroka kompatybilność, słaba typizacja, duży rozmiar.\n\n**Protobuf** (Google): binarny, silnie typowany (`.proto` schemat), 3-10x mniejszy i szybszy niż JSON, wymaga schematu po obu stronach. Używany przez gRPC.\n\n**Avro** (Apache): binarny, schemat przechowywany razem z danymi lub w Schema Registry, dominujący w ekosystemie Kafka.\n\nWybór:\n- komunikacja serwis-serwis (latency) → Protobuf,\n- Kafka event streaming → Avro + Schema Registry,\n- publiczne API → JSON."
+        },
+        {
+          "id": "comm-18",
+          "q": "Czym jest HATEOAS?",
+          "a": "HATEOAS (Hypermedia As The Engine Of Application State) to zasada REST Level 3: odpowiedź API zawiera linki do możliwych następnych akcji.\n\nPrzykład:\n```json\n{\n  \"orderId\": \"123\",\n  \"status\": \"PENDING\",\n  \"_links\": {\n    \"cancel\": { \"href\": \"/orders/123/cancel\" },\n    \"pay\":    { \"href\": \"/orders/123/pay\" }\n  }\n}\n```\n\nKlient nie musi znać URL-i na sztywno — odkrywa je z odpowiedzi.\nW praktyce rzadko stosowane (złożoność > korzyść)."
+        },
+        {
+          "id": "comm-19",
+          "q": "Czym jest rate limiting na poziomie API?",
+          "a": "Rate limiting ogranicza liczbę żądań klienta w danym czasie.\n\nPoziomy:\n- per IP,\n- per user/API key,\n- per endpoint.\n\nOdpowiedzi:\n- `429 Too Many Requests` + nagłówek `Retry-After`.\n\nNagłówki informujące klienta:\n- `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`.\n\nImplementacja: API Gateway (Kong, AWS API GW), Redis (token bucket)."
+        },
+        {
+          "id": "comm-20",
+          "q": "Czym jest OpenAPI/Swagger?",
+          "a": "OpenAPI (dawniej Swagger) to standard opisu REST API w formacie YAML/JSON.\n\nUmożliwia:\n- generowanie dokumentacji (Swagger UI),\n- generowanie klientów SDK (openapi-generator),\n- walidację requestów/responses,\n- contract testing.\n\nW Spring Boot: `springdoc-openapi` generuje spec automatycznie z adnotacji.\n\nDesign-first vs code-first to wybór zależny od procesu — design-first lepiej wymusza kontrakt przed implementacją."
+        },
+        {
+          "id": "comm-21",
+          "q": "Czym jest Circuit Breaker na poziomie HTTP?",
+          "a": "Circuit Breaker chroni przed kaskadową awarią gdy downstream serwis jest niedostępny.\n\nImplementacja z Resilience4j:\n- `CLOSED` → żądania przechodzą,\n- po X błędach → `OPEN` → żądania fail fast (bez czekania na timeout),\n- po czasie → `HALF_OPEN` → testowe żądanie,\n- jeśli sukces → `CLOSED`.\n\nKluczowe: ustawić sensowny `timeout` przed circuit breakerem — bez timeoutu OPEN nigdy nie pomoże."
+        },
+        {
+          "id": "comm-22",
+          "q": "Czym jest connection keep-alive i connection pooling w HTTP?",
+          "a": "**Keep-alive**: nagłówek `Connection: keep-alive` utrzymuje TCP po zakończeniu requestu, eliminując overhead TCP handshake dla kolejnych requestów.\n\n**Connection pooling** (po stronie klienta HTTP):\n- pula gotowych połączeń TCP (np. w Apache HttpClient, OkHttp),\n- każde żądanie bierze połączenie z puli zamiast tworzyć nowe,\n- kluczowe przy dużej liczbie wywołań serwis-serwis.\n\nW RestTemplate/WebClient — skonfiguruj pool, nie używaj domyślnego klienta bez puli."
+        },
+        {
+          "id": "comm-23",
+          "q": "Czym jest mTLS i kiedy go używać?",
+          "a": "mTLS (mutual TLS) — obie strony połączenia uwierzytelniają się certyfikatami X.509.\n\nStandardowy TLS: klient weryfikuje serwer.\nmTLS: serwer weryfikuje też klienta.\n\nZastosowania:\n- uwierzytelnianie serwisów w architekturze mikroserwisów (zero-trust),\n- API do partnerów zewnętrznych,\n- service mesh (Istio automatyzuje).\n\nZarządzanie certyfikatami to główna złożoność — HashiCorp Vault PKI lub cert-manager w Kubernetes."
+        },
+        {
+          "id": "comm-24",
+          "q": "Czym jest Request Hedging?",
+          "a": "Request hedging to technika wysyłania tego samego żądania do kilku replik jednocześnie i użycie pierwszej odpowiedzi.\n\nCel: redukcja tail latency (p99, p99.9).\nKoszt: dodatkowe obciążenie serwera (~2x żądania).\n\nStosowane gdy:\n- mamy wiele replik tego samego serwisu,\n- sporadyczne wolne instancje powodują skoki latency.\n\nPopularne w Google (opisane w \"The Tail at Scale\" Jeff Dean)."
         }
       ]
     },
@@ -829,6 +1069,86 @@
           "id": "devops-8",
           "q": "Horizontal vs Vertical scaling — różnice i konsekwencje",
           "a": "Vertical scaling:\n- Większa maszyna (CPU/RAM).\n- Proste, ale ma limit sprzętowy.\n\nHorizontal scaling:\n- Więcej instancji.\n- Wymaga stateless aplikacji lub zewnętrznego stanu.\n- Lepsza dostępność i skalowalność.\n\nW praktyce preferuje się horizontal scaling."
+        },
+        {
+          "id": "devops-9",
+          "q": "Czym są Kubernetes Deployment vs StatefulSet?",
+          "a": "**Deployment**:\n- do aplikacji bezstanowych (stateless),\n- pody są wymienne — każdy identyczny,\n- rolling update domyślnie.\n\n**StatefulSet**:\n- do aplikacji stanowych (bazy danych, Kafka, ZooKeeper),\n- każdy pod ma stałą tożsamość (pod-0, pod-1) i trwały wolumin (PVC),\n- rolling update w kolejności — pod-N dopiero po pod-N-1.\n\nZasada: aplikacje Java powinny być stateless i uruchamiane jako Deployment."
+        },
+        {
+          "id": "devops-10",
+          "q": "Czym są resource requests i limits w Kubernetes?",
+          "a": "```yaml\nresources:\n  requests:\n    cpu: \"250m\"\n    memory: \"512Mi\"\n  limits:\n    cpu: \"1\"\n    memory: \"1Gi\"\n```\n\n**Request** — minimalna gwarantowana ilość (scheduler uwzględnia przy planowaniu).\n**Limit** — maksimum (CPU throttling po przekroczeniu, OOM kill przy pamięci).\n\nWażne dla JVM:\n- ustawić `-Xmx` mniejszy niż memory limit (np. limit 1Gi → `-Xmx768m`),\n- `MaxRAMPercentage` pozwala JVM dostosować się dynamicznie."
+        },
+        {
+          "id": "devops-11",
+          "q": "Jakie są typy Service w Kubernetes?",
+          "a": "- **ClusterIP** — dostępny tylko wewnątrz klastra (domyślny),\n- **NodePort** — ekspozycja na każdym node na statycznym porcie,\n- **LoadBalancer** — tworzy zewnętrzny load balancer (np. AWS ALB),\n- **ExternalName** — alias DNS do zewnętrznego serwisu.\n\nHeadless Service (ClusterIP=None): bezpośredni DNS do podów — używany przez StatefulSet."
+        },
+        {
+          "id": "devops-12",
+          "q": "ConfigMap vs Secret w Kubernetes",
+          "a": "**ConfigMap**: niecitliwe dane konfiguracyjne (URL-e, porty, flagi).\n\n**Secret**: dane wrażliwe (hasła, klucze API, certyfikaty) — zakodowane Base64, dostęp RBAC.\n\nWażne: Secret w Kubernetes domyślnie nie jest szyfrowany w etcd — wymagane:\n- `EncryptionConfiguration` w etcd,\n- lub External Secrets Operator (Vault, AWS Secrets Manager).\n\nNie commituj sekretów — używaj sealed-secrets lub External Secrets."
+        },
+        {
+          "id": "devops-13",
+          "q": "Czym jest HPA (Horizontal Pod Autoscaler)?",
+          "a": "HPA automatycznie skaluje liczbę replik Deployment na podstawie metryk.\n\nDomyślna metryka: CPU utilization.\nCustom metrics: throughput, queue depth, latency (przez Prometheus Adapter).\n\n```yaml\nmetrics:\n- type: Resource\n  resource:\n    name: cpu\n    target:\n      averageUtilization: 60\n```\n\nPułapki:\n- requests muszą być ustawione (HPA liczy % od request, nie limit),\n- cooldown period zapobiega flapping."
+        },
+        {
+          "id": "devops-14",
+          "q": "Czym jest Kubernetes Ingress?",
+          "a": "Ingress to reguły routingu HTTP/HTTPS do serwisów wewnątrz klastra.\n\nPrzykład:\n```yaml\nrules:\n- host: api.example.com\n  http:\n    paths:\n    - path: /orders\n      backend:\n        service:\n          name: order-service\n```\n\nWymaga Ingress Controller (nginx, Traefik, AWS ALB Ingress Controller).\nTLS terminowany na Ingress (certyfikaty przez cert-manager + Let's Encrypt)."
+        },
+        {
+          "id": "devops-15",
+          "q": "Czym jest GitOps?",
+          "a": "GitOps to podejście, w którym Git jest jedynym źródłem prawdy dla stanu infrastruktury i aplikacji.\n\nOperator (Flux, ArgoCD) ciągle synchronizuje klaster z repozytory — zamiast ręcznego `kubectl apply`.\n\nZalety:\n- pełny audit trail zmian (git log),\n- rollback = git revert,\n- nie ma \"ręcznych\" zmian w klastrze."
+        },
+        {
+          "id": "devops-16",
+          "q": "Czym jest Infrastructure as Code (IaC)?",
+          "a": "IaC to zarządzanie infrastrukturą przez deklaratywne pliki konfiguracyjne wersjonowane w Git.\n\nNarzędzia:\n- **Terraform** — deklaratywny, wspiera wielu providerów (AWS, GCP, Azure),\n- **Pulumi** — IaC w kodzie (TypeScript, Python),\n- **AWS CDK** — AWS-specific, kod generuje CloudFormation.\n\nKorzyści:\n- reprodukowalne środowiska,\n- code review dla zmian infrastruktury,\n- eliminacja \"snowflake servers\"."
+        },
+        {
+          "id": "devops-17",
+          "q": "Jak przeprowadzić zero-downtime deployment?",
+          "a": "Kubernetes Rolling Update jest domyślny i zapewnia zero-downtime przy spełnieniu warunków:\n\n- **Readiness probe** — nowe pody muszą być gotowe przed przełączeniem ruchu,\n- **terminationGracePeriodSeconds** — czas na dokończenie in-flight requestów,\n- **podDisruptionBudget** — minimum X podów dostępnych podczas rolloutu.\n\nBaza danych: migracje muszą być kompatybilne wstecznie (expand-contract pattern)."
+        },
+        {
+          "id": "devops-18",
+          "q": "Jak zarządzać migracjami bazy w CI/CD?",
+          "a": "Zasady:\n- migracje wersjonowane (Flyway, Liquibase) i w repozytorium,\n- uruchamiane automatycznie przy starcie aplikacji lub jako init-container.\n\nExpand-contract pattern dla zero-downtime:\n1. Dodaj nową kolumnę (nullable) — stary kod ignoruje, nowy pisze.\n2. Wypełnij dane migracyjne.\n3. Zmień kod do użycia nowej kolumny.\n4. Usuń starą kolumnę.\n\nNigdy nie modyfikuj istniejącej migracji Flyway — dodaj nową."
+        },
+        {
+          "id": "devops-19",
+          "q": "Czym jest Chaos Engineering?",
+          "a": "Chaos Engineering to celowe wprowadzanie awarii do systemu w kontrolowany sposób, żeby weryfikować odporność.\n\nProces (Netflix Simian Army):\n1. Zdefiniuj \"steady state\" (normalne metryki).\n2. Hipoteza: system utrzyma steady state mimo awarii X.\n3. Wprowadź awarię (kill pod, delay network, exhaust CPU).\n4. Obserwuj.\n\nNarzędzia: Chaos Monkey, Litmus, Chaos Mesh.\n\nWażne: zacznij od non-prod, przejdź do prod stopniowo."
+        },
+        {
+          "id": "devops-20",
+          "q": "Czym są SLI, SLO i SLA?",
+          "a": "**SLI** (Service Level Indicator): miara jakości usługi (np. % requestów z latency < 200ms).\n\n**SLO** (Service Level Objective): cel dla SLI (np. 99,9% requestów < 200ms w miesiącu).\n\n**SLA** (Service Level Agreement): kontrakt z klientem + konsekwencje (finansowe) przy naruszeniu.\n\nError budget: `1 - SLO` = budżet na błędy.\nGdy error budget wyczerpany → freeze nowych features, focus na reliability."
+        },
+        {
+          "id": "devops-21",
+          "q": "Jak zarządzać sekretami w Kubernetes produkcyjnie?",
+          "a": "Opcje:\n1. **External Secrets Operator** — synchronizuje sekrety z Vault/AWS SM do K8s Secret,\n2. **Sealed Secrets** (Bitnami) — zaszyfrowane sekrety w Git, odszyfrowane przez controller w klastrze,\n3. **Vault Agent Sidecar** — Vault wstrzykuje sekrety do pliku lub env kontenera,\n4. **AWS Secrets Manager + IRSA** — pod ma IAM role i czyta bezpośrednio.\n\nZawsze: rotacja sekretów, audit kto i kiedy odczytał."
+        },
+        {
+          "id": "devops-22",
+          "q": "Czym jest container image security?",
+          "a": "Dobre praktyki:\n- **distroless / minimal base image** (np. `gcr.io/distroless/java21`) — brak shella, mniejsza powierzchnia ataku,\n- **non-root user** — `USER 10001` w Dockerfile,\n- **read-only filesystem** — montuj woluminy jako readOnly,\n- **skanowanie obrazów** — Trivy, Snyk, AWS ECR scanning przy push,\n- **image signing** — Cosign + policy admission (Kyverno).\n\nSupply chain: nie używaj obrazów `latest`, przypinaj do digesta SHA."
+        },
+        {
+          "id": "devops-23",
+          "q": "Czym jest Service Mesh i czym różni się od API Gateway?",
+          "a": "**API Gateway** — punkt wejścia z zewnątrz (north-south traffic):\n- auth, rate limiting, routing.\n\n**Service Mesh** — komunikacja wewnątrz klastra (east-west traffic):\n- mTLS, retry, circuit breaker, tracing — bez zmian w kodzie aplikacji.\n\nOba rozwiązują różne warstwy — często stosowane razem (Gateway + Istio/Linkerd)."
+        },
+        {
+          "id": "devops-24",
+          "q": "Czym jest multi-environment configuration strategy?",
+          "a": "Ten sam artefakt (image Docker) wdrażany na dev/staging/prod — konfiguracja pochodzi ze środowiska, nie z obrazu.\n\nMechanizmy:\n- zmienne środowiskowe (`APP_DB_URL=...`),\n- Kubernetes ConfigMap/Secret per namespace,\n- Spring Profiles + ConfigMap,\n- External Secrets per environment.\n\nZasada 12-factor: \"Store config in the environment\". Image nie powinien zawierać żadnych środowiskowych danych."
         }
       ]
     },
@@ -875,6 +1195,91 @@
           "id": "sec-7",
           "q": "Jak zabezpieczać sekrety w systemie?",
           "a": "Nie powinny być:\n- w kodzie,\n- w repozytorium,\n- w obrazach Docker.\n\nPowinny być:\n- w Secret Manager (Vault, AWS Secrets Manager),\n- w zmiennych środowiskowych,\n- rotowane cyklicznie.\n\nZasada: najmniejsze możliwe uprawnienia (least privilege)."
+        },
+        {
+          "id": "sec-8",
+          "q": "Jaka jest struktura JWT i jak go weryfikować?",
+          "a": "JWT = `header.payload.signature`, każda część zakodowana Base64URL.\n\n**Header**: algorytm (`alg: RS256`) + typ.\n**Payload**: claims (sub, iss, exp, iat, role...).\n**Signature**: podpis HMAC lub RSA/ECDSA.\n\nWeryfikacja:\n1. Sprawdź podpis kluczem publicznym (JWKS endpoint).\n2. Sprawdź `exp` (expiration).\n3. Sprawdź `iss` (issuer) i `aud` (audience).\n\nNigdy nie ufaj payload bez weryfikacji podpisu. Nie przechowuj danych wrażliwych w payload."
+        },
+        {
+          "id": "sec-9",
+          "q": "Jakie są przepływy OAuth2?",
+          "a": "**Authorization Code** (z PKCE): przeglądarka/mobile → najbezpieczniejszy, code wymieniony na token po stronie serwera.\n\n**Client Credentials**: serwis-do-serwisu (M2M), bez udziału użytkownika. Client ID + Secret → access token.\n\n**Implicit**: przestarzały, token w URL — nie używać.\n\n**Resource Owner Password**: przestarzały — bezpośrednio hasło do OAuth serwera.\n\nSenior powinien wiedzieć: Authorization Code + PKCE dla aplikacji user-facing, Client Credentials dla M2M."
+        },
+        {
+          "id": "sec-10",
+          "q": "Czym jest PKCE i dlaczego jest ważne?",
+          "a": "PKCE (Proof Key for Code Exchange) — rozszerzenie Authorization Code chroniące przed przechwyceniem authorization code.\n\nMechanizm:\n1. Klient generuje losowy `code_verifier`.\n2. Wysyła `code_challenge = SHA256(code_verifier)` z żądaniem autoryzacji.\n3. Po otrzymaniu kodu, wysyła `code_verifier` przy wymianie na token.\n4. Server weryfikuje hash.\n\nNawet jeśli authorization code wycieknie — jest bezużyteczny bez `code_verifier`.\nObowiązkowe dla SPA i mobile apps."
+        },
+        {
+          "id": "sec-11",
+          "q": "Czym jest OIDC?",
+          "a": "OIDC (OpenID Connect) to warstwa tożsamości nad OAuth2.\n\nOAuth2 = autoryzacja (co możesz zrobić).\nOIDC = uwierzytelnienie (kto jesteś).\n\nOIDC dodaje:\n- **ID Token** (JWT z danymi użytkownika: sub, email, name),\n- standardowy endpoint `/.well-known/openid-configuration`,\n- endpoint `userinfo`.\n\nKeycloak, Auth0, Google, AWS Cognito implementują OIDC."
+        },
+        {
+          "id": "sec-12",
+          "q": "Czym jest Broken Access Control (OWASP #1)?",
+          "a": "Broken Access Control — użytkownik może wykonać akcję lub zobaczyć dane do których nie powinien mieć dostępu.\n\nPrzykłady:\n- IDOR (Insecure Direct Object Reference): `/orders/12345` — zmień ID i dostaniesz cudzą zamówienie,\n- privilege escalation: zwykły user dostaje admin endpoint,\n- brakujące sprawdzenie uprawnień przy DELETE/PUT.\n\nMitygacja:\n- sprawdzaj uprawnienia na serwerze, nie tylko ukrywaj w UI,\n- DENY by default,\n- testy autoryzacji jako część CI."
+        },
+        {
+          "id": "sec-13",
+          "q": "Czym jest SSRF (Server-Side Request Forgery)?",
+          "a": "SSRF: atakujący zmusza serwer do wysłania żądania HTTP do dowolnego adresu — w tym infrastruktury wewnętrznej.\n\nPrzykład: endpoint `?url=http://...` — atakujący podaje `http://169.254.169.254/latest/meta-data/` (AWS metadata).\n\nMitygacja:\n- allowlist adresów URL,\n- blokada połączeń do 169.254.x.x, 10.x.x.x, 172.16.x.x,\n- nie przekazuj zewnętrznych URL-i bezpośrednio do HTTP klienta."
+        },
+        {
+          "id": "sec-14",
+          "q": "Jakie security headers powinien zwracać serwer?",
+          "a": "- **HSTS** (`Strict-Transport-Security`) — wymusza HTTPS,\n- **CSP** (`Content-Security-Policy`) — ogranicza skąd mogą ładować się zasoby (ochrona XSS),\n- **X-Frame-Options: DENY** — blokuje osadzanie w iframie (clickjacking),\n- **X-Content-Type-Options: nosniff** — blokuje MIME type sniffing,\n- **Referrer-Policy** — kontroluje co trafia w nagłówku Referer.\n\nSpring Security ustawia większość domyślnie. Sprawdź przez [securityheaders.com](https://securityheaders.com)."
+        },
+        {
+          "id": "sec-15",
+          "q": "Czym jest Injection (OWASP Top 10)?",
+          "a": "Injection to wstrzykiwanie złośliwych danych interpretowanych jako kod/polecenie.\n\nRodzaje:\n- **SQL Injection** — nieprzypadkowe zapytania SQL,\n- **Command Injection** — `Runtime.exec()` z danymi od użytkownika,\n- **LDAP Injection** — manipulacja zapytaniami LDAP,\n- **Log Injection** — wstrzykiwanie nowych linii do logów.\n\nMitygacja:\n- parameterized queries / prepared statements,\n- walidacja i sanityzacja wejścia,\n- unikaj `Runtime.exec()` z danymi zewnętrznymi."
+        },
+        {
+          "id": "sec-16",
+          "q": "Czym jest Security Misconfiguration?",
+          "a": "Jedna z najczęstszych klas błędów (OWASP Top 10 #5).\n\nPrzykłady:\n- domyślne hasła (admin/admin),\n- włączony debug/stack trace na produkcji,\n- otwarte S3 bucket,\n- niepotrzebne otwarte porty,\n- brak HTTPS.\n\nMitygacja:\n- hardening guide dla każdej technologii,\n- Infrastructure as Code (nie \"ręczna\" konfiguracja),\n- regularne security scany (DAST, infrastructure scans),\n- zasada minimal exposure."
+        },
+        {
+          "id": "sec-17",
+          "q": "Jak wdrożyć audit logging?",
+          "a": "Audit log rejestruje kto, co i kiedy zrobił — niezbędny do compliance (GDPR, PCI-DSS) i forensics.\n\nPowinien zawierać:\n- userId, IP, timestamp,\n- akcja i zasób (np. `ORDER_CANCELLED orderId=123`),\n- wynik (sukces/porażka).\n\nWażne:\n- nie loguj danych wrażliwych (haseł, numerów kart),\n- logi powinny być niemodyfikowalne (append-only, WORM storage),\n- separacja od application logs."
+        },
+        {
+          "id": "sec-18",
+          "q": "Czym jest zasada least privilege?",
+          "a": "Least Privilege: każdy komponent systemu powinien mieć tylko minimalne uprawnienia niezbędne do działania.\n\nPrzykłady:\n- serwis aplikacji: `SELECT, INSERT` na swojej tabeli, nie `GRANT ALL`,\n- pod K8s: tylko RBAC do swoich ConfigMap/Secret,\n- IAM role dla AWS: tylko S3 do konkretnego bucket,\n- developer: read-only do prod, pełen dostęp do dev.\n\nOgranicza blast radius przy kompromitacji komponentu."
+        },
+        {
+          "id": "sec-19",
+          "q": "Czym jest secret rotation i jak ją zautomatyzować?",
+          "a": "Secret rotation to cykliczna wymiana kluczy/haseł bez downtime.\n\nProblem: aplikacja musi obsługiwać stary i nowy sekret w oknie rotacji.\n\nAutomatyzacja:\n- **HashiCorp Vault dynamic secrets** — Vault generuje tymczasowe credentiale do DB (TTL np. 1h),\n- **AWS Secrets Manager** — automatyczna rotacja co N dni z Lambda,\n- **Kubernetes External Secrets** — synchronizuje rotowane sekrety do podów.\n\nZero-downtime rotation: najpierw dodaj nowy sekret, poczekaj na propagację, usuń stary."
+        },
+        {
+          "id": "sec-20",
+          "q": "Czym jest supply chain security?",
+          "a": "Supply chain security to ochrona przed atakami przez zależności (biblioteki, obrazy, pipeline CI).\n\nZagrożenia:\n- złośliwa biblioteka w npm/Maven (typosquatting, kompromitacja maintainera),\n- podatności w base image,\n- kompromitacja CI/CD.\n\nMitygacja:\n- **SBOM** (Software Bill of Materials) — inwentarz wszystkich zależności,\n- skanowanie zależności (Snyk, Dependabot, OWASP Dependency-Check),\n- image signing (Cosign, Sigstore),\n- private artifact repository (Nexus, Artifactory) — cache i scan przed użyciem."
+        },
+        {
+          "id": "sec-21",
+          "q": "Czym jest Zero Trust Architecture?",
+          "a": "Zero Trust: \"Never trust, always verify\" — brak domyślnego zaufania nawet wewnątrz sieci.\n\nZałożenie: sieć wewnętrzna jest skompromitowana.\n\nFilar:\n- każde żądanie wymaga uwierzytelnienia i autoryzacji,\n- mTLS między serwisami,\n- least privilege,\n- mikrosegmentacja sieci,\n- continuous monitoring.\n\nKontrast z tradycyjnym modelem: \"twierdza\" z zaufanym wnętrzem."
+        },
+        {
+          "id": "sec-22",
+          "q": "Jak chronić przed Broken Authentication?",
+          "a": "Broken Authentication (OWASP Top 10 #7) — słabe mechanizmy uwierzytelnienia.\n\nTypowe błędy:\n- słabe hasła (brak polityki),\n- brak MFA,\n- sesje nie wygasają,\n- credential stuffing (brak rate limiting na login),\n- JWT z algorytmem `alg: none`.\n\nMitygacja:\n- MFA,\n- bcrypt/Argon2 do haseł,\n- rate limiting na endpoint logowania,\n- weryfikacja `alg` w JWT (nie przyjmuj `none`)."
+        },
+        {
+          "id": "sec-23",
+          "q": "Czym jest path traversal?",
+          "a": "Path traversal (directory traversal): atakujący manipuluje ścieżką pliku by uzyskać dostęp poza dozwolonym katalogiem.\n\nPrzykład: `?file=../../etc/passwd`.\n\nMitygacja:\n- walidacja i normalizacja ścieżki (`Path.normalize()`, `toRealPath()`),\n- sprawdzenie czy wynikowa ścieżka jest wewnątrz dozwolonego katalogu,\n- nie przekazuj ścieżek od użytkownika bezpośrednio do API systemu plików,\n- sandboxed filesystem access."
+        },
+        {
+          "id": "sec-24",
+          "q": "Czym jest Sensitive Data Exposure?",
+          "a": "Sensitive Data Exposure (OWASP): nieumyślne ujawnienie danych wrażliwych.\n\nPrzykłady:\n- stack trace z danymi w response API,\n- hasła w logach,\n- numery kart w URL (GET request trafia do logów serwera),\n- dane w cache bez szyfrowania.\n\nMitygacja:\n- klasyfikuj dane (PII, PCI, PHI),\n- szyfruj w spoczynku (AES-256) i w transporcie (TLS),\n- maskuj w logach (`password=***`),\n- GDPR: minimalizuj zbieranie i czas przechowywania danych."
         }
       ]
     },
@@ -926,6 +1331,86 @@
           "id": "test-8",
           "q": "Czym jest mutation testing?",
           "a": "Mutation testing sprawdza jakość testów poprzez wprowadzanie małych zmian w kodzie (mutacje).\n\nJeśli testy nie wykryją zmiany — są niewystarczające.\n\nPozwala ocenić skuteczność testów, nie tylko ich pokrycie."
+        },
+        {
+          "id": "test-9",
+          "q": "Czym jest piramida testów i dlaczego jest ważna?",
+          "a": "Piramida testów (Mike Cohn):\n- **Unit** (podstawa) — dużo, szybkie, tanie,\n- **Integration** (środek) — umiarkowanie,\n- **E2E/UI** (szczyt) — mało, wolne, drogie.\n\nAnty-wzorzec: \"odwrócona piramida\" — dużo E2E, brak unit testów → wolne CI, kruche testy.\n\nW mikroserwisach: unit + integration (Testcontainers) + contract testing (Pact)."
+        },
+        {
+          "id": "test-10",
+          "q": "Czym jest BDD i czym różni się od TDD?",
+          "a": "**TDD**: programista pisze test, potem kod — fokus na design i implementację.\n\n**BDD** (Behavior-Driven Development): testy opisane w języku biznesowym (Given/When/Then) — dialog między biznesem a developerem.\n\n```gherkin\nGiven użytkownik ma 100 PLN na koncie\nWhen przeleje 150 PLN\nThen transakcja zostaje odrzucona\n```\n\nNarzędzia: Cucumber, JBehave. BDD nie zastępuje TDD — to uzupełniające podejścia."
+        },
+        {
+          "id": "test-11",
+          "q": "Jak testować kod asynchroniczny?",
+          "a": "Wyzwania:\n- wynik dostępny po czasie — test musi poczekać,\n- race conditions w testach.\n\nTechniki:\n- **Awaitility** — pollinguje warunek z timeoutem:\n  ```java\n  await().atMost(5, SECONDS).until(() -> repo.count() == 1);\n  ```\n- Testowanie przez obserwowane skutki uboczne (stan w DB, wyemitowany event),\n- Mocking executorów do kontroli czasu (np. `TestScheduler` w Reactor).\n\nUnikaj: `Thread.sleep()` — kruche i spowalnia testy."
+        },
+        {
+          "id": "test-12",
+          "q": "Czym są flaky tests i jak z nimi walczyć?",
+          "a": "Flaky test to test, który raz przechodzi, raz nie — bez zmiany kodu.\n\nPrzyczyny:\n- zależność od czasu (`Thread.sleep`),\n- współdzielony stan między testami,\n- zależność od kolejności testów,\n- race conditions,\n- zewnętrzne serwisy.\n\nWalka:\n- izolacja stanu (rollback transakcji, fresh containers per test),\n- Awaitility zamiast sleep,\n- quarantine flaky tests — wydziel, napraw lub usuń,\n- retry w CI jest planem awaryjnym, nie rozwiązaniem."
+        },
+        {
+          "id": "test-13",
+          "q": "Czym jest Consumer-Driven Contract Testing (Pact)?",
+          "a": "Pact: konsument definiuje kontrakt (oczekiwane żądania i odpowiedzi), provider weryfikuje czy go spełnia.\n\nPrzepływ:\n1. Consumer pisze test → generuje plik kontraktu (`.json`).\n2. Kontrakt jest publikowany do Pact Broker.\n3. Provider pobiera kontrakt i uruchamia weryfikację.\n\nZalety vs E2E:\n- brak zależności na żyjący serwis podczas testów,\n- early detection breaking changes w pipeline CI."
+        },
+        {
+          "id": "test-14",
+          "q": "Jak zarządzać danymi testowymi?",
+          "a": "Strategie:\n- **Test fixtures** — predefiniowane obiekty domenowe (factory methods, builder pattern),\n- **SQL scripts** — wczytane przed testem, rollback po,\n- **@Transactional na testach** — automatyczny rollback po każdym teście,\n- **Object Mother / Test Data Builder** — centralne fabryki danych testowych.\n\nZasada: testy powinny tworzyć własne dane i nie zakładać stanu z poprzednich testów (izolacja).\n\nUnikaj: shared fixtures mutowane przez testy — prowadzi do flakyness."
+        },
+        {
+          "id": "test-15",
+          "q": "Jak testować z zewnętrznymi serwisami (WireMock)?",
+          "a": "WireMock to HTTP stub server — zastępuje zewnętrzne API w testach.\n\n```java\nstubFor(get(\"/external/api/user/1\")\n    .willReturn(okJson(\"{\\\"name\\\": \\\"Jan\\\"}\")));\n```\n\nZalety vs mock:\n- testuje rzeczywisty HTTP stack (serialization, headers, timeout),\n- odtwarza edge cases (timeout, 503, powolna odpowiedź).\n\nSpring Boot: `@WireMockTest` lub `WireMockServer` w Testcontainers."
+        },
+        {
+          "id": "test-16",
+          "q": "Czym jest architektura testów integracyjnych w Spring Boot?",
+          "a": "`@SpringBootTest` + `@Testcontainers` — najlepszy setup do testów integracyjnych:\n\n```java\n@SpringBootTest(webEnvironment = RANDOM_PORT)\n@Testcontainers\nclass OrderIntegrationTest {\n    @Container\n    static PostgreSQLContainer<?> pg = new PostgreSQLContainer<>(\"postgres:16\");\n}\n```\n\nOptymalizacja:\n- `@DirtiesContext` tylko gdy konieczne (tworzy nowy kontekst),\n- współdzielony `@Container` między testami (static) — jeden start dla całej klasy,\n- `@TestConfiguration` do nadpisania beansów."
+        },
+        {
+          "id": "test-17",
+          "q": "Czym jest performance testing i jakie narzędzia stosować?",
+          "a": "Performance testing weryfikuje czy system spełnia SLO pod obciążeniem.\n\nNarzędzia:\n- **Gatling** — Scala DSL, czytelne raporty, dobre do CI,\n- **k6** — JavaScript, skrypty jako kod, świetne do CI/CD,\n- **JMeter** — GUI, szeroka funkcjonalność.\n\nTypy testów:\n- **Load** — normalne obciążenie,\n- **Stress** — powyżej normy,\n- **Soak** — długotrwałe (memory leaks),\n- **Spike** — nagły wzrost."
+        },
+        {
+          "id": "test-18",
+          "q": "Co oznacza \"test behavior, not implementation\"?",
+          "a": "Testowanie implementacji: weryfikujesz czy `repository.save()` został wywołany raz z konkretnym obiektem.\n\nTestowanie zachowania: weryfikujesz że po wywołaniu `placeOrder()` zamówienie pojawia się w bazie i event został wyemitowany.\n\nTesty implementacji są kruche — refaktor (np. zamiana metody wewnętrznej) łamie testy bez zmiany logiki.\n\nReguła: test powinien przejść po dowolnym refaktorze który nie zmienia obserwowalnego zachowania."
+        },
+        {
+          "id": "test-19",
+          "q": "Jak testować security w aplikacji?",
+          "a": "Warstwy testowania security:\n\n- **Unit/Integration**: `@WithMockUser`, `@PreAuthorize` testy — czy endpoint odrzuca nieautoryzowanego?\n- **SAST** (Static Application Security Testing): SonarQube, SpotBugs, Semgrep — statyczna analiza kodu,\n- **DAST** (Dynamic): OWASP ZAP — skanuje działającą aplikację,\n- **Dependency scan**: OWASP Dependency-Check, Snyk — podatności w bibliotekach,\n- **Penetration testing** — ręczne lub automatyczne próby włamania.\n\nMinimum w CI: SAST + dependency scan przy każdym merge."
+        },
+        {
+          "id": "test-20",
+          "q": "Jakie są anti-patterns w testowaniu?",
+          "a": "- **Test zbyt mocno mockuje** — testuje interakcje, nie logikę,\n- **Logika w testach** — if/else w testach ukrywa co jest sprawdzane,\n- **Brak asercji** — test przechodzi zawsze (brak `assert`),\n- **Jeden test sprawdza zbyt wiele** — trudno zdiagnozować błąd,\n- **Testy zależne od kolejności** — test X musi przejść przed Y,\n- **Komentowane testy** — \"tymczasowo\" wyłączone na zawsze."
+        },
+        {
+          "id": "test-21",
+          "q": "Jak mierzyć jakość testów poza coverage?",
+          "a": "Code coverage (% linii) mówi co *było* wywołane, nie czy zachowanie było sprawdzone.\n\nLepsze metryki:\n- **Mutation score** (Pitest) — % mutantów zabitych przez testy,\n- **Defect detection ratio** — ile bugów testy znalazły przed produkcją,\n- **Test execution time** — czy testy są na tyle szybkie by uruchamiać je często,\n- **Flakiness rate** — % testów z niestabilnym wynikiem.\n\n80% coverage z 30% mutation score jest gorsze niż 60% coverage z 80% mutation score."
+        },
+        {
+          "id": "test-22",
+          "q": "Czym jest Chaos Testing?",
+          "a": "Chaos Testing celowo wprowadza awarie do systemu by testować odporność.\n\nNa poziomie testów integracyjnych:\n- symulacja timeoutu (WireMock `withFixedDelay`),\n- simulacja błędu serwisu (WireMock 503),\n- Testcontainers + zatrzymanie kontenera w trakcie testu.\n\nNa poziomie produkcyjnym: Chaos Monkey, Litmus.\n\nRóżnica od load testing: nie chodzi o skalę, ale o awarie."
+        },
+        {
+          "id": "test-23",
+          "q": "Jak testować distributed transactions (Saga)?",
+          "a": "Saga jest trudna w testowaniu z powodu asynchroniczności i wielu kroków.\n\nStrategie:\n- **Testy jednostkowe** kroków Sagi niezależnie,\n- **Testy integracyjne** z Testcontainers (DB + Kafka): wywołaj command → poczekaj na event → sprawdź stan,\n- **Awaitility** do czekania na async wynik,\n- **WireMock** do symulacji innych serwisów,\n- **Testy kompensacji** — co się dzieje gdy krok N zawiedzie?"
+        },
+        {
+          "id": "test-24",
+          "q": "Czym jest Test Data Builder pattern?",
+          "a": "Test Data Builder (Object Mother) — centralna fabryka obiektów testowych z wartościami domyślnymi.\n\n```java\nOrder order = OrderBuilder.anOrder()\n    .withStatus(PENDING)\n    .withAmount(Money.of(100, PLN))\n    .build();\n```\n\nZalety:\n- testy są czytelne — pokazują tylko relevantne dane,\n- zmiana struktury obiektu wymaga zmiany tylko buildera,\n- wartości domyślne ukryte w builderze — test skupia się na tym co testuje.\n\nKażdy domenowy agregat powinien mieć swój builder w `src/test`."
         }
       ]
     },
@@ -967,6 +1452,96 @@
           "id": "perf-6",
           "q": "Czym jest load testing i czym różni się od stress testing?",
           "a": "Load testing:\n- Test przy oczekiwanym obciążeniu.\n- Sprawdza czy system spełnia SLA.\n\nStress testing:\n- Test powyżej zakładanego obciążenia.\n- Sprawdza jak system zachowuje się przy przeciążeniu.\n\nCelem jest poznanie granic systemu i jego zachowania w awarii."
+        },
+        {
+          "id": "perf-7",
+          "q": "Czym jest N+1 problem i jak go rozwiązać?",
+          "a": "N+1: 1 zapytanie po listę + N zapytań po każdy powiązany element.\n\nPrzykład JPA:\n```java\nList<Order> orders = orderRepo.findAll(); // 1 query\norders.forEach(o -> o.getItems().size()); // N queries (LazyLoad)\n```\n\nRozwiązania:\n- `JOIN FETCH` w JPQL,\n- `@EntityGraph`,\n- `@BatchSize`,\n- dedykowane DTO z projekcją (np. Spring Data Projections).\n\nWykrycie: Hibernate statistics, p6spy, Datasource Proxy."
+        },
+        {
+          "id": "perf-8",
+          "q": "Jakie są strategie cache'owania?",
+          "a": "**Cache-aside (Lazy Loading)**: aplikacja sprawdza cache → miss → wczytuje z DB → zapisuje do cache. Prosta, ale ryzyko cold start i race conditions.\n\n**Write-through**: zapis idzie do DB i cache jednocześnie. Cache zawsze aktualny, ale zwiększa latency zapisu.\n\n**Write-behind (Write-back)**: zapis do cache, asynchroniczny flush do DB. Szybki zapis, ale ryzyko utraty danych przy awarii cache.\n\n**Read-through**: cache pobiera dane z DB automatycznie przy miss — aplikacja nie wie o bazie."
+        },
+        {
+          "id": "perf-9",
+          "q": "Redis jako cache — kluczowe koncepty",
+          "a": "Redis to in-memory data structure store — typowo jako cache i session store.\n\nKluczowe cechy:\n- TTL per klucz (`EXPIRE`),\n- atomowe operacje (INCR, SETNX),\n- struktury danych: String, Hash, List, Set, Sorted Set,\n- persistence opcjonalna (RDB snapshots, AOF log).\n\nEviction policies:\n- `allkeys-lru` — usuwa najrzadziej używane (dobre dla cache),\n- `volatile-lru` — tylko klucze z TTL.\n\nPułapki: cache stampede (wiele requestów przy miss), memory fragmentation."
+        },
+        {
+          "id": "perf-10",
+          "q": "Strategie indeksowania w bazach danych",
+          "a": "**B-tree index** (domyślny): dobry do range queries i equals.\n\n**Composite index**: na wielu kolumnach. Kolejność ma znaczenie — `(a, b)` przyspiesza `WHERE a=? AND b=?` i `WHERE a=?`, ale nie `WHERE b=?`.\n\n**Covering index** (index-only scan): index zawiera wszystkie kolumny potrzebne do zapytania — baza nie musi sięgać do tabeli.\n\n**Partial index**: index tylko na wybranych wierszach (`WHERE status='ACTIVE'`).\n\nPułapka: każdy index spowalnia INSERT/UPDATE/DELETE."
+        },
+        {
+          "id": "perf-11",
+          "q": "Jak optymalizować zapytania SQL?",
+          "a": "Proces:\n1. `EXPLAIN ANALYZE` — sprawdź plan wykonania,\n2. Szukaj: `Seq Scan` na dużych tabelach (brak indexu), `Nested Loop` z dużymi zbiorami.\n3. Dodaj index na kolumnach w `WHERE`, `JOIN ON`, `ORDER BY`.\n4. Unikaj funkcji na indeksowanych kolumnach (`WHERE LOWER(email) = ?` → `WHERE email = LOWER(?)`).\n5. Unikaj `SELECT *` — wybieraj tylko potrzebne kolumny.\n\nStatystyki: `ANALYZE` aktualizuje statystyki planisty."
+        },
+        {
+          "id": "perf-12",
+          "q": "Percentyle vs średnia w metrykach latency",
+          "a": "Średnia (average) ukrywa ogon rozkładu — 1% requestów może trwać 10s ale średnia wygląda OK.\n\nPercentyle:\n- **p50** — mediana (50% requestów szybszych),\n- **p95** — 95% requestów poniżej tej wartości,\n- **p99** — ogon latency (odczuwany przez 1% użytkowników ale to może być miliony requestów),\n- **p999** — tail latency.\n\nSLO definiuje się przez percentyle: \"p99 < 500ms\". Zawsze monitoruj p99, nie tylko średnią."
+        },
+        {
+          "id": "perf-13",
+          "q": "Czym jest JVM tuning dla kontenerów?",
+          "a": "JVM nie widzi limitu pamięci kontenera bez odpowiednich flag (przed Java 11).\n\nNowoczesne ustawienia:\n- `-XX:MaxRAMPercentage=75` — max 75% pamięci kontenera na heap,\n- `-XX:+UseContainerSupport` — włączone domyślnie od Java 11,\n- GC: `G1GC` (domyślny), `ZGC` (low-latency, Java 15+), `Shenandoah`.\n\nDiagnostyka w runtime:\n- `jcmd <pid> VM.native_memory` — szczegółowy breakdown pamięci JVM."
+        },
+        {
+          "id": "perf-14",
+          "q": "Jak wykrywać memory leaks w Javie?",
+          "a": "Objawy: rosnące zużycie heap między GC, aż do OutOfMemoryError.\n\nTypowe przyczyny:\n- statyczne kolekcje trzymające referencje,\n- listener/callback nigdy niezarejestrowany,\n- thread-local variables nie czyszczone,\n- cache bez TTL/eviction.\n\nNarzędzia:\n- heap dump (`jmap -dump:format=b,file=heap.hprof <pid>`),\n- Eclipse MAT — analiza dominatorów i najgrubszych referencji,\n- JFR (Java Flight Recorder) — profilowanie bez dużego narzutu."
+        },
+        {
+          "id": "perf-15",
+          "q": "Czym jest Java Flight Recorder (JFR)?",
+          "a": "JFR to low-overhead profiler wbudowany w JVM (open source od Java 11).\n\nZbiera:\n- CPU profiling (metody, stack traces),\n- alokacje obiektów,\n- GC events,\n- I/O, monitor waits, thread states.\n\nUruchomienie:\n```bash\njava -XX:StartFlightRecording=duration=60s,filename=app.jfr MyApp\n```\n\nAnaliza: JDK Mission Control (JMC). Narzut: < 2% na produkcji."
+        },
+        {
+          "id": "perf-16",
+          "q": "Czym są Virtual Threads (Project Loom)?",
+          "a": "Virtual Threads (Java 21) — lekkie wątki zarządzane przez JVM, nie przez OS.\n\nProblem tradycyjnych wątków:\n- 1 OS thread ≈ 1MB stack,\n- zablokowany wątek (I/O) blokuje OS thread.\n\nVirtual Threads:\n- miliony jednocześnie,\n- blokowanie na I/O = unmount z carrier thread,\n- kod synchroniczny, semantyka jak reactive — bez callback hell.\n\nIdealne do: aplikacji I/O-bound (HTTP, DB). Nie zastępują reaktywnego dla CPU-bound."
+        },
+        {
+          "id": "perf-17",
+          "q": "Czym jest cache stampede i jak mu zapobiec?",
+          "a": "Cache stampede (dogpile effect): wszystkie instancje jednocześnie tracą ten sam klucz (TTL wygasł) i szturmują bazę danych.\n\nMitygacja:\n- **Probabilistic Early Expiration** — losowo odświeżaj klucz przed wygaśnięciem,\n- **Locking przy miss** — tylko jeden wątek pobiera z DB, reszta czeka na cache,\n- **Soft/Hard TTL** — soft TTL służy do tła odświeżania, hard TTL do ostateczności.\n\nRedis: `SET key value EX 60 NX` (Set if Not Exists) do atomic lock przy miss."
+        },
+        {
+          "id": "perf-18",
+          "q": "Czym jest connection pool sizing i jaka jest optymalna wartość?",
+          "a": "HikariCP recommendation (PostgreSQL wiki):\n```\npool_size = (core_count * 2) + effective_spindle_count\n```\n\nDla typowego SSD serwera z 8 core: `(8 * 2) + 1 ≈ 17`.\n\nParadoks: **duży pool nie zawsze = lepsza wydajność**. Baza ma ograniczony planner, więcej połączeń → więcej context switching → wolniej.\n\nMonitoruj:\n- `hikaricp.pending.threads` — liczba requestów czekających na połączenie,\n- `hikaricp.connections.timeout` — ile razy przekroczono `connectionTimeout`."
+        },
+        {
+          "id": "perf-19",
+          "q": "Czym jest Distributed Cache i kiedy go używać?",
+          "a": "Distributed Cache (Redis Cluster, Hazelcast) — cache współdzielony przez wszystkie instancje aplikacji.\n\nKiedy:\n- wiele instancji aplikacji — lokalny cache per instancja powoduje inconsistency,\n- cache dużych obiektów (nie mieszczą się w heap),\n- potrzeba TTL i automatic eviction.\n\nKiedy lokalny (Caffeine/Guava):\n- małe, rzadko zmieniające się dane (konfiguracja, listy statyczne),\n- bardzo niska latency wymagana (< 1ms).\n\nDwa poziomy: L1 (Caffeine) + L2 (Redis) — popularne dla hot data."
+        },
+        {
+          "id": "perf-20",
+          "q": "Czym jest async processing i kiedy stosować?",
+          "a": "Async processing: czasochłonne operacje są wykonywane w tle, klient dostaje natychmiastową odpowiedź (202 Accepted).\n\nWzorzec:\n1. Przyjmij żądanie → zapisz do kolejki → zwróć `jobId`.\n2. Worker przetwarza asynchronicznie.\n3. Klient polling lub webhook po wynik.\n\nKiedy stosować:\n- generowanie raportów, eksport danych,\n- wysyłka emaili,\n- przetwarzanie obrazów,\n- długie transakcje.\n\nNarzędzia: Kafka, RabbitMQ, Spring `@Async`, Spring Batch."
+        },
+        {
+          "id": "perf-21",
+          "q": "Jak mierzyć wydajność w produkcji (APM)?",
+          "a": "APM (Application Performance Monitoring) daje wgląd w:\n- latency per endpoint,\n- error rate,\n- dependency performance (DB, cache, zewnętrzne API),\n- JVM metrics (heap, GC, threads).\n\nNarzędzia:\n- **Micrometer** + Prometheus + Grafana — open source stack,\n- **Datadog, New Relic** — SaaS z auto-instrumentation,\n- **OpenTelemetry** — standard zbierania telemetrii (traces, metrics, logs).\n\nSpring Boot Actuator + Micrometer to minimum dla każdej aplikacji produkcyjnej."
+        },
+        {
+          "id": "perf-22",
+          "q": "Czym jest object pooling i kiedy go stosować?",
+          "a": "Object pooling: ponowne użycie drogich obiektów zamiast tworzenia od nowa.\n\nKiedy sensowne:\n- tworzenie obiektu jest kosztowne (połączenia DB, wątki),\n- obiekt jest często potrzebny i krótko używany.\n\nKiedy NIE:\n- zwykłe POJO — GC radzi sobie lepiej,\n- przetrzymywanie pooled objects zwiększa retention i może powodować GC pause.\n\nPrzykłady: connection pooling (HikariCP), ByteBuffer pools (Netty), thread pools (ExecutorService)."
+        },
+        {
+          "id": "perf-23",
+          "q": "Czym jest CDN i jak poprawia wydajność?",
+          "a": "CDN (Content Delivery Network) to sieć serwerów cache rozmieszczonych geograficznie.\n\nŻądanie trafia do najbliższego edge node zamiast origin server.\n\nKorzyści:\n- mniejsza latency (mniej ms do edge niż do origin),\n- odciążenie origin servera,\n- absorpcja ruchu przy DDoS,\n- caching statycznych assetów (CSS, JS, images) i API responses.\n\nPopularne: CloudFront (AWS), Cloudflare, Fastly.\nWażne: poprawna konfiguracja cache headers (`Cache-Control`, `Vary`, `ETag`)."
+        },
+        {
+          "id": "perf-24",
+          "q": "Czym są SLI, SLO i SLA w kontekście wydajności?",
+          "a": "**SLI** (Service Level Indicator): konkretna miara: p99 latency, error rate, availability.\n\n**SLO** (Service Level Objective): docelowa wartość SLI: \"p99 < 200ms przez 99,9% czasu w miesiącu\".\n\n**SLA** (Service Level Agreement): kontrakt z konsekwencjami: \"availability 99,9%, inaczej zwracamy x% opłaty\".\n\nError budget = `1 - SLO` = budżet na błędy i eksperymenty.\n\nGdy error budget wyczerpany: zamróź deploye, zwiększ niezawodność.\nGdy pełny: możesz ryzykować nowe funkcje."
         }
       ]
     },
@@ -1018,6 +1593,86 @@
           "id": "sys-8",
           "q": "Jak podejmować decyzje technologiczne długoterminowo?",
           "a": "Należy brać pod uwagę:\n- dojrzałość technologii,\n- wsparcie społeczności,\n- koszt utrzymania,\n- łatwość rekrutacji,\n- vendor lock-in.\n\nNajlepsza technologia to taka, którą zespół potrafi utrzymać przez lata."
+        },
+        {
+          "id": "sys-9",
+          "q": "Jak zaprojektować URL shortener?",
+          "a": "Wymagania: `POST /shorten` → zwraca short URL, `GET /{code}` → redirect 301/302.\n\nGenerowanie kodu:\n- Base62 (a-z A-Z 0-9) z 7 znaków = 62^7 ≈ 3.5 biliona unikalnych URL-i,\n- counter-based (Snowflake ID → Base62) lub losowy + check collision.\n\nSkala:\n- write: tabel Cassandra / Redis (kod → URL),\n- read: CDN lub Redis cache (100M redirects/dzień → ~1200 req/s).\n\nRedirect 301 (permanent, browser cache) vs 302 (temporary, zawsze odpytuje serwer) — zależy czy chcemy analytics."
+        },
+        {
+          "id": "sys-10",
+          "q": "Jak zaprojektować rate limiter?",
+          "a": "Algorytm Token Bucket w Redis:\n```\nMULTI\n  DECR user:123:tokens\n  EXPIRE user:123:tokens 60\nEXEC\n```\n\nWarianty:\n- **Fixed Window**: prosty, ale spike na granicy okna,\n- **Sliding Window Log**: dokładny, duże zużycie pamięci,\n- **Token Bucket**: balansuje burst i steady rate.\n\nOdpowiedź: `429 Too Many Requests` + `Retry-After`.\n\nDistributed rate limiting: Redis centralny, ale dodaje latency — rozważ lokalne z synchronizacją."
+        },
+        {
+          "id": "sys-11",
+          "q": "Jak zaprojektować system powiadomień?",
+          "a": "Komponenty:\n- **Notification Service**: przyjmuje event, decyduje co i do kogo,\n- **Template Service**: renderuje treść,\n- **Channel Adapters**: Email (SES), SMS (Twilio), Push (FCM/APNs).\n\nSkala:\n- kolejka (Kafka) per kanał → consumers wysyłają,\n- retry z exponential backoff,\n- DLQ dla nieudanych.\n\nWażne:\n- preferences per user (opt-out),\n- rate limit (1 email/godzinę per typ),\n- idempotency (nie wyślij dwa razy tego samego)."
+        },
+        {
+          "id": "sys-12",
+          "q": "Czym jest PACELC theorem?",
+          "a": "Rozszerzenie CAP: w przypadku partycji (P) wybierasz A lub C; **Even (E) w normalnym działaniu wybierasz Latency (L) lub Consistency (C)**.\n\nPACELC = PA/EL lub PC/EC.\n\nPrzykłady:\n- DynamoDB: PA/EL — dostępność i niska latency,\n- PostgreSQL synchronous replication: PC/EC — konsystencja zawsze,\n- Cassandra (quorum): konfigurowalny.\n\nCAP mówi co robisz przy awarii. PACELC mówi co robisz na co dzień."
+        },
+        {
+          "id": "sys-13",
+          "q": "Jak zaimplementować Distributed Lock?",
+          "a": "Problem: wiele instancji nie może wykonywać tej samej operacji jednocześnie.\n\nRedis (Redlock):\n```\nSET lock:resource <unique-id> NX PX 30000\n```\n- `NX` — tylko jeśli nie istnieje,\n- `PX 30000` — TTL 30s (zapobiega deadlock przy crashu).\n\nWażne:\n- każda instancja ma unikalny `unique-id` (nie nadpisuje cudzego locka),\n- Redlock na 3+ node Redis dla odporności na split-brain.\n\nAlternatywy: ZooKeeper (ZNode ephemeral), PostgreSQL advisory locks."
+        },
+        {
+          "id": "sys-14",
+          "q": "Czym jest Leader Election?",
+          "a": "Leader Election: spośród wielu instancji wybierana jest jedna jako leader (np. do zadań cron, processing partitioned work).\n\nMechanizmy:\n- **ZooKeeper**: ephemeral node — instancja która stworzy node jako pierwsza jest leaderem. Przy crashu node znika, reszta rerywalizuje,\n- **Redis** (Redlock z renewal): leader co N sekund odnawia lock,\n- **Kubernetes leader election**: biblioteka `k8s.io/client-go/tools/leaderelection` przez Lease object.\n\nSpring: `@SchedulerLock` (ShedLock) dla prostszych przypadków."
+        },
+        {
+          "id": "sys-15",
+          "q": "Jak generować unikalne ID at scale?",
+          "a": "**UUID v4**: losowy, 128-bit — prosty, ale niezoptymalizowany dla B-tree indexes (random insert).\n\n**UUID v7**: timestamp + random — monotoniczny (lepszy dla indexów).\n\n**Snowflake ID** (Twitter): 64-bit int = `timestamp(41bit) | datacenter(5) | worker(5) | sequence(12)`.\n- Sortable, kompaktowy, generowany lokalnie bez DB.\n\n**ULID**: podobny do Snowflake, Base32, czytelny.\n\nUnikaj: auto-increment z jednej bazy przy shardingu — bottleneck i nie unikalny globalnie."
+        },
+        {
+          "id": "sys-16",
+          "q": "Czym jest Fan-out pattern?",
+          "a": "Fan-out: jeden event/message jest dostarczony do wielu odbiorców.\n\n**Fan-out on write**: przy tweecie zapisz do timeline każdego followera z góry.\n- Zaleta: szybki odczyt (gotowy timeline).\n- Wada: drogi zapis przy dużej liczbie followerów (celebrity problem).\n\n**Fan-out on read**: pobierz tweety od obserwowanych dynamicznie.\n- Zaleta: prosty zapis.\n- Wada: wolny odczyt.\n\nW praktyce: hybryda — fan-out on write dla zwykłych użytkowników, on read dla celebrytów."
+        },
+        {
+          "id": "sys-17",
+          "q": "Read-heavy vs write-heavy — jak wpływa na design?",
+          "a": "**Read-heavy** (10:1 read/write):\n- agresywne cache'owanie (Redis, CDN),\n- read replicas,\n- denormalizacja (precomputed views),\n- CQRS z osobnym read modelem.\n\n**Write-heavy** (1:10 read/write):\n- write batching,\n- append-only log (Kafka jako durable buffer),\n- asynchroniczne zapisy,\n- sharding po write key,\n- unikaj expensive indexes."
+        },
+        {
+          "id": "sys-18",
+          "q": "Czym są consistency patterns w systemach rozproszonych?",
+          "a": "**Strong consistency**: każdy odczyt widzi ostatni zapis. Wymaga synchronizacji (quorum, 2PC). Wysoka latency.\n\n**Eventual consistency**: wszystkie repliki w końcu zbiegają. Tymczasowe niespójności są akceptowalne. Wysoka dostępność.\n\n**Causal consistency**: operacje powiązane przyczynowo są widziane w odpowiedniej kolejności.\n\n**Read-your-writes**: po zapisie zawsze widzisz swój ostatni zapis (nie cudzych).\n\nWybór zależy od wymagań biznesowych — system bankowy = strong, social media = eventual."
+        },
+        {
+          "id": "sys-19",
+          "q": "Jak projektować sharding strategię bazy danych?",
+          "a": "Sharding = poziomy podział danych między wiele baz.\n\n**Hash sharding**: `shard = hash(key) % N`. Równomierny rozkład, ale resharding trudny.\n\n**Range sharding**: `shard 1: A-M, shard 2: N-Z`. Dobre dla range queries, ale hot spots możliwe.\n\n**Directory sharding**: mapping table → który klucz na którym shardzie. Elastyczny, ale mapping table = SPOF.\n\nWyzwania:\n- cross-shard queries (brak ACID),\n- resharding = duża operacja,\n- join między shardami niemożliwy."
+        },
+        {
+          "id": "sys-20",
+          "q": "Jak zaprojektować system obsługujący milion użytkowników?",
+          "a": "Ewolucja architektury:\n\n1. Jeden serwer (monolith) → wyczerpuje się przy ~10k users.\n2. Dodaj CDN i statyczne zasoby na S3.\n3. Separuj DB od app servera.\n4. Load balancer + kilka instancji app.\n5. Read replicas dla bazy.\n6. Cache (Redis) dla gorących danych.\n7. Async processing przez kolejkę.\n8. Sharding lub NoSQL gdy DB staje się wąskim gardłem.\n9. Mikroserwisy gdy zespoły i domeny to uzasadniają.\n\nKluczowe: nie skacz do kroku 9 od razu."
+        },
+        {
+          "id": "sys-21",
+          "q": "Czym jest Event Storming?",
+          "a": "Event Storming to technika warsztatowa (Alberto Brandolini) do eksploracji domeny biznesowej przez wspólne mapowanie zdarzeń.\n\nUczestnicy: developrzy + eksperci domenowi.\nNarzędzie: karteczki samoprzylepne na ścianie.\n\nFazy:\n1. **Big Picture** — wszystkie eventy domenowe (pomarańczowe),\n2. **Process Modelling** — komendy, aktorzy, polityki,\n3. **Design Level** — agregaty, bounded contexts.\n\nWynik: mapa domeny, identyfikacja Bounded Contexts, gotowość do podziału na serwisy."
+        },
+        {
+          "id": "sys-22",
+          "q": "Jak projektować system pod high availability (HA)?",
+          "a": "HA = eliminacja Single Point of Failure (SPOF).\n\nKażda warstwa musi być redundantna:\n- **Load balancer**: min 2 (active-active lub active-passive),\n- **App servers**: min 2 instancje, health checks,\n- **Baza danych**: primary + replica(s), automatic failover (Patroni dla PostgreSQL),\n- **Cache**: Redis Sentinel lub Cluster,\n- **Kolejki**: Kafka z replikacją partycji.\n\nMulti-AZ deployment: instancje w co najmniej 2 strefach dostępności.\n\nRTO (Recovery Time Objective) i RPO (Recovery Point Objective) definiują wymagania dla HA."
+        },
+        {
+          "id": "sys-23",
+          "q": "Czym jest data pipeline architecture?",
+          "a": "Data pipeline: przepływ danych od źródła do celu z transformacjami.\n\nWzorce:\n- **Lambda Architecture**: batch layer (Spark) + speed layer (Kafka) → serving layer,\n- **Kappa Architecture**: tylko streaming (Kafka + Flink) — upraszcza Lambda,\n- **ELT** (Extract-Load-Transform): załaduj surowe dane → transformuj w DWH (dbt + Snowflake/BigQuery).\n\nNarzędzia:\n- Kafka (transport), Apache Flink (stream processing), Apache Spark (batch), dbt (transformacje SQL)."
+        },
+        {
+          "id": "sys-24",
+          "q": "Jak ocenić architekturę systemu podczas code review / design review?",
+          "a": "Pytania do zadania:\n\n- **SPOF**: gdzie system padnie gdy jeden komponent zawiedzie?\n- **Skalowalność**: gdzie jest wąskie gardło przy 10x obciążeniu?\n- **Spójność**: jakie są gwarancje przy częściowej awarii (partial failure)?\n- **Obserwowalność**: jak zdiagnozuję problem o 3 w nocy?\n- **Złożoność**: czy ta złożoność jest uzasadniona wymaganiami?\n- **Reversibility**: jak łatwo cofnąć tę decyzję za rok?\n\n\"Good architecture maximizes the number of decisions NOT made\" (Uncle Bob)."
         }
       ]
     }

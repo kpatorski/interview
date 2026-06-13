@@ -180,3 +180,297 @@ Należy brać pod uwagę:
 
 Najlepsza technologia to taka, którą zespół potrafi utrzymać przez lata.
 
+---
+
+#### 🔹 10. Jak zaprojektować URL shortener?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+Wymagania: `POST /shorten` → zwraca short URL, `GET /{code}` → redirect 301/302.
+
+Generowanie kodu:
+- Base62 (a-z A-Z 0-9) z 7 znaków = 62^7 ≈ 3.5 biliona unikalnych URL-i,
+- counter-based (Snowflake ID → Base62) lub losowy + check collision.
+
+Skala:
+- write: tabel Cassandra / Redis (kod → URL),
+- read: CDN lub Redis cache (100M redirects/dzień → ~1200 req/s).
+
+Redirect 301 (permanent, browser cache) vs 302 (temporary, zawsze odpytuje serwer) — zależy czy chcemy analytics.
+
+---
+
+#### 🔹 11. Jak zaprojektować rate limiter?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+Algorytm Token Bucket w Redis:
+```
+MULTI
+  DECR user:123:tokens
+  EXPIRE user:123:tokens 60
+EXEC
+```
+
+Warianty:
+- **Fixed Window**: prosty, ale spike na granicy okna,
+- **Sliding Window Log**: dokładny, duże zużycie pamięci,
+- **Token Bucket**: balansuje burst i steady rate.
+
+Odpowiedź: `429 Too Many Requests` + `Retry-After`.
+
+Distributed rate limiting: Redis centralny, ale dodaje latency — rozważ lokalne z synchronizacją.
+
+---
+
+#### 🔹 12. Jak zaprojektować system powiadomień?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+Komponenty:
+- **Notification Service**: przyjmuje event, decyduje co i do kogo,
+- **Template Service**: renderuje treść,
+- **Channel Adapters**: Email (SES), SMS (Twilio), Push (FCM/APNs).
+
+Skala:
+- kolejka (Kafka) per kanał → consumers wysyłają,
+- retry z exponential backoff,
+- DLQ dla nieudanych.
+
+Ważne:
+- preferences per user (opt-out),
+- rate limit (1 email/godzinę per typ),
+- idempotency (nie wyślij dwa razy tego samego).
+
+---
+
+#### 🔹 13. Czym jest PACELC theorem?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+Rozszerzenie CAP: w przypadku partycji (P) wybierasz A lub C; **Even (E) w normalnym działaniu wybierasz Latency (L) lub Consistency (C)**.
+
+PACELC = PA/EL lub PC/EC.
+
+Przykłady:
+- DynamoDB: PA/EL — dostępność i niska latency,
+- PostgreSQL synchronous replication: PC/EC — konsystencja zawsze,
+- Cassandra (quorum): konfigurowalny.
+
+CAP mówi co robisz przy awarii. PACELC mówi co robisz na co dzień.
+
+---
+
+#### 🔹 14. Jak zaimplementować Distributed Lock?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+Problem: wiele instancji nie może wykonywać tej samej operacji jednocześnie.
+
+Redis (Redlock):
+```
+SET lock:resource <unique-id> NX PX 30000
+```
+- `NX` — tylko jeśli nie istnieje,
+- `PX 30000` — TTL 30s (zapobiega deadlock przy crashu).
+
+Ważne:
+- każda instancja ma unikalny `unique-id` (nie nadpisuje cudzego locka),
+- Redlock na 3+ node Redis dla odporności na split-brain.
+
+Alternatywy: ZooKeeper (ZNode ephemeral), PostgreSQL advisory locks.
+
+---
+
+#### 🔹 15. Czym jest Leader Election?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+Leader Election: spośród wielu instancji wybierana jest jedna jako leader (np. do zadań cron, processing partitioned work).
+
+Mechanizmy:
+- **ZooKeeper**: ephemeral node — instancja która stworzy node jako pierwsza jest leaderem. Przy crashu node znika, reszta rerywalizuje,
+- **Redis** (Redlock z renewal): leader co N sekund odnawia lock,
+- **Kubernetes leader election**: biblioteka `k8s.io/client-go/tools/leaderelection` przez Lease object.
+
+Spring: `@SchedulerLock` (ShedLock) dla prostszych przypadków.
+
+---
+
+#### 🔹 16. Jak generować unikalne ID at scale?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+**UUID v4**: losowy, 128-bit — prosty, ale niezoptymalizowany dla B-tree indexes (random insert).
+
+**UUID v7**: timestamp + random — monotoniczny (lepszy dla indexów).
+
+**Snowflake ID** (Twitter): 64-bit int = `timestamp(41bit) | datacenter(5) | worker(5) | sequence(12)`.
+- Sortable, kompaktowy, generowany lokalnie bez DB.
+
+**ULID**: podobny do Snowflake, Base32, czytelny.
+
+Unikaj: auto-increment z jednej bazy przy shardingu — bottleneck i nie unikalny globalnie.
+
+---
+
+#### 🔹 17. Czym jest Fan-out pattern?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+Fan-out: jeden event/message jest dostarczony do wielu odbiorców.
+
+**Fan-out on write**: przy tweecie zapisz do timeline każdego followera z góry.
+- Zaleta: szybki odczyt (gotowy timeline).
+- Wada: drogi zapis przy dużej liczbie followerów (celebrity problem).
+
+**Fan-out on read**: pobierz tweety od obserwowanych dynamicznie.
+- Zaleta: prosty zapis.
+- Wada: wolny odczyt.
+
+W praktyce: hybryda — fan-out on write dla zwykłych użytkowników, on read dla celebrytów.
+
+---
+
+#### 🔹 18. Read-heavy vs write-heavy — jak wpływa na design?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+**Read-heavy** (10:1 read/write):
+- agresywne cache'owanie (Redis, CDN),
+- read replicas,
+- denormalizacja (precomputed views),
+- CQRS z osobnym read modelem.
+
+**Write-heavy** (1:10 read/write):
+- write batching,
+- append-only log (Kafka jako durable buffer),
+- asynchroniczne zapisy,
+- sharding po write key,
+- unikaj expensive indexes.
+
+---
+
+#### 🔹 19. Czym są consistency patterns w systemach rozproszonych?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+**Strong consistency**: każdy odczyt widzi ostatni zapis. Wymaga synchronizacji (quorum, 2PC). Wysoka latency.
+
+**Eventual consistency**: wszystkie repliki w końcu zbiegają. Tymczasowe niespójności są akceptowalne. Wysoka dostępność.
+
+**Causal consistency**: operacje powiązane przyczynowo są widziane w odpowiedniej kolejności.
+
+**Read-your-writes**: po zapisie zawsze widzisz swój ostatni zapis (nie cudzych).
+
+Wybór zależy od wymagań biznesowych — system bankowy = strong, social media = eventual.
+
+---
+
+#### 🔹 20. Jak projektować sharding strategię bazy danych?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+Sharding = poziomy podział danych między wiele baz.
+
+**Hash sharding**: `shard = hash(key) % N`. Równomierny rozkład, ale resharding trudny.
+
+**Range sharding**: `shard 1: A-M, shard 2: N-Z`. Dobre dla range queries, ale hot spots możliwe.
+
+**Directory sharding**: mapping table → który klucz na którym shardzie. Elastyczny, ale mapping table = SPOF.
+
+Wyzwania:
+- cross-shard queries (brak ACID),
+- resharding = duża operacja,
+- join między shardami niemożliwy.
+
+---
+
+#### 🔹 21. Jak zaprojektować system obsługujący milion użytkowników?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+Ewolucja architektury:
+
+1. Jeden serwer (monolith) → wyczerpuje się przy ~10k users.
+2. Dodaj CDN i statyczne zasoby na S3.
+3. Separuj DB od app servera.
+4. Load balancer + kilka instancji app.
+5. Read replicas dla bazy.
+6. Cache (Redis) dla gorących danych.
+7. Async processing przez kolejkę.
+8. Sharding lub NoSQL gdy DB staje się wąskim gardłem.
+9. Mikroserwisy gdy zespoły i domeny to uzasadniają.
+
+Kluczowe: nie skacz do kroku 9 od razu.
+
+---
+
+#### 🔹 22. Czym jest Event Storming?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+Event Storming to technika warsztatowa (Alberto Brandolini) do eksploracji domeny biznesowej przez wspólne mapowanie zdarzeń.
+
+Uczestnicy: developrzy + eksperci domenowi.
+Narzędzie: karteczki samoprzylepne na ścianie.
+
+Fazy:
+1. **Big Picture** — wszystkie eventy domenowe (pomarańczowe),
+2. **Process Modelling** — komendy, aktorzy, polityki,
+3. **Design Level** — agregaty, bounded contexts.
+
+Wynik: mapa domeny, identyfikacja Bounded Contexts, gotowość do podziału na serwisy.
+
+---
+
+#### 🔹 23. Jak projektować system pod high availability (HA)?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+HA = eliminacja Single Point of Failure (SPOF).
+
+Każda warstwa musi być redundantna:
+- **Load balancer**: min 2 (active-active lub active-passive),
+- **App servers**: min 2 instancje, health checks,
+- **Baza danych**: primary + replica(s), automatic failover (Patroni dla PostgreSQL),
+- **Cache**: Redis Sentinel lub Cluster,
+- **Kolejki**: Kafka z replikacją partycji.
+
+Multi-AZ deployment: instancje w co najmniej 2 strefach dostępności.
+
+RTO (Recovery Time Objective) i RPO (Recovery Point Objective) definiują wymagania dla HA.
+
+---
+
+#### 🔹 24. Czym jest data pipeline architecture?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+Data pipeline: przepływ danych od źródła do celu z transformacjami.
+
+Wzorce:
+- **Lambda Architecture**: batch layer (Spark) + speed layer (Kafka) → serving layer,
+- **Kappa Architecture**: tylko streaming (Kafka + Flink) — upraszcza Lambda,
+- **ELT** (Extract-Load-Transform): załaduj surowe dane → transformuj w DWH (dbt + Snowflake/BigQuery).
+
+Narzędzia:
+- Kafka (transport), Apache Flink (stream processing), Apache Spark (batch), dbt (transformacje SQL).
+
+---
+
+#### 🔹 25. Jak ocenić architekturę systemu podczas code review / design review?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+Pytania do zadania:
+
+- **SPOF**: gdzie system padnie gdy jeden komponent zawiedzie?
+- **Skalowalność**: gdzie jest wąskie gardło przy 10x obciążeniu?
+- **Spójność**: jakie są gwarancje przy częściowej awarii (partial failure)?
+- **Obserwowalność**: jak zdiagnozuję problem o 3 w nocy?
+- **Złożoność**: czy ta złożoność jest uzasadniona wymaganiami?
+- **Reversibility**: jak łatwo cofnąć tę decyzję za rok?
+
+"Good architecture maximizes the number of decisions NOT made" (Uncle Bob).
+

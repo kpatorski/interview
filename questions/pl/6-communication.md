@@ -192,3 +192,286 @@ Dobre praktyki:
 
 Protobuf/Avro wspierają kompatybilne zmiany lepiej niż "goły" JSON.
 
+---
+
+#### 🔹 10. Czym jest Richardson Maturity Model?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+Model opisuje stopnie "dojrzałości" REST API:
+
+- **Level 0** — jeden endpoint, różne operacje przez parametry,
+- **Level 1** — osobne zasoby (resources) jako oddzielne URL-e,
+- **Level 2** — HTTP verbs (GET, POST, PUT, DELETE) do wyrażania operacji,
+- **Level 3** — HATEOAS: odpowiedź zawiera linki do kolejnych możliwych akcji.
+
+Większość "REST" API w praktyce jest na poziomie 2.
+
+---
+
+#### 🔹 11. WebSocket vs SSE vs Long Polling — kiedy co?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+**WebSocket**:
+- pełny duplex (klient i serwer mogą nadawać jednocześnie),
+- stałe połączenie TCP,
+- do: chaty, real-time collaboration, gry.
+
+**SSE (Server-Sent Events)**:
+- serwer pushuje zdarzenia do klienta przez HTTP,
+- simplex (tylko serwer → klient),
+- automatyczne reconnect, łatwe w implementacji.
+
+**Long Polling**:
+- klient trzyma otwarty request do momentu pojawienia się danych,
+- kompatybilne z każdym serwerem HTTP,
+- duże narzuty na połączenia.
+
+---
+
+#### 🔹 12. Czym jest GraphQL i jakie są jego wady i zalety?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+GraphQL to język zapytań do API gdzie klient określa dokładnie jakich danych potrzebuje.
+
+Zalety:
+- brak over-fetching i under-fetching,
+- jeden endpoint,
+- silnie typowany schemat.
+
+Wady:
+- N+1 problem (DataLoader jako rozwiązanie),
+- trudniejszy caching (nie GET),
+- złożoność autoryzacji per field,
+- learning curve.
+
+Dobre do: BFF (Backend For Frontend), złożone frontendowe wymagania.
+
+---
+
+#### 🔹 13. Czym jest Webhook i czym różni się od pollingu?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+Webhook: zewnętrzny system wysyła HTTP POST na zarejestrowany URL gdy zajdzie zdarzenie.
+
+Polling: aplikacja cyklicznie pyta zewnętrzny system o zmiany.
+
+Webhook — bardziej efektywny (brak pustych odpowiedzi), ale wymaga publicznego URL i obsługi retry po stronie nadawcy.
+
+Ważne przy odbiorze webhooków:
+- weryfikacja sygnatury (HMAC),
+- idempotent processing (duplikaty),
+- szybka odpowiedź 200 + przetwarzanie asynchroniczne.
+
+---
+
+#### 🔹 14. Czym jest API Pagination i jakie są strategie?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+**Offset pagination** (`?page=2&size=20`):
+- prosta w implementacji,
+- problemy: przy modyfikacjach danych strony się "przesuwają", wolna dla dużych offsetów.
+
+**Cursor/keyset pagination** (`?after=lastId`):
+- kursor wskazuje na konkretny rekord (ID lub timestamp),
+- stabilna przy zmianach danych, wydajna (INDEX range scan),
+- trudniejsza w implementacji.
+
+Cursor to standard dla API produkcyjnych przy dużych zbiorach.
+
+---
+
+#### 🔹 15. Czym jest Content Negotiation?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+Mechanizm HTTP pozwalający klientowi i serwerowi uzgodnić format danych.
+
+Klient wysyła:
+- `Accept: application/json` — oczekiwany format odpowiedzi,
+- `Content-Type: application/json` — format wysyłanego ciała.
+
+Serwer odpowiada `Content-Type` wskazującym wybrany format lub `406 Not Acceptable`.
+
+Pozwala serwerowi obsługiwać JSON, XML, Protobuf z tego samego endpointu.
+
+---
+
+#### 🔹 16. Czym jest Correlation ID?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+Correlation ID (też: Request ID, Trace ID) to unikalny identyfikator propagowany przez cały łańcuch wywołań.
+
+Cel:
+- powiązanie logów z różnych serwisów w jeden przepływ,
+- diagnostyka błędów w systemach rozproszonych.
+
+Implementacja:
+- generowany na wejściu (API Gateway lub pierwszy serwis),
+- propagowany w nagłówkach HTTP (`X-Correlation-ID`, `traceparent`),
+- dołączany do każdego logu (MDC w SLF4J).
+
+---
+
+#### 🔹 17. HTTP/2 vs HTTP/1.1 — kluczowe różnice
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+HTTP/2 wprowadza:
+- **multiplexing** — wiele requestów przez jedno połączenie TCP bez head-of-line blocking,
+- **header compression** (HPACK) — mniejszy narzut na powtarzające się nagłówki,
+- **server push** — serwer może wysłać zasoby zanim klient zapyta,
+- binarny protokół zamiast tekstowego.
+
+gRPC wymaga HTTP/2. Dla REST typowo HTTP/1.1 jest wystarczający, ale HTTP/2 poprawia wydajność przy dużej liczbie requestów.
+
+---
+
+#### 🔹 18. Protobuf vs JSON vs Avro — kiedy co?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+**JSON**: czytelny dla człowieka, szeroka kompatybilność, słaba typizacja, duży rozmiar.
+
+**Protobuf** (Google): binarny, silnie typowany (`.proto` schemat), 3-10x mniejszy i szybszy niż JSON, wymaga schematu po obu stronach. Używany przez gRPC.
+
+**Avro** (Apache): binarny, schemat przechowywany razem z danymi lub w Schema Registry, dominujący w ekosystemie Kafka.
+
+Wybór:
+- komunikacja serwis-serwis (latency) → Protobuf,
+- Kafka event streaming → Avro + Schema Registry,
+- publiczne API → JSON.
+
+---
+
+#### 🔹 19. Czym jest HATEOAS?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+HATEOAS (Hypermedia As The Engine Of Application State) to zasada REST Level 3: odpowiedź API zawiera linki do możliwych następnych akcji.
+
+Przykład:
+```json
+{
+  "orderId": "123",
+  "status": "PENDING",
+  "_links": {
+    "cancel": { "href": "/orders/123/cancel" },
+    "pay":    { "href": "/orders/123/pay" }
+  }
+}
+```
+
+Klient nie musi znać URL-i na sztywno — odkrywa je z odpowiedzi.
+W praktyce rzadko stosowane (złożoność > korzyść).
+
+---
+
+#### 🔹 20. Czym jest rate limiting na poziomie API?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+Rate limiting ogranicza liczbę żądań klienta w danym czasie.
+
+Poziomy:
+- per IP,
+- per user/API key,
+- per endpoint.
+
+Odpowiedzi:
+- `429 Too Many Requests` + nagłówek `Retry-After`.
+
+Nagłówki informujące klienta:
+- `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`.
+
+Implementacja: API Gateway (Kong, AWS API GW), Redis (token bucket).
+
+---
+
+#### 🔹 21. Czym jest OpenAPI/Swagger?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+OpenAPI (dawniej Swagger) to standard opisu REST API w formacie YAML/JSON.
+
+Umożliwia:
+- generowanie dokumentacji (Swagger UI),
+- generowanie klientów SDK (openapi-generator),
+- walidację requestów/responses,
+- contract testing.
+
+W Spring Boot: `springdoc-openapi` generuje spec automatycznie z adnotacji.
+
+Design-first vs code-first to wybór zależny od procesu — design-first lepiej wymusza kontrakt przed implementacją.
+
+---
+
+#### 🔹 22. Czym jest Circuit Breaker na poziomie HTTP?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+Circuit Breaker chroni przed kaskadową awarią gdy downstream serwis jest niedostępny.
+
+Implementacja z Resilience4j:
+- `CLOSED` → żądania przechodzą,
+- po X błędach → `OPEN` → żądania fail fast (bez czekania na timeout),
+- po czasie → `HALF_OPEN` → testowe żądanie,
+- jeśli sukces → `CLOSED`.
+
+Kluczowe: ustawić sensowny `timeout` przed circuit breakerem — bez timeoutu OPEN nigdy nie pomoże.
+
+---
+
+#### 🔹 23. Czym jest connection keep-alive i connection pooling w HTTP?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+**Keep-alive**: nagłówek `Connection: keep-alive` utrzymuje TCP po zakończeniu requestu, eliminując overhead TCP handshake dla kolejnych requestów.
+
+**Connection pooling** (po stronie klienta HTTP):
+- pula gotowych połączeń TCP (np. w Apache HttpClient, OkHttp),
+- każde żądanie bierze połączenie z puli zamiast tworzyć nowe,
+- kluczowe przy dużej liczbie wywołań serwis-serwis.
+
+W RestTemplate/WebClient — skonfiguruj pool, nie używaj domyślnego klienta bez puli.
+
+---
+
+#### 🔹 24. Czym jest mTLS i kiedy go używać?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+mTLS (mutual TLS) — obie strony połączenia uwierzytelniają się certyfikatami X.509.
+
+Standardowy TLS: klient weryfikuje serwer.
+mTLS: serwer weryfikuje też klienta.
+
+Zastosowania:
+- uwierzytelnianie serwisów w architekturze mikroserwisów (zero-trust),
+- API do partnerów zewnętrznych,
+- service mesh (Istio automatyzuje).
+
+Zarządzanie certyfikatami to główna złożoność — HashiCorp Vault PKI lub cert-manager w Kubernetes.
+
+---
+
+#### 🔹 25. Czym jest Request Hedging?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+Request hedging to technika wysyłania tego samego żądania do kilku replik jednocześnie i użycie pierwszej odpowiedzi.
+
+Cel: redukcja tail latency (p99, p99.9).
+Koszt: dodatkowe obciążenie serwera (~2x żądania).
+
+Stosowane gdy:
+- mamy wiele replik tego samego serwisu,
+- sporadyczne wolne instancje powodują skoki latency.
+
+Popularne w Google (opisane w "The Tail at Scale" Jeff Dean).
+
