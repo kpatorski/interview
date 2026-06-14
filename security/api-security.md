@@ -1,173 +1,173 @@
 [Back to interview](../interview.md)
 
-# Jak kompleksowo zabezpieczyć publiczne REST API?
+# 🔒 How to Secure a Public REST API — Comprehensively
 
 <!-- TOC -->
 * [TL;DR](#tldr)
-* [Analogia — Bank z recepcją](#analogia--bank-z-recepcją)
-* [Jak to działa — krok po kroku](#jak-to-działa--krok-po-kroku)
-  * [Krok 1: Zaszyfruj kanał (TLS)](#krok-1-zaszyfruj-kanał-tls)
-  * [Krok 2: Sprawdź tożsamość (Autentykacja)](#krok-2-sprawdź-tożsamość-autentykacja)
-  * [Krok 3: Sprawdź uprawnienia (Autoryzacja)](#krok-3-sprawdź-uprawnienia-autoryzacja)
-  * [Krok 4: Waliduj każdy bajt danych wejściowych](#krok-4-waliduj-każdy-bajt-danych-wejściowych)
-  * [Krok 5: Ogranicz ruch (Rate Limiting)](#krok-5-ogranicz-ruch-rate-limiting)
-  * [Krok 6: Dodaj security headers](#krok-6-dodaj-security-headers)
-  * [Krok 7: Loguj wszystko (Audit Log)](#krok-7-loguj-wszystko-audit-log)
-  * [Krok 8: Postaw API Gateway jako pierwszą linię obrony](#krok-8-postaw-api-gateway-jako-pierwszą-linię-obrony)
-  * [Krok 9: Utrzymuj zabezpieczenia w czasie](#krok-9-utrzymuj-zabezpieczenia-w-czasie)
-* [Pojęcia techniczne](#pojęcia-techniczne)
-* [Mapa warstw — gdzie co realizujesz](#mapa-warstw--gdzie-co-realizujesz)
-* [Najczęstsze luki (OWASP API Security Top 10)](#najczęstsze-luki-owasp-api-security-top-10)
-* [Źródła](#źródła)
+* [Analogy — A Bank Building](#analogy--a-bank-building)
+* [How It Works — Step by Step](#how-it-works--step-by-step)
+  * [Step 1: Encrypt the Channel (TLS)](#step-1-encrypt-the-channel-tls)
+  * [Step 2: Verify Identity (Authentication)](#step-2-verify-identity-authentication)
+  * [Step 3: Check Permissions (Authorization)](#step-3-check-permissions-authorization)
+  * [Step 4: Validate Every Byte of Input](#step-4-validate-every-byte-of-input)
+  * [Step 5: Limit Traffic (Rate Limiting)](#step-5-limit-traffic-rate-limiting)
+  * [Step 6: Add Security Headers](#step-6-add-security-headers)
+  * [Step 7: Log Everything (Audit Log)](#step-7-log-everything-audit-log)
+  * [Step 8: Put an API Gateway at the Front](#step-8-put-an-api-gateway-at-the-front)
+  * [Step 9: Keep Security Up to Date](#step-9-keep-security-up-to-date)
+* [Technical Terms Glossary](#technical-terms-glossary)
+* [Layer Map — Who Does What](#layer-map--who-does-what)
+* [Most Common Gaps (OWASP API Security Top 10)](#most-common-gaps-owasp-api-security-top-10)
+* [Sources](#sources)
 <!-- TOC -->
 
 ---
 
 ## TL;DR
 
-Publiczne API to drzwi do Twojego systemu otwarte na internet — każdy może zapukać.
-Zabezpieczenie to nie jeden zamek, ale **osiem warstw**: szyfrowanie rozmowy, sprawdzenie tożsamości, sprawdzenie uprawnień, walidacja danych, limit żądań, bezpieczne nagłówki, audit log i brama wejściowa.
-Jedna warstwa to za mało — gdy jedna zawiedzie, kolejna zatrzymuje atak.
+A public REST API is a door to your system — open to the entire internet.
+Securing it is not one lock, but **eight layers**: encrypt the channel, verify identity, check permissions, validate input, limit traffic, set browser policies via headers, audit log, and put a gateway in front.
+One layer is never enough — when one fails, the next one stops the attack.
 
 ---
 
-## Analogia — Bank z recepcją
+## Analogy — A Bank Building
 
-Wyobraź sobie budynek banku ze skarbcem w środku.
+Think of a bank building with a vault inside.
 
-| Warstwa bezpieczeństwa | Odpowiednik w banku |
+| Security layer | Bank equivalent |
 |---|---|
-| TLS (szyfrowanie) | Szyba kuloodporna i zaszyfrowane telefony — nikt z zewnątrz nie słyszy rozmowy |
-| Autentykacja | Ochroniarz przy wejściu sprawdzający dowód tożsamości |
-| Autoryzacja | Różne karty dostępu — klient idzie do okienka, nie do skarbca |
-| Walidacja inputu | Bramka metalowa — nie wnosisz czegoś co nie powinno wejść |
-| Rate limiting | Kolejka — jeden klient nie może zająć wszystkich kas jednocześnie |
-| Security headers | Regulamin wywwieszony na drzwiach — co wolno, czego nie |
-| Audit log | Kamera i rejestr odwiedzin — kto, kiedy, co robił |
-| API Gateway | Recepcja — pierwsza osoba którą spotykasz, zanim dostaniesz się do pracownika |
+| **TLS** | Bulletproof glass and encrypted phones — nobody outside can hear the conversation |
+| **Authentication** | Security guard checking your ID at the entrance |
+| **Authorization** | Access cards — a customer goes to the counter, not into the vault |
+| **Input validation** | Metal detector — you can't bring in things that don't belong |
+| **Rate limiting** | A queue — one customer can't occupy all the tellers at once |
+| **Security headers** | Rules posted on the door — what's allowed, what isn't |
+| **Audit log** | CCTV camera and visitor log — who came, when, what they did |
+| **API Gateway** | Reception desk — the first person you meet before reaching any employee |
 
-Każde zabezpieczenie działa niezależnie. Jeśli ochroniarz nie zauważy fałszywego dowodu, kamera i tak nagra twarz. Jeśli karta dostępu nie przejdzie, skarbiec i tak pozostaje zamknięty.
+Each layer works independently. If the guard misses a fake ID, the camera still recorded the face. If the access card fails, the vault stays locked.
 
 ---
 
-## Jak to działa — krok po kroku
+## How It Works — Step by Step
 
-### Krok 1: Zaszyfruj kanał (TLS)
+### Step 1: Encrypt the Channel (TLS)
 
-**Problem**: Dane w internecie przepływają przez dziesiątki serwerów pośrednich. Każdy z nich może je odczytać, jeśli lecą "gołe".
+**The problem**: Data on the internet passes through dozens of intermediate servers. Any one of them can read it if sent in plaintext.
 
-**Rozwiązanie**: TLS (to co stoi za `https://`) tworzy zaszyfrowany tunel. Nikt po drodze nie widzi treści — tylko że dwa adresy IP rozmawiają.
+**The solution**: TLS (what sits behind `https://`) creates an encrypted tunnel. Nobody in between sees the content — only that two IP addresses are talking.
 
-**W praktyce**:
+**In practice**:
 ```
-# Certyfikat (Let's Encrypt — darmowy, auto-renewal)
-# HSTS header — mówi przeglądarce: nigdy nie używaj HTTP dla tej domeny
+# Certificate (Let's Encrypt — free, auto-renewal via Certbot)
+# HSTS header — tells the browser: never use HTTP for this domain
 Strict-Transport-Security: max-age=31536000; includeSubDomains
 ```
 
-**Luka bez tego**: haker w tej samej sieci Wi-Fi (kawiarnia, lotnisko) widzi wszystkie Twoje tokeny i dane — "man in the middle attack".
+**Without this**: an attacker on the same Wi-Fi (café, airport) can read every token and request body in transit — man-in-the-middle attack.
 
 ---
 
-### Krok 2: Sprawdź tożsamość (Autentykacja)
+### Step 2: Verify Identity (Authentication)
 
-**Problem**: Kto puka? API jest publiczne — może pukać ktokolwiek.
+**The problem**: Who is knocking? The API is public — anyone can send a request.
 
-Trzy rodzaje klientów, trzy strategie:
+Three types of callers, three strategies:
 
-#### Użytkownik z aplikacji/przeglądarki → OAuth2 + JWT
-
-```
-1. Użytkownik klika "Zaloguj" w aplikacji
-2. Aplikacja przekierowuje do Authorization Servera (Keycloak, Auth0, własny)
-3. Użytkownik podaje login/hasło TAM, nie w aplikacji
-4. Authorization Server zwraca access token (JWT) — mały dokument z cyfrowym podpisem
-5. Aplikacja dołącza token do każdego żądania: Authorization: Bearer <token>
-6. Twój serwis weryfikuje podpis (JWKS) — bez pytania Authorization Servera
-```
-
-Dlaczego JWT? Bo podpis kryptograficzny gwarantuje autentyczność bez dodatkowego sieciowego call.
-Ważne: krótki TTL (5–15 minut) — jeśli token wycieknie, szybko wygaśnie.
-
-#### Serwis do serwisu (M2M) → OAuth2 Client Credentials
+#### User from a browser/mobile app → OAuth2 + JWT
 
 ```
-Billing Service → zamawia token: POST /token
+1. User clicks "Login" in the app
+2. App redirects to Authorization Server (Keycloak, Auth0, Cognito...)
+3. User enters credentials THERE, not in the app
+4. Authorization Server returns an access token (JWT) — a small digitally signed document
+5. App attaches the token to every request: Authorization: Bearer <token>
+6. Your service verifies the signature (via JWKS) — without calling the Authorization Server again
+```
+
+Why JWT? Because the cryptographic signature guarantees authenticity without an extra network hop.
+Key detail: short TTL (5–15 minutes) — if the token leaks, it expires quickly.
+
+#### Service to service (M2M) → OAuth2 Client Credentials
+
+```
+Billing Service → requests a token: POST /token
   client_id=billing-svc
-  client_secret=<sekret>
+  client_secret=<secret>
   grant_type=client_credentials
-← dostaje access token (JWT)
-→ używa tokenu do wywołania Orders API
+← receives access token (JWT)
+→ uses the token to call Orders API
 ```
 
-Nie ma "użytkownika" — serwis działa we własnym imieniu.
+There is no human user — the service acts on its own behalf.
 
-#### Partner zewnętrzny → API Key
+#### External partner → API Key
 
 ```
 X-API-Key: sk_live_abc123xyz
 ```
 
-Prostsze niż OAuth2, ale token nie wygasa automatycznie — trzeba rotować ręcznie i natychmiast odwołać przy kompromitacji.
+Simpler than OAuth2, but the key doesn't expire automatically — must be rotated manually and revoked immediately if compromised.
 
 ---
 
-### Krok 3: Sprawdź uprawnienia (Autoryzacja)
+### Step 3: Check Permissions (Authorization)
 
-**Problem**: Wiesz kto puka — ale co mu wolno? Zalogowany użytkownik nie powinien widzieć danych innych użytkowników.
+**The problem**: You know who is calling — but what are they allowed to do? A logged-in user should not see other users' data.
 
-**Rozwiązanie**: Token (JWT) zawiera listę uprawnień (scopes). Serwer sprawdza czy token ma właściwy scope dla danej operacji.
+**The solution**: The token (JWT) contains a list of permissions (scopes). The server checks whether the token has the required scope for the operation.
 
 ```java
-// Spring Security: automatycznie z tokenu JWT
+// Spring Security: reads scope automatically from the JWT
 @GetMapping("/orders")
 @PreAuthorize("hasAuthority('SCOPE_orders:read')")
 public List<Order> getMyOrders(Authentication auth) {
-    // WAŻNE: filtruj po userId z tokenu, nie z parametru URL
+    // CRITICAL: filter by userId from the token, not from the URL parameter
     String userId = auth.getName();
     return orderRepository.findByUserId(userId);
 }
 ```
 
-**Typowy błąd — IDOR**: endpoint `/orders/{id}` bez sprawdzenia czy zamówienie należy do zalogowanego użytkownika. Zmień `id` w URL → dostaniesz cudze zamówienie. Autentykacja zadziałała, autoryzacja — nie.
+**Classic mistake — IDOR**: endpoint `/orders/{id}` without checking whether the order belongs to the authenticated user. Change the `id` in the URL → you get someone else's order. Authentication worked, authorization didn't.
 
 ---
 
-### Krok 4: Waliduj każdy bajt danych wejściowych
+### Step 4: Validate Every Byte of Input
 
-**Problem**: Klient może wysłać dosłownie cokolwiek jako JSON. `"amount": -99999` albo `"script": "<script>alert('xss')</script>"`.
+**The problem**: A client can send literally anything as JSON. `"amount": -99999` or `"name": "<script>alert('xss')</script>"`.
 
-**Rozwiązanie**: Bean Validation (Jakarta Validation) na każdym `@RequestBody`:
+**The solution**: Bean Validation (Jakarta Validation) on every `@RequestBody`:
 
 ```java
 record CreateOrderRequest(
-    @NotBlank                          // nie null, nie ""
+    @NotBlank                          // not null, not ""
     String customerId,
 
-    @NotNull @Positive                 // wymagane, musi być > 0
+    @NotNull @Positive                 // required and must be > 0
     BigDecimal amount,
 
-    @Pattern(regexp = "[A-Z]{3}")      // tylko 3 wielkie litery (kod waluty ISO)
+    @Pattern(regexp = "[A-Z]{3}")      // exactly 3 uppercase letters (ISO currency code)
     String currency
 ) {}
 
 @PostMapping("/orders")
 public ResponseEntity<OrderResponse> placeOrder(
-    @Valid @RequestBody CreateOrderRequest req  // @Valid uruchamia walidację
+    @Valid @RequestBody CreateOrderRequest req  // @Valid triggers validation
 ) { ... }
 ```
 
-Gdy walidacja się nie powiedzie, Spring zwraca `400 Bad Request` automatycznie — zanim wykonasz jakikolwiek kod biznesowy.
+When validation fails, Spring returns `400 Bad Request` automatically — before any business logic runs.
 
-**Zasada**: nigdy nie ufaj żadnemu inputowi z zewnątrz. Nawet od "zaufanych" serwisów wewnętrznych — na granicach HTTP zawsze walidacja.
+**The rule**: never trust any input from outside. Even from "trusted" internal services — always validate at HTTP boundaries.
 
 ---
 
-### Krok 5: Ogranicz ruch (Rate Limiting)
+### Step 5: Limit Traffic (Rate Limiting)
 
-**Problem**: Jeden skrypt może wysłać 50 000 żądań na sekundę. Twój serwis padnie. Wszyscy inni klienci też przestaną działać. To się nazywa DoS (Denial of Service).
+**The problem**: A single script can send 50,000 requests per second. Your service will go down. Every other legitimate client goes down with it. This is called a DoS (Denial of Service) attack.
 
-**Rozwiązanie**: Policz żądania per klient (API Key, IP, userId). Przekroczenie limitu → `429 Too Many Requests`.
+**The solution**: Count requests per client (API Key, IP, userId). Exceeding the limit → `429 Too Many Requests`.
 
 ```
 HTTP/1.1 429 Too Many Requests
@@ -177,34 +177,34 @@ X-RateLimit-Remaining: 0
 X-RateLimit-Reset: 1718352000
 ```
 
-`Retry-After: 60` to ważny szczegół. Bez niego klienci retryują natychmiast → thundering herd → problem się pogłębia. Z nim — czekają 60 sekund i próbują raz.
+`Retry-After: 60` is an important detail. Without it, clients retry immediately → thundering herd → the overload gets worse. With it — they wait 60 seconds and try once.
 
-**Gdzie realizować**: w API Gateway (Kong, AWS API Gateway, Spring Cloud Gateway) — zanim żądanie dotrze do serwisu. Serwis, który jest pod DoS, nie powinien w ogóle widzieć ruchu.
+**Where to enforce**: in the API Gateway, before the request reaches your service. A service under DoS shouldn't see the traffic at all.
 
 ---
 
-### Krok 6: Dodaj security headers
+### Step 6: Add Security Headers
 
-Małe nagłówki HTTP, które mówią przeglądarce jak ma się zachować. Każdy chroni przed konkretnym atakiem:
+Small HTTP headers that tell the browser how to behave. Each one protects against a specific attack:
 
 ```
-# Nie sniff-uj typu pliku (ochrona przed MIME confusion attacks)
+# Don't sniff the content type (prevents MIME confusion attacks)
 X-Content-Type-Options: nosniff
 
-# Nie pozwól osadzić w iframe na innych domenach (ochrona przed clickjacking)
+# Don't allow embedding in iframes on other domains (prevents clickjacking)
 X-Frame-Options: DENY
 
-# Skrypty tylko z naszej domeny (ochrona przed XSS)
+# Scripts only from our own domain (prevents XSS)
 Content-Security-Policy: default-src 'self'
 
-# Zawsze HTTPS, przez rok, w tym subdomeny
+# Always use HTTPS, for one year, including subdomains
 Strict-Transport-Security: max-age=31536000; includeSubDomains
 
-# Nie wysyłaj referrer do innych domen
+# Don't send referrer to external domains
 Referrer-Policy: no-referrer-when-downgrade
 ```
 
-W Spring Security:
+In Spring Security:
 ```java
 http.headers(headers -> headers
     .frameOptions(frame -> frame.deny())
@@ -215,11 +215,11 @@ http.headers(headers -> headers
 
 ---
 
-### Krok 7: Loguj wszystko (Audit Log)
+### Step 7: Log Everything (Audit Log)
 
-**Po co**: gdy coś pójdzie nie tak (naruszenie bezpieczeństwa, błąd, spór z klientem), musisz wiedzieć co się stało. W środowiskach regulowanych (fintech, healthcare) to też wymóg prawny.
+**Why**: when something goes wrong (security breach, bug, client dispute), you need to know what happened. In regulated environments (fintech, healthcare) it's also a legal requirement.
 
-**Co logować**:
+**What to log**:
 ```json
 {
   "ts": "2026-06-14T10:22:01Z",
@@ -233,22 +233,22 @@ http.headers(headers -> headers
 }
 ```
 
-**Czego NIE logować**: hasła, tokeny, numery kart, PESEL, pełne dane osobowe. Zamiast `"token": "Bearer eyJ..."` loguj `"tokenPresent": true`.
+**What NOT to log**: passwords, tokens, card numbers, personal data. Instead of `"token": "Bearer eyJ..."` log `"tokenPresent": true`.
 
-**Korelacja**: każde żądanie dostaje unikalny `traceId` (Correlation ID). Przekazujesz go przez wszystkie serwisy → możesz prześledzić jedno żądanie przez cały system w Splunk/Grafana.
+**Correlation**: every request gets a unique `traceId` (Correlation ID). You propagate it through all services → you can trace a single request across the entire system in Splunk or Grafana.
 
 ---
 
-### Krok 8: Postaw API Gateway jako pierwszą linię obrony
+### Step 8: Put an API Gateway at the Front
 
-**Problem**: Twój serwis nie powinien martwić się o wszystkie powyższe rzeczy osobno — to cross-cutting concern.
+**The problem**: your service shouldn't have to handle all of the above separately — these are cross-cutting concerns.
 
-**Rozwiązanie**: API Gateway (Spring Cloud Gateway, Kong, AWS API GW, Nginx) przed serwisami:
+**The solution**: API Gateway (Spring Cloud Gateway, Kong, AWS API GW, Nginx) sits in front of your services:
 
 ```
-Klient → [API Gateway] → [Twój serwis]
+Client → [API Gateway] → [Your Service]
               ↓
-         realizuje:
+         handles:
          - TLS termination
          - JWT validation
          - Rate limiting
@@ -256,45 +256,45 @@ Klient → [API Gateway] → [Twój serwis]
          - Routing
 ```
 
-Serwis otrzymuje już uwierzytelnione, przetworzone żądanie. Skupia się tylko na logice biznesowej.
+Your service receives an already-authenticated, pre-processed request and can focus solely on business logic.
 
-**Dodatkowa korzyść**: jeden punkt do aktualizacji polityk bezpieczeństwa — zmiana rate limitów, dodanie nowej reguły auth — bez modyfikacji dziesiątek serwisów.
-
----
-
-### Krok 9: Utrzymuj zabezpieczenia w czasie
-
-Bezpieczeństwo to nie stan — to proces.
-
-- **Dependency scanning**: co sprincie (Dependabot, OWASP Dependency Check) — czy Twoje biblioteki nie mają znanych CVE?
-- **Secret rotation**: tokeny, API klucze, hasła do bazy — zmieniaj co 90 dni, natychmiast przy podejrzeniu kompromitacji.
-- **Pen testing**: raz na kwartał lub po dużych zmianach.
-- **OWASP checklist**: przed każdym major release przejrzyj OWASP API Security Top 10.
+**Additional benefit**: a single place to update security policies — change rate limits or add a new auth rule without modifying dozens of services.
 
 ---
 
-## Pojęcia techniczne
+### Step 9: Keep Security Up to Date
 
-| Termin | Co to jest (prosto) |
+Security is not a state — it's a process.
+
+- **Dependency scanning**: every sprint (Dependabot, OWASP Dependency Check) — do your libraries have known CVEs?
+- **Secret rotation**: tokens, API keys, database passwords — rotate every 90 days, immediately on suspicion of compromise.
+- **Pen testing**: once per quarter or after major changes.
+- **OWASP checklist**: review OWASP API Security Top 10 before every major release.
+
+---
+
+## Technical Terms Glossary
+
+| Term | What it is (simply) |
 |---|---|
-| **TLS** | Protokół szyfrowania połączenia sieciowego; `https://` używa TLS |
-| **OAuth2** | Standard pozwalający aplikacjom działać w imieniu użytkownika bez znajomości jego hasła |
-| **JWT** (JSON Web Token) | Mały, podpisany cyfrowo dokument zawierający tożsamość i uprawnienia |
-| **JWKS** | Publiczne klucze Authorization Servera — serwis używa ich do weryfikacji podpisu JWT |
-| **Scope** | Nazwane uprawnienie w OAuth2, np. `orders:read` = "może odczytywać zamówienia" |
-| **Rate limiting** | Ograniczenie liczby żądań w jednostce czasu per klient/IP |
-| **API Gateway** | Serwis pośredniczący między klientem a backendowymi serwisami |
-| **HSTS** | Nagłówek HTTP mówiący przeglądarce: zawsze używaj HTTPS dla tej domeny |
-| **CSP** (Content Security Policy) | Nagłówek ograniczający skąd przeglądarka może ładować zasoby |
-| **IDOR** | Insecure Direct Object Reference — dostęp do zasobu innego użytkownika przez zmianę ID |
-| **DoS** | Denial of Service — atak polegający na zalaniu serwisu żądaniami |
-| **Bean Validation** | Mechanizm Spring/Jakarta do walidacji obiektów przez adnotacje (`@NotBlank`, `@Positive`) |
-| **Correlation ID** | Unikalny identyfikator żądania propagowany przez cały system do celów tracingu |
-| **CVE** | Common Vulnerabilities and Exposures — baza znanych luk w oprogramowaniu |
+| **TLS** | Encryption protocol for network connections; `https://` uses TLS |
+| **OAuth2** | Standard that lets apps act on behalf of a user without knowing their password |
+| **JWT** (JSON Web Token) | A small, digitally signed document containing identity and permissions |
+| **JWKS** | Public keys of the Authorization Server — your service uses them to verify JWT signatures |
+| **Scope** | A named permission in OAuth2, e.g. `orders:read` = "can read orders" |
+| **Rate limiting** | Restricting the number of requests per unit of time per client/IP |
+| **API Gateway** | A proxy between clients and backend services handling cross-cutting concerns |
+| **HSTS** | HTTP header telling the browser: always use HTTPS for this domain |
+| **CSP** (Content Security Policy) | Header restricting where the browser can load resources from |
+| **IDOR** | Insecure Direct Object Reference — accessing another user's resource by changing an ID |
+| **DoS** | Denial of Service — flooding a service with requests to take it down |
+| **Bean Validation** | Spring/Jakarta mechanism for validating objects via annotations (`@NotBlank`, `@Positive`) |
+| **Correlation ID** | A unique request identifier propagated through all services for tracing |
+| **CVE** | Common Vulnerabilities and Exposures — database of known software vulnerabilities |
 
 ---
 
-## Mapa warstw — gdzie co realizujesz
+## Layer Map — Who Does What
 
 ```
                     INTERNET
@@ -304,38 +304,37 @@ Bezpieczeństwo to nie stan — to proces.
                 └──────┬──────┘
                        │
               ┌────────▼────────┐
-              │   Twój serwis   │  ← autoryzacja (@PreAuthorize), walidacja inputu
-              │  Spring Boot    │     audit log, security headers
+              │   Spring Boot   │  ← @PreAuthorize, @Valid, audit log, security headers
               └────────┬────────┘
                        │
               ┌────────▼────────┐
-              │    Baza danych  │  ← szyfrowanie at-rest, least privilege konta DB
+              │    Database     │  ← encryption at rest, least privilege DB account
               └─────────────────┘
 ```
 
 ---
 
-## Najczęstsze luki (OWASP API Security Top 10)
+## Most Common Gaps (OWASP API Security Top 10)
 
-| # | Luka | Jak chronić |
+| # | Vulnerability | How to protect |
 |---|---|---|
-| 1 | Broken Object Level Authorization (IDOR) | Filtruj zasoby po userId z tokenu, nie z URL |
-| 2 | Broken Authentication | Krótkie TTL tokenów, PKCE, nie przechowuj sekretów w kodzie |
-| 3 | Broken Object Property Level Authorization | Nie zwracaj więcej pól niż klient powinien widzieć (DTO, @JsonView) |
-| 4 | Unrestricted Resource Consumption | Rate limiting, max request body size, pagination limit |
-| 5 | Broken Function Level Authorization | Endpointy admin wymagają osobnego scope, nie tylko zalogowania |
-| 6 | Unrestricted Access to Sensitive Business Flows | Rate limit na wrażliwe operacje (reset hasła, zamówienie) |
-| 7 | Server-Side Request Forgery (SSRF) | Whitelist dozwolonych URL w żądaniach do zewnętrznych serwisów |
-| 8 | Security Misconfiguration | Disable debug endpoints, nie eksponuj stack trace klientom |
-| 9 | Improper Inventory Management | Wersjonuj API, wyłączaj stare wersje, znaj swoje endpointy |
-| 10 | Unsafe Consumption of APIs | Waliduj odpowiedzi od zewnętrznych API, nie ufaj im bezwarunkowo |
+| 1 | Broken Object Level Authorization (IDOR) | Filter resources by `userId` from the token, not from the URL |
+| 2 | Broken Authentication | Short token TTL, PKCE, never store secrets in code |
+| 3 | Broken Object Property Level Authorization | Don't return more fields than the client should see (DTO, `@JsonView`) |
+| 4 | Unrestricted Resource Consumption | Rate limiting, max request body size, pagination limits |
+| 5 | Broken Function Level Authorization | Admin endpoints require a dedicated scope, not just being logged in |
+| 6 | Unrestricted Access to Sensitive Business Flows | Rate limit sensitive operations (password reset, order placement) |
+| 7 | Server-Side Request Forgery (SSRF) | Whitelist allowed URLs when making requests to external services |
+| 8 | Security Misconfiguration | Disable debug endpoints, never expose stack traces to clients |
+| 9 | Improper Inventory Management | Version your API, decommission old versions, know your endpoints |
+| 10 | Unsafe Consumption of APIs | Validate responses from external APIs — don't trust them unconditionally |
 
 ---
 
-## Źródła
+## Sources
 
-- [`questions/pl/12-public-api.md`](../questions/pl/12-public-api.md) — karta 26: overview zabezpieczenia API
-- [`questions/pl/8-security.md`](../questions/pl/8-security.md) — karty: TLS, OAuth2, JWT, OWASP Top 10, SSRF, security headers
-- [`security/security.md`](security.md) — JWT deep dive, encryption
-- [OWASP API Security Top 10](https://owasp.org/API-Security/editions/2023/en/0x00-header/)
-- Spring Security docs: `oauth2ResourceServer`, CORS, headers
+- [`questions/pl/12-public-api.md`](../questions/pl/12-public-api.md) — card 26: API security overview
+- [`questions/pl/8-security.md`](../questions/pl/8-security.md) — cards: TLS, OAuth2, JWT, OWASP Top 10, SSRF, security headers
+- [`security/security.md`](security.md) — JWT deep dive, encryption basics
+- [OWASP API Security Top 10 (2023)](https://owasp.org/API-Security/editions/2023/en/0x00-header/)
+- Spring Security reference: `oauth2ResourceServer`, CORS, headers configuration
