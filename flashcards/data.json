@@ -1018,6 +1018,31 @@
           "id": "comm-24",
           "q": "Czym jest Request Hedging?",
           "a": "Request hedging to technika wysyłania tego samego żądania do kilku replik jednocześnie i użycie pierwszej odpowiedzi.\n\nCel: redukcja tail latency (p99, p99.9).\nKoszt: dodatkowe obciążenie serwera (~2x żądania).\n\nStosowane gdy:\n- mamy wiele replik tego samego serwisu,\n- sporadyczne wolne instancje powodują skoki latency.\n\nPopularne w Google (opisane w \"The Tail at Scale\" Jeff Dean)."
+        },
+        {
+          "id": "comm-25",
+          "q": "Jak Kafka decyduje, który event trafia do której partycji?",
+          "a": "Kafka używa **partition key** — jeśli podany, wyznacza partycję przez `hash(key) % numPartitions`.\n\nKonsekwencje:\n- Ten sam klucz → zawsze ta sama partycja → **gwarantowany ordering** dla danego klucza.\n- Bez klucza → round-robin między partycjami (lub sticky partitioning w nowszych wersjach) → brak orderingu.\n\nW praktyce:\n- Klucz = identyfikator agregatu, np. `orderId`, `userId` — wszystkie eventy dotyczące jednej encji lądują w tej samej partycji.\n- Unikaj kluczy o niskiej kardynalności (np. kraj) — ryzyko hot partition.\n\nZmiana liczby partycji zaburza routing dla istniejących kluczy — zrób to przy starcie topiku."
+        },
+        {
+          "id": "comm-26",
+          "q": "Czym jest consumer group i zasada 1 partycja = 1 konsumer?",
+          "a": "**Consumer group** to zbiór konsumerów czytających ten sam topic jako jedna logiczna aplikacja. Kafka rozdziela partycje między członków grupy.\n\nZasada: **jedna partycja może być czytana przez co najwyżej jednego konsumera w danej grupie** w tym samym czasie.\n\nKonsekwencje:\n- Liczba partycji = max parallelism w grupie.\n- 10 partycji + 10 konsumerów w grupie → idealne rozłożenie.\n- 10 partycji + 15 konsumerów → 5 konsumerów idle (bez przypisanej partycji).\n- 10 partycji + 5 konsumerów → każdy konsumer czyta 2 partycje.\n\nRóżne consumer groups (np. billing-service i audit-service) czytają te same partycje niezależnie — każda ma własny offset."
+        },
+        {
+          "id": "comm-27",
+          "q": "Kto zakłada Kafka topic i w jaki sposób?",
+          "a": "Trzy podejścia:\n\n**1. Auto-create** (`auto.create.topics.enable=true`) — Kafka tworzy topic przy pierwszym publish/subscribe. Wygodne, ale niebezpieczne na produkcji (literówka w nazwie = nowy topic zamiast błędu).\n\n**2. Kafka AdminClient (programatycznie)**:\n```java\ntry (AdminClient admin = AdminClient.create(props)) {\n    NewTopic topic = new NewTopic(\"orders.placed\", 12, (short) 3); // partitions, replicas\n    admin.createTopics(List.of(topic)).all().get();\n}\n```\n\n**3. IaC / GitOps** — preferowane na produkcji:\n- Terraform (`confluentcloud_kafka_topic`),\n- Helm chart z init-container wywołującym kafka-topics.sh,\n- Strimzi Kafka Operator w Kubernetes (`KafkaTopic` CRD).\n\nNa produkcji zawsze wyłącz auto-create i zarządzaj topicami jako kodem (wersjonowanie, review, audit trail)."
+        },
+        {
+          "id": "comm-28",
+          "q": "Jakich heurystyk używać przy podziale eventów na topiki?",
+          "a": "**1. Jeden topic = jeden typ zdarzenia domenowego** (np. `orders.placed`, `orders.cancelled`).\nZaleta: różni konsumenci subskrybują tylko to, co potrzebują.\n\n**2. Alternatywnie: topic per agregat** (np. `orders`) ze wszystkimi eventami dla danego agregatu.\nZaleta: gwarantowany ordering wszystkich eventów jednego agregatu (jeden klucz = jedna partycja).\n\n**3. Separacja po środowisku**: `dev.orders.placed`, `prod.orders.placed` — izolacja środowisk.\n\n**4. Unikaj \"mega-topic\"**: jeden topic na wszystko → brak możliwości selektywnego subskrybowania i trudne zarządzanie schematami.\n\n**5. Schemat i kontrakt**: topic powinien mieć zdefiniowany schemat (Avro + Schema Registry) — zmiana schematu = wersjonowanie, nie nowy topic.\n\n**6. Retencja**: topiki z wymaganiem \"reply\" (event sourcing) — długa retencja; topiki z wymaganiem \"notify\" — krótka retencja."
+        },
+        {
+          "id": "comm-29",
+          "q": "Czym jest Retry-After i jak działa?",
+          "a": "`Retry-After` to nagłówek HTTP informujący klienta, **kiedy może ponowić żądanie**.\n\nUżywany z:\n- `429 Too Many Requests` — przekroczono rate limit,\n- `503 Service Unavailable` — serwis tymczasowo niedostępny.\n\nFormat:\n```\nRetry-After: 60          # liczba sekund\nRetry-After: Fri, 14 Jun 2026 10:00:00 GMT  # data\n```\n\nPo stronie serwera (Spring Boot + Resilience4j):\n```java\nresponse.setHeader(\"Retry-After\", \"60\");\nresponse.setStatus(429);\n```\n\nPo stronie klienta (exponential backoff z Retry-After):\n```java\nif (response.status() == 429) {\n    int wait = Integer.parseInt(response.header(\"Retry-After\").orElse(\"30\"));\n    Thread.sleep(wait * 1000L);\n}\n```\n\nDlaczego ważne: bez `Retry-After` klienci retryują natychmiast → thundering herd → pogłębia problem przeciążenia."
         }
       ]
     },
@@ -1804,6 +1829,11 @@
           "id": "api-24",
           "q": "Jak dokumentować API przez OpenAPI 3.x?",
           "a": "springdoc-openapi automatycznie generuje spec z kodu:\n\n```xml\n<dependency>\n  <groupId>org.springdoc</groupId>\n  <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>\n</dependency>\n```\n\nWzbogacanie spec:\n```java\n@Operation(summary = \"Place a new order\", security = @SecurityRequirement(name = \"bearer-jwt\"))\n@ApiResponse(responseCode = \"201\", description = \"Order created\")\n@ApiResponse(responseCode = \"400\", description = \"Validation failed\",\n    content = @Content(schema = @Schema(implementation = ProblemDetail.class)))\n@PostMapping(\"/orders\")\npublic ResponseEntity<OrderResponse> placeOrder(@Valid @RequestBody OrderRequest req) { }\n```\n\n`springdoc.api-docs.path=/api-docs` → Swagger UI na `/swagger-ui.html`.\n\nDla contract-first: generuj stubs z `openapi-generator-maven-plugin` zamiast pisać kontrolery ręcznie."
+        },
+        {
+          "id": "api-25",
+          "q": "Jak kompleksowo zabezpieczyć publiczne REST API?",
+          "a": "Bezpieczeństwo API to warstwy — każda kolejna redukuje ryzyko, gdy poprzednia zawiedzie.\n\n**1. Transport**: TLS 1.2+, HSTS header, bez HTTP.\n\n**2. Autentykacja**:\n- Użytkownicy: OAuth2 Authorization Code + PKCE → JWT access token (krótki TTL 5–15 min).\n- Serwisy M2M: OAuth2 Client Credentials.\n- Partnerzy zewnętrzni: API Keys (rotowane, odwoływalne).\n\n**3. Autoryzacja**: scope-based (`orders:read`, `orders:write`) + `@PreAuthorize` na metodzie.\n\n**4. Walidacja inputu**: `@Valid` + Bean Validation na każdym `@RequestBody`. Odrzucaj nieznane pola.\n\n**5. Rate limiting**: w API Gateway — per klucz/IP, `429 + Retry-After`.\n\n**6. Security headers**: HSTS, CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy.\n\n**7. Audit logging**: każde żądanie z userId/clientId, endpoint, status — bez PII/tokenów w logach.\n\n**8. API Gateway jako pierwsza linia**: auth, rate limit, TLS termination zanim żądanie dotrze do serwisu.\n\n**9. Regularne**: dependency scanning (CVE), pen testing, OWASP Top 10 checklist."
         }
       ]
     }

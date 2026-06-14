@@ -475,3 +475,118 @@ Stosowane gdy:
 
 Popularne w Google (opisane w "The Tail at Scale" Jeff Dean).
 
+---
+
+#### 🔹 26. Jak Kafka decyduje, który event trafia do której partycji?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+Kafka używa **partition key** — jeśli podany, wyznacza partycję przez `hash(key) % numPartitions`.
+
+Konsekwencje:
+- Ten sam klucz → zawsze ta sama partycja → **gwarantowany ordering** dla danego klucza.
+- Bez klucza → round-robin między partycjami (lub sticky partitioning w nowszych wersjach) → brak orderingu.
+
+W praktyce:
+- Klucz = identyfikator agregatu, np. `orderId`, `userId` — wszystkie eventy dotyczące jednej encji lądują w tej samej partycji.
+- Unikaj kluczy o niskiej kardynalności (np. kraj) — ryzyko hot partition.
+
+Zmiana liczby partycji zaburza routing dla istniejących kluczy — zrób to przy starcie topiku.
+
+---
+
+#### 🔹 27. Czym jest consumer group i zasada 1 partycja = 1 konsumer?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+**Consumer group** to zbiór konsumerów czytających ten sam topic jako jedna logiczna aplikacja. Kafka rozdziela partycje między członków grupy.
+
+Zasada: **jedna partycja może być czytana przez co najwyżej jednego konsumera w danej grupie** w tym samym czasie.
+
+Konsekwencje:
+- Liczba partycji = max parallelism w grupie.
+- 10 partycji + 10 konsumerów w grupie → idealne rozłożenie.
+- 10 partycji + 15 konsumerów → 5 konsumerów idle (bez przypisanej partycji).
+- 10 partycji + 5 konsumerów → każdy konsumer czyta 2 partycje.
+
+Różne consumer groups (np. billing-service i audit-service) czytają te same partycje niezależnie — każda ma własny offset.
+
+---
+
+#### 🔹 28. Kto zakłada Kafka topic i w jaki sposób?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+Trzy podejścia:
+
+**1. Auto-create** (`auto.create.topics.enable=true`) — Kafka tworzy topic przy pierwszym publish/subscribe. Wygodne, ale niebezpieczne na produkcji (literówka w nazwie = nowy topic zamiast błędu).
+
+**2. Kafka AdminClient (programatycznie)**:
+```java
+try (AdminClient admin = AdminClient.create(props)) {
+    NewTopic topic = new NewTopic("orders.placed", 12, (short) 3); // partitions, replicas
+    admin.createTopics(List.of(topic)).all().get();
+}
+```
+
+**3. IaC / GitOps** — preferowane na produkcji:
+- Terraform (`confluentcloud_kafka_topic`),
+- Helm chart z init-container wywołującym kafka-topics.sh,
+- Strimzi Kafka Operator w Kubernetes (`KafkaTopic` CRD).
+
+Na produkcji zawsze wyłącz auto-create i zarządzaj topicami jako kodem (wersjonowanie, review, audit trail).
+
+---
+
+#### 🔹 29. Jakich heurystyk używać przy podziale eventów na topiki?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+**1. Jeden topic = jeden typ zdarzenia domenowego** (np. `orders.placed`, `orders.cancelled`).
+Zaleta: różni konsumenci subskrybują tylko to, co potrzebują.
+
+**2. Alternatywnie: topic per agregat** (np. `orders`) ze wszystkimi eventami dla danego agregatu.
+Zaleta: gwarantowany ordering wszystkich eventów jednego agregatu (jeden klucz = jedna partycja).
+
+**3. Separacja po środowisku**: `dev.orders.placed`, `prod.orders.placed` — izolacja środowisk.
+
+**4. Unikaj "mega-topic"**: jeden topic na wszystko → brak możliwości selektywnego subskrybowania i trudne zarządzanie schematami.
+
+**5. Schemat i kontrakt**: topic powinien mieć zdefiniowany schemat (Avro + Schema Registry) — zmiana schematu = wersjonowanie, nie nowy topic.
+
+**6. Retencja**: topiki z wymaganiem "reply" (event sourcing) — długa retencja; topiki z wymaganiem "notify" — krótka retencja.
+
+---
+
+#### 🔹 30. Czym jest Retry-After i jak działa?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+`Retry-After` to nagłówek HTTP informujący klienta, **kiedy może ponowić żądanie**.
+
+Używany z:
+- `429 Too Many Requests` — przekroczono rate limit,
+- `503 Service Unavailable` — serwis tymczasowo niedostępny.
+
+Format:
+```
+Retry-After: 60          # liczba sekund
+Retry-After: Fri, 14 Jun 2026 10:00:00 GMT  # data
+```
+
+Po stronie serwera (Spring Boot + Resilience4j):
+```java
+response.setHeader("Retry-After", "60");
+response.setStatus(429);
+```
+
+Po stronie klienta (exponential backoff z Retry-After):
+```java
+if (response.status() == 429) {
+    int wait = Integer.parseInt(response.header("Retry-After").orElse("30"));
+    Thread.sleep(wait * 1000L);
+}
+```
+
+Dlaczego ważne: bez `Retry-After` klienci retryują natychmiast → thundering herd → pogłębia problem przeciążenia.
+

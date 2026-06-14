@@ -643,3 +643,32 @@ public ResponseEntity<OrderResponse> placeOrder(@Valid @RequestBody OrderRequest
 `springdoc.api-docs.path=/api-docs` → Swagger UI na `/swagger-ui.html`.
 
 Dla contract-first: generuj stubs z `openapi-generator-maven-plugin` zamiast pisać kontrolery ręcznie.
+
+---
+
+#### 🔹 26. Jak kompleksowo zabezpieczyć publiczne REST API?
+
+✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
+
+Bezpieczeństwo API to warstwy — każda kolejna redukuje ryzyko, gdy poprzednia zawiedzie.
+
+**1. Transport**: TLS 1.2+, HSTS header, bez HTTP.
+
+**2. Autentykacja**:
+- Użytkownicy: OAuth2 Authorization Code + PKCE → JWT access token (krótki TTL 5–15 min).
+- Serwisy M2M: OAuth2 Client Credentials.
+- Partnerzy zewnętrzni: API Keys (rotowane, odwoływalne).
+
+**3. Autoryzacja**: scope-based (`orders:read`, `orders:write`) + `@PreAuthorize` na metodzie.
+
+**4. Walidacja inputu**: `@Valid` + Bean Validation na każdym `@RequestBody`. Odrzucaj nieznane pola.
+
+**5. Rate limiting**: w API Gateway — per klucz/IP, `429 + Retry-After`.
+
+**6. Security headers**: HSTS, CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy.
+
+**7. Audit logging**: każde żądanie z userId/clientId, endpoint, status — bez PII/tokenów w logach.
+
+**8. API Gateway jako pierwsza linia**: auth, rate limit, TLS termination zanim żądanie dotrze do serwisu.
+
+**9. Regularne**: dependency scanning (CVE), pen testing, OWASP Top 10 checklist.
