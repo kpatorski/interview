@@ -1,5 +1,34 @@
 # ⚛️ React — Comprehensive Study Notes
 
+<!-- TOC -->
+* [⚛️ React — Comprehensive Study Notes](#-react--comprehensive-study-notes)
+  * [TL;DR](#tldr)
+  * [Analogy — The Whiteboard](#analogy--the-whiteboard)
+  * [Core Concepts — Step by Step](#core-concepts--step-by-step)
+    * [1. Components & JSX](#1-components--jsx)
+    * [2. Props vs State](#2-props-vs-state)
+    * [3. useState](#3-usestate)
+    * [4. useEffect](#4-useeffect)
+    * [5. Context API](#5-context-api)
+    * [6. useRef](#6-useref)
+    * [7. Lists & Keys](#7-lists--keys)
+    * [8. Forms — Controlled vs Uncontrolled](#8-forms--controlled-vs-uncontrolled)
+    * [9. Higher-Order Components & Render Props (Legacy Patterns)](#9-higher-order-components--render-props-legacy-patterns)
+    * [10. Custom Hooks](#10-custom-hooks)
+    * [11. Reconciliation & Fiber](#11-reconciliation--fiber)
+    * [12. Performance Optimization](#12-performance-optimization)
+    * [13. Code Splitting & Suspense](#13-code-splitting--suspense)
+    * [14. Error Boundaries](#14-error-boundaries)
+    * [15. React Server Components (RSC)](#15-react-server-components-rsc)
+    * [16. Concurrent Features (React 18)](#16-concurrent-features-react-18)
+    * [17. State Management Decision Guide](#17-state-management-decision-guide)
+    * [18. Testing — React Testing Library Philosophy](#18-testing--react-testing-library-philosophy)
+    * [19. useLayoutEffect vs useEffect](#19-uselayouteffect-vs-useeffect)
+  * [Mental Model — React's Data Flow](#mental-model--reacts-data-flow)
+  * [Glossary](#glossary)
+  * [Sources](#sources)
+<!-- TOC -->
+
 ## TL;DR
 
 React is a JavaScript **library** for building user interfaces, created by Meta (2013). It handles the view layer only — you compose your own stack for routing, state management, and data fetching. React's core bet: describe **what** the UI should look like for a given state, not **how** to update it. The framework (virtual DOM reconciliation) figures out the minimal real DOM changes.

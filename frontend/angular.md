@@ -1,5 +1,28 @@
 # 🅰️ Angular — Comprehensive Study Notes
 
+<!-- TOC -->
+* [🅰️ Angular — Comprehensive Study Notes](#🅰-angular--comprehensive-study-notes)
+  * [TL;DR](#tldr)
+  * [Analogy — The Professional Kitchen](#analogy--the-professional-kitchen)
+  * [Core Concepts — Step by Step](#core-concepts--step-by-step)
+    * [1. Components](#1-components)
+    * [2. Dependency Injection (DI)](#2-dependency-injection-di)
+    * [3. Data Binding](#3-data-binding)
+    * [4. Directives & Pipes](#4-directives--pipes)
+    * [5. Modules vs Standalone Components](#5-modules-vs-standalone-components)
+    * [6. RxJS & Async Patterns](#6-rxjs--async-patterns)
+    * [7. Change Detection](#7-change-detection)
+    * [8. Routing & Lazy Loading](#8-routing--lazy-loading)
+    * [9. Forms](#9-forms)
+    * [10. State Management](#10-state-management)
+    * [11. Testing](#11-testing)
+    * [12. Performance Checklist](#12-performance-checklist)
+    * [13. SSR — Angular Universal](#13-ssr--angular-universal)
+  * [Mental Model — Angular's Architecture](#mental-model--angulars-architecture)
+  * [Glossary](#glossary)
+  * [Sources](#sources)
+<!-- TOC -->
+
 ## TL;DR
 
 Angular is a full-featured, opinionated TypeScript framework for building single-page applications, maintained by Google. Unlike React (a UI library) or Vue (a progressive framework), Angular is a **complete kitchen** — router, forms, HTTP client, DI container, testing utilities all included. You trade composition freedom for structure and strong conventions that scale well in large teams.
