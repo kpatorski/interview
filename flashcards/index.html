@@ -43,6 +43,15 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe 
 .foot{display:flex;gap:10px;margin-top:22px;padding-bottom:16px;flex-wrap:wrap;}
 .lnk{font-size:.7rem;color:var(--muted);background:none;border:none;cursor:pointer;text-decoration:underline;}
 
+/* ── LEVEL DIALOG ── */
+.lvl-opt{display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:10px;
+  border:1px solid var(--border);cursor:pointer;transition:border-color .15s;margin-bottom:8px;}
+.lvl-opt:hover{border-color:var(--accent);}
+.lvl-opt input{accent-color:var(--accent);width:16px;height:16px;cursor:pointer;}
+.lvl-opt-info{flex:1;}
+.lvl-opt-title{font-size:.88rem;font-weight:600;}
+.lvl-opt-sub{font-size:.7rem;color:var(--muted);margin-top:2px;}
+
 /* ── STUDY ── */
 #ss{height:100vh;height:-webkit-fill-available;}
 .sh-hdr{display:flex;align-items:center;padding:13px 15px 10px;gap:10px;border-bottom:1px solid var(--border);flex-shrink:0;}
@@ -124,7 +133,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe 
     <div class="hstat"><div class="v new" id="s-new">0</div><div class="l">Nowe</div></div>
     <div class="hstat"><div class="v ok" id="s-ok">0</div><div class="l">Poznane</div></div>
   </div>
-  <button class="btn-all" id="btn-all" onclick="startStudy('__all__')">📚 Ucz się zaległych</button>
+  <button class="btn-all" id="btn-all" onclick="showLvlDlg('__all__')">📚 Ucz się zaległych</button>
   <div class="sec-title">Kategorie</div>
   <div class="cat-list" id="cat-list"><div style="color:var(--muted);text-align:center;padding:20px;">Ładowanie…</div></div>
   <div class="foot">
@@ -184,6 +193,31 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe 
   </div>
 </div>
 
+<!-- LEVEL DIALOG -->
+<div class="overlay" id="lvl-dlg">
+  <div class="dlg">
+    <h3 id="lvl-cat-name" style="margin-bottom:14px;"></h3>
+    <label class="lvl-opt">
+      <input type="radio" name="lvl" value="middle" id="r-middle">
+      <div class="lvl-opt-info">
+        <div class="lvl-opt-title">🟢 Middle</div>
+        <div class="lvl-opt-sub" id="lvl-mid-sub"></div>
+      </div>
+    </label>
+    <label class="lvl-opt">
+      <input type="radio" name="lvl" value="all" id="r-all" checked>
+      <div class="lvl-opt-info">
+        <div class="lvl-opt-title">🟢+🔴 Wszystkie poziomy</div>
+        <div class="lvl-opt-sub" id="lvl-all-sub"></div>
+      </div>
+    </label>
+    <div class="dlg-btns" style="margin-top:6px;">
+      <button class="btn-cancel" onclick="hideLvlDlg()">Anuluj</button>
+      <button class="btn-confirm" style="background:var(--accent);color:#0f172a" onclick="startWithLevel()">▶ Start</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ─── Data & state ─────────────────────────────────────────────────────────────
 let DATA = null;
@@ -193,7 +227,7 @@ const MAX_NEW = 20;
 
 let queue = [], failed = [], qIdx = 0, flipped = false;
 let stats = { tot:0, ag:0, hd:0, ok:0, ez:0 };
-let curCat = null;
+let curCat = null, curLevel = 'all', pendingCatId = null;
 
 // ─── Persistence ──────────────────────────────────────────────────────────────
 function loadProg() {
@@ -279,7 +313,7 @@ function renderHome() {
 
     const el = document.createElement('div');
     el.className='cat-item'+(due===0&&nw===0?' dim':'');
-    el.onclick=()=>startStudy(cat.id);
+    el.onclick=()=>showLvlDlg(cat.id);
 
     let badge;
     if (due>0) badge=`<span class="badge bdg-due">${due} do dziś</span>`;
@@ -309,25 +343,70 @@ function shuffle(a) {
   return a;
 }
 
+function catCards(catId) {
+  let all = [];
+  if (catId === '__all__') DATA.categories.forEach(c => all.push(...c.cards));
+  else { const c = DATA.categories.find(x => x.id === catId); if (c) all = c.cards; }
+  return all;
+}
+
+function filterByLevel(cards, level) {
+  return level === 'middle' ? cards.filter(c => c.level === 'middle') : cards;
+}
+
 function buildQueue(catId) {
-  let all=[];
-  if (catId==='__all__') DATA.categories.forEach(c=>all.push(...c.cards));
-  else { const c=DATA.categories.find(x=>x.id===catId); if(c) all=c.cards; }
-  const due=shuffle(all.filter(c=>isDue(c.id)));
-  const nw=shuffle(all.filter(c=>isNew(c.id))).slice(0,MAX_NEW);
-  return [...due,...nw];
+  const all = filterByLevel(catCards(catId), curLevel);
+  const due = shuffle(all.filter(c => isDue(c.id)));
+  const nw  = shuffle(all.filter(c => isNew(c.id))).slice(0, MAX_NEW);
+  return [...due, ...nw];
+}
+
+function countQueue(catId, level) {
+  const cards = filterByLevel(catCards(catId), level);
+  const due = cards.filter(c => isDue(c.id)).length;
+  const nw  = cards.filter(c => isNew(c.id)).length;
+  return { due, nw, tot: cards.length };
+}
+
+function showLvlDlg(catId) {
+  pendingCatId = catId;
+  const name = catId === '__all__' ? 'Wszystkie kategorie'
+    : DATA.categories.find(x => x.id === catId)?.label || '';
+  document.getElementById('lvl-cat-name').textContent = name;
+
+  const mid = countQueue(catId, 'middle');
+  const all = countQueue(catId, 'all');
+  document.getElementById('lvl-mid-sub').textContent =
+    `${mid.tot} fiszek · ${mid.due} do dziś · ${mid.nw} nowych`;
+  document.getElementById('lvl-all-sub').textContent =
+    `${all.tot} fiszek · ${all.due} do dziś · ${all.nw} nowych`;
+
+  document.getElementById('r-all').checked = true;
+  document.getElementById('lvl-dlg').classList.add('show');
+}
+
+function hideLvlDlg() {
+  document.getElementById('lvl-dlg').classList.remove('show');
+  pendingCatId = null;
+}
+
+function startWithLevel() {
+  curLevel = document.querySelector('input[name="lvl"]:checked')?.value || 'all';
+  hideLvlDlg();
+  startStudy(pendingCatId);
 }
 
 function startStudy(catId) {
-  curCat=catId;
-  queue=buildQueue(catId); failed=[]; qIdx=0;
-  stats={tot:0,ag:0,hd:0,ok:0,ez:0};
+  curCat = catId;
+  queue = buildQueue(catId); failed = []; qIdx = 0;
+  stats = { tot:0, ag:0, hd:0, ok:0, ez:0 };
 
   if (!queue.length) { alert('Brak fiszek do nauki na dziś!'); return; }
 
-  let lbl='Wszystkie kategorie';
-  if (catId!=='__all__') { const c=DATA.categories.find(x=>x.id===catId); if(c) lbl=c.label; }
-  document.getElementById('ss-cat').textContent=lbl;
+  let lbl = 'Wszystkie kategorie';
+  if (catId !== '__all__') { const c = DATA.categories.find(x => x.id === catId); if (c) lbl = c.label; }
+  const lvlBadge = curLevel === 'middle' ? ' 🟢' : '';
+  document.getElementById('ss-cat').textContent = lbl + lvlBadge;
 
   showScreen('ss'); showCard();
 }

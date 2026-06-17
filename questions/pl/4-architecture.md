@@ -25,7 +25,7 @@
 
 ## 1️⃣ Fundamenty Architektoniczne
 
-#### 🔹 1. Czym jest Separation of Concerns?
+#### 🔹 1. 🟢 Czym jest Separation of Concerns?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -44,7 +44,7 @@ Celem jest:
 
 ---
 
-#### 🔹 2. Czym jest Dependency Inversion Principle?
+#### 🔹 2. 🟢 Czym jest Dependency Inversion Principle?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -63,7 +63,7 @@ Zmniejsza sprzężenie i ułatwia testowanie.
 
 ## 2️⃣ Clean / Hexagonal / Onion
 
-#### 🔹 3. Czym jest Clean Architecture?
+#### 🔹 3. 🟢 Czym jest Clean Architecture?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -80,7 +80,7 @@ Zasada:
 
 ---
 
-#### 🔹 4. Czym jest Hexagonal Architecture?
+#### 🔹 4. 🟢 Czym jest Hexagonal Architecture?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -96,7 +96,7 @@ Pozwala oddzielić:
 
 ---
 
-#### 🔹 5. Czym jest Onion Architecture?
+#### 🔹 5. 🔴 Czym jest Onion Architecture?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -111,7 +111,7 @@ Podobna do Clean i Hexagonal — różni się nazewnictwem i akcentem.
 
 ## 3️⃣ Domain-Driven Design (DDD)
 
-#### 🔹 6. Czym jest Bounded Context?
+#### 🔹 6. 🔴 Czym jest Bounded Context?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -127,7 +127,7 @@ Ułatwia modularność i skalowanie organizacyjne.
 
 ---
 
-#### 🔹 7. Czym jest Aggregate?
+#### 🔹 7. 🔴 Czym jest Aggregate?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -142,7 +142,7 @@ Transakcje powinny obejmować jeden agregat.
 
 ---
 
-#### 🔹 8. Czym jest CQRS?
+#### 🔹 8. 🔴 Czym jest CQRS?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -159,7 +159,7 @@ Wady:
 
 ---
 
-#### 🔹 9. Czym jest Event Sourcing?
+#### 🔹 9. 🔴 Czym jest Event Sourcing?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -179,7 +179,7 @@ Wyzwania:
 
 ## 4️⃣ Modularność i Skalowanie
 
-#### 🔹 10. Czym jest Modular Monolith?
+#### 🔹 10. 🟢 Czym jest Modular Monolith?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -196,7 +196,7 @@ Może być etapem przed mikroserwisami.
 
 ---
 
-#### 🔹 11. Jak podejmować decyzje architektoniczne?
+#### 🔹 11. 🔴 Jak podejmować decyzje architektoniczne?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -212,7 +212,7 @@ Nie istnieje jedna "najlepsza" architektura — zależy od kontekstu.
 
 ---
 
-#### 🔹 12. Czym jest Open/Closed Principle?
+#### 🔹 12. 🟢 Czym jest Open/Closed Principle?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -226,7 +226,7 @@ Narzędzia: polimorfizm, strategia, dekorator.
 
 ---
 
-#### 🔹 13. Czym jest Liskov Substitution Principle?
+#### 🔹 13. 🟢 Czym jest Liskov Substitution Principle?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -240,7 +240,7 @@ Dobry test: czy możesz podmienić implementację bez zmiany kodu klienckiego?
 
 ---
 
-#### 🔹 14. Czym jest Interface Segregation Principle?
+#### 🔹 14. 🟢 Czym jest Interface Segregation Principle?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -252,7 +252,7 @@ Problem z grubym interfejsem:
 
 ---
 
-#### 🔹 15. Czym różni się Value Object od Entity?
+#### 🔹 15. 🟢 Czym różni się Value Object od Entity?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -271,7 +271,7 @@ VO są bezpieczne wielowątkowo i eliminują błędy związane z tożsamością.
 
 ---
 
-#### 🔹 16. Czym jest Domain Event?
+#### 🔹 16. 🔴 Czym jest Domain Event?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -289,7 +289,7 @@ Zastosowania:
 
 ---
 
-#### 🔹 17. Czym jest Anti-Corruption Layer (ACL)?
+#### 🔹 17. 🔴 Czym jest Anti-Corruption Layer (ACL)?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -303,7 +303,7 @@ Typowe miejsca: integracje z legacy systemami, zewnętrznymi API, innymi Bounded
 
 ---
 
-#### 🔹 18. Czym jest wzorzec Repository?
+#### 🔹 18. 🔴 Czym jest wzorzec Repository?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -322,7 +322,7 @@ Pozwala testować logikę domenową bez bazy danych (in-memory implementation).
 
 ---
 
-#### 🔹 19. Czym różni się Application Service od Domain Service?
+#### 🔹 19. 🔴 Czym różni się Application Service od Domain Service?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -340,7 +340,7 @@ Application Service:
 
 ---
 
-#### 🔹 20. Czym jest wzorzec Strangler Fig?
+#### 🔹 20. 🔴 Czym jest wzorzec Strangler Fig?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -357,7 +357,7 @@ Alternatywa dla Big Bang rewrite, który prawie zawsze kończy się katastrofą.
 
 ---
 
-#### 🔹 21. Czym jest Anemic Domain Model i dlaczego to anty-wzorzec?
+#### 🔹 21. 🔴 Czym jest Anemic Domain Model i dlaczego to anty-wzorzec?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -372,7 +372,7 @@ Poprawne podejście: agregaty i encje zawierają logikę i chronią swoje niezmi
 
 ---
 
-#### 🔹 22. Co to jest Cohesion i Coupling?
+#### 🔹 22. 🟢 Co to jest Cohesion i Coupling?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -388,7 +388,7 @@ Cel: **wysokie cohesion, niskie coupling**.
 
 ---
 
-#### 🔹 23. Czym jest Architecture Decision Record (ADR)?
+#### 🔹 23. 🔴 Czym jest Architecture Decision Record (ADR)?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -404,7 +404,7 @@ ADR-y żyją w repo razem z kodem — pozwalają przyszłym deweloperom zrozumie
 
 ---
 
-#### 🔹 24. Czym są Feature Flags i do czego służą?
+#### 🔹 24. 🟢 Czym są Feature Flags i do czego służą?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -420,7 +420,7 @@ Ryzyko: akumulacja starych flag tworzy dług techniczny — flagi wymagają regu
 
 ---
 
-#### 🔹 25. Czym jest Shared Kernel?
+#### 🔹 25. 🔴 Czym jest Shared Kernel?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 

@@ -42,7 +42,7 @@
 
 ## 1️⃣ API Design
 
-#### 🔹 1. Jak projektować zasoby (resources) w REST API?
+#### 🔹 1. 🟢 Jak projektować zasoby (resources) w REST API?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -62,7 +62,7 @@ Unikaj czasowników w URL: `/activate` → `PATCH /accounts/{id}` z `{"status":"
 
 ---
 
-#### 🔹 2. Czym jest RFC 7807 Problem Details?
+#### 🔹 2. 🔴 Czym jest RFC 7807 Problem Details?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -88,7 +88,7 @@ Spring Boot 6 / Spring Framework 6: `ProblemDetail` wbudowany w framework.
 
 ---
 
-#### 🔹 3. Jakie są strategie wersjonowania API?
+#### 🔹 3. 🟢 Jakie są strategie wersjonowania API?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -106,7 +106,7 @@ Rekomendacja dla publicznego API:
 
 ---
 
-#### 🔹 4. Czym jest contract-first API design?
+#### 🔹 4. 🔴 Czym jest contract-first API design?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -123,7 +123,7 @@ Dla publicznego API: contract-first zdecydowanie lepszy.
 
 ---
 
-#### 🔹 5. Jak obsługiwać backward compatibility?
+#### 🔹 5. 🟢 Jak obsługiwać backward compatibility?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -147,7 +147,7 @@ Testowanie: Consumer-Driven Contract (Pact) wykrywa breaking changes przed relea
 
 ## 2️⃣ Walidacja i obsługa błędów w Spring
 
-#### 🔹 6. Jak działają @Valid i Bean Validation w Spring?
+#### 🔹 6. 🔴 Jak działają @Valid i Bean Validation w Spring?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -174,7 +174,7 @@ public @interface IsoDate { String message() default "Invalid date"; ... }
 
 ---
 
-#### 🔹 7. Jak działa @ControllerAdvice i @ExceptionHandler?
+#### 🔹 7. 🟢 Jak działa @ControllerAdvice i @ExceptionHandler?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -205,7 +205,7 @@ Hierarchia: bardziej szczegółowy `@ExceptionHandler` ma priorytet.
 
 ---
 
-#### 🔹 8. Czym jest @Validated i czym różni się od @Valid?
+#### 🔹 8. 🔴 Czym jest @Validated i czym różni się od @Valid?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -232,7 +232,7 @@ record ProductRequest(
 
 ## 3️⃣ Bezpieczeństwo API
 
-#### 🔹 9. Jak skonfigurować OAuth2 Resource Server w Spring Boot?
+#### 🔹 9. 🔴 Jak skonfigurować OAuth2 Resource Server w Spring Boot?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -266,7 +266,7 @@ Spring weryfikuje podpis JWT przez JWKS, `exp`, `iss`, `aud`.
 
 ---
 
-#### 🔹 10. Czym różni się opaque token od JWT i co to token introspection?
+#### 🔹 10. 🔴 Czym różni się opaque token od JWT i co to token introspection?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -289,7 +289,7 @@ Hybrydowo: krótki JWT (5-15min) + refresh token dla balance.
 
 ---
 
-#### 🔹 11. Jak implementować scope-based authorization w Spring Security?
+#### 🔹 11. 🔴 Jak implementować scope-based authorization w Spring Security?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -313,7 +313,7 @@ Fine-grained: `@PostAuthorize("returnObject.userId == authentication.name")` —
 
 ---
 
-#### 🔹 12. Jak działają API Keys i kiedy je stosować?
+#### 🔹 12. 🔴 Jak działają API Keys i kiedy je stosować?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -334,7 +334,7 @@ Dobre praktyki:
 
 ---
 
-#### 🔹 13. Jak skonfigurować CORS w Spring Security?
+#### 🔹 13. 🟢 Jak skonfigurować CORS w Spring Security?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -364,7 +364,7 @@ Wildcard `*` w `allowedOrigins` nie działa z `allowCredentials(true)`.
 
 ## 4️⃣ API Gateway
 
-#### 🔹 14. Czym różni się API Gateway od BFF?
+#### 🔹 14. 🔴 Czym różni się API Gateway od BFF?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -378,7 +378,7 @@ BFF rozwiązuje: mobile BFF zwraca uproszczony response, web BFF pełny. Kosztem
 
 ---
 
-#### 🔹 15. Jakie funkcje realizuje API Gateway?
+#### 🔹 15. 🟢 Jakie funkcje realizuje API Gateway?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -402,7 +402,7 @@ Popularne: Kong, AWS API Gateway, Azure APIM, Nginx, Spring Cloud Gateway.
 
 ---
 
-#### 🔹 16. Czym jest Spring Cloud Gateway?
+#### 🔹 16. 🔴 Czym jest Spring Cloud Gateway?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -432,7 +432,7 @@ Reaktywny = nie blokuje wątków przy I/O — idealny do proxy i aggregation z w
 
 ## 5️⃣ Caching i idempotency dla API
 
-#### 🔹 17. Jak cache'ować odpowiedzi REST API?
+#### 🔹 17. 🟢 Jak cache'ować odpowiedzi REST API?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -456,7 +456,7 @@ Dla publicznego API: HTTP caching + CDN (CloudFront) to duże oszczędności na 
 
 ---
 
-#### 🔹 18. Czym jest Idempotency-Key i jak go implementować?
+#### 🔹 18. 🔴 Czym jest Idempotency-Key i jak go implementować?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -482,7 +482,7 @@ Stripe, Adyen, Wise — wszystkie implementują ten wzorzec.
 
 ## 6️⃣ Observability API
 
-#### 🔹 19. Jak logować żądania API bez ujawniania wrażliwych danych?
+#### 🔹 19. 🔴 Jak logować żądania API bez ujawniania wrażliwych danych?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -506,7 +506,7 @@ Prawo: GDPR wymaga możliwości usunięcia PII z logów — przechowuj userId za
 
 ---
 
-#### 🔹 20. Jak eksponować metryki API z Micrometer + Prometheus?
+#### 🔹 20. 🔴 Jak eksponować metryki API z Micrometer + Prometheus?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -532,7 +532,7 @@ Grafana dashboard: `rate(http_server_requests_seconds_count[5m])` — throughput
 
 ---
 
-#### 🔹 21. Jakie metryki SLO definiować dla publicznego API?
+#### 🔹 21. 🔴 Jakie metryki SLO definiować dla publicznego API?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -555,7 +555,7 @@ Alerting:
 
 ## 7️⃣ Zaawansowane wzorce
 
-#### 🔹 22. Jak projektować API pod high availability?
+#### 🔹 22. 🔴 Jak projektować API pod high availability?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -574,7 +574,7 @@ Circuit breaker na downstream dependencies — API nie może padać przez wolną
 
 ---
 
-#### 🔹 23. Czym jest deprecation strategy dla API?
+#### 🔹 23. 🔴 Czym jest deprecation strategy dla API?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -591,7 +591,7 @@ Changelog + migration guide muszą być dostępne zanim ogłosisz deprecation.
 
 ---
 
-#### 🔹 24. Jak testować publiczne API?
+#### 🔹 24. 🔴 Jak testować publiczne API?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -617,7 +617,7 @@ webTestClient.post().uri("/orders")
 
 ---
 
-#### 🔹 25. Jak dokumentować API przez OpenAPI 3.x?
+#### 🔹 25. 🔴 Jak dokumentować API przez OpenAPI 3.x?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -646,7 +646,7 @@ Dla contract-first: generuj stubs z `openapi-generator-maven-plugin` zamiast pis
 
 ---
 
-#### 🔹 26. Jak kompleksowo zabezpieczyć publiczne REST API?
+#### 🔹 26. 🟢 Jak kompleksowo zabezpieczyć publiczne REST API?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 

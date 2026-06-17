@@ -21,7 +21,7 @@
 
 ## 1️⃣ Zrozumienie Wydajności
 
-#### 🔹 1. Czym różni się latency od throughput?
+#### 🔹 1. 🟢 Czym różni się latency od throughput?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -41,7 +41,7 @@ Optymalizacja zależy od wymagań biznesowych.
 
 ---
 
-#### 🔹 2. Czym jest bottleneck i jak go znaleźć?
+#### 🔹 2. 🟢 Czym jest bottleneck i jak go znaleźć?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -66,7 +66,7 @@ Optymalizuje się wąskie gardło, nie wszystko naraz.
 
 ## 2️⃣ JVM Profilowanie
 
-#### 🔹 3. Czym jest heap dump i kiedy go używać?
+#### 🔹 3. 🟢 Czym jest heap dump i kiedy go używać?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -83,7 +83,7 @@ Narzędzia:
 
 ---
 
-#### 🔹 4. Czym jest thread dump?
+#### 🔹 4. 🔴 Czym jest thread dump?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -98,7 +98,7 @@ Zawiera stack trace każdego wątku.
 
 ---
 
-#### 🔹 5. Jak działa Garbage Collection i kiedy może być problemem?
+#### 🔹 5. 🟢 Jak działa Garbage Collection i kiedy może być problemem?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -118,7 +118,7 @@ Rozwiązania:
 
 ## 3️⃣ Analiza Algorytmiczna
 
-#### 🔹 6. Dlaczego Big-O jest ważne w systemach backendowych?
+#### 🔹 6. 🟢 Dlaczego Big-O jest ważne w systemach backendowych?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -136,7 +136,7 @@ Przy dużej skali różnice stają się krytyczne.
 
 ## 4️⃣ Load Testing
 
-#### 🔹 7. Czym jest load testing i czym różni się od stress testing?
+#### 🔹 7. 🟢 Czym jest load testing i czym różni się od stress testing?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -152,7 +152,7 @@ Celem jest poznanie granic systemu i jego zachowania w awarii.
 
 ---
 
-#### 🔹 8. Czym jest N+1 problem i jak go rozwiązać?
+#### 🔹 8. 🟢 Czym jest N+1 problem i jak go rozwiązać?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -174,7 +174,7 @@ Wykrycie: Hibernate statistics, p6spy, Datasource Proxy.
 
 ---
 
-#### 🔹 9. Jakie są strategie cache'owania?
+#### 🔹 9. 🟢 Jakie są strategie cache'owania?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -188,7 +188,7 @@ Wykrycie: Hibernate statistics, p6spy, Datasource Proxy.
 
 ---
 
-#### 🔹 10. Redis jako cache — kluczowe koncepty
+#### 🔹 10. 🟢 Redis jako cache — kluczowe koncepty
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -208,7 +208,7 @@ Pułapki: cache stampede (wiele requestów przy miss), memory fragmentation.
 
 ---
 
-#### 🔹 11. Strategie indeksowania w bazach danych
+#### 🔹 11. 🟢 Strategie indeksowania w bazach danych
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -224,7 +224,7 @@ Pułapka: każdy index spowalnia INSERT/UPDATE/DELETE.
 
 ---
 
-#### 🔹 12. Jak optymalizować zapytania SQL?
+#### 🔹 12. 🟢 Jak optymalizować zapytania SQL?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -239,7 +239,7 @@ Statystyki: `ANALYZE` aktualizuje statystyki planisty.
 
 ---
 
-#### 🔹 13. Percentyle vs średnia w metrykach latency
+#### 🔹 13. 🔴 Percentyle vs średnia w metrykach latency
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -255,7 +255,7 @@ SLO definiuje się przez percentyle: "p99 < 500ms". Zawsze monitoruj p99, nie ty
 
 ---
 
-#### 🔹 14. Czym jest JVM tuning dla kontenerów?
+#### 🔹 14. 🔴 Czym jest JVM tuning dla kontenerów?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -271,7 +271,7 @@ Diagnostyka w runtime:
 
 ---
 
-#### 🔹 15. Jak wykrywać memory leaks w Javie?
+#### 🔹 15. 🔴 Jak wykrywać memory leaks w Javie?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -290,7 +290,7 @@ Narzędzia:
 
 ---
 
-#### 🔹 16. Czym jest Java Flight Recorder (JFR)?
+#### 🔹 16. 🔴 Czym jest Java Flight Recorder (JFR)?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -311,7 +311,7 @@ Analiza: JDK Mission Control (JMC). Narzut: < 2% na produkcji.
 
 ---
 
-#### 🔹 17. Czym są Virtual Threads (Project Loom)?
+#### 🔹 17. 🔴 Czym są Virtual Threads (Project Loom)?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -330,7 +330,7 @@ Idealne do: aplikacji I/O-bound (HTTP, DB). Nie zastępują reaktywnego dla CPU-
 
 ---
 
-#### 🔹 18. Czym jest cache stampede i jak mu zapobiec?
+#### 🔹 18. 🔴 Czym jest cache stampede i jak mu zapobiec?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -345,7 +345,7 @@ Redis: `SET key value EX 60 NX` (Set if Not Exists) do atomic lock przy miss.
 
 ---
 
-#### 🔹 19. Czym jest connection pool sizing i jaka jest optymalna wartość?
+#### 🔹 19. 🔴 Czym jest connection pool sizing i jaka jest optymalna wartość?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -364,7 +364,7 @@ Monitoruj:
 
 ---
 
-#### 🔹 20. Czym jest Distributed Cache i kiedy go używać?
+#### 🔹 20. 🔴 Czym jest Distributed Cache i kiedy go używać?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -383,7 +383,7 @@ Dwa poziomy: L1 (Caffeine) + L2 (Redis) — popularne dla hot data.
 
 ---
 
-#### 🔹 21. Czym jest async processing i kiedy stosować?
+#### 🔹 21. 🔴 Czym jest async processing i kiedy stosować?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -404,7 +404,7 @@ Narzędzia: Kafka, RabbitMQ, Spring `@Async`, Spring Batch.
 
 ---
 
-#### 🔹 22. Jak mierzyć wydajność w produkcji (APM)?
+#### 🔹 22. 🟢 Jak mierzyć wydajność w produkcji (APM)?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -423,7 +423,7 @@ Spring Boot Actuator + Micrometer to minimum dla każdej aplikacji produkcyjnej.
 
 ---
 
-#### 🔹 23. Czym jest object pooling i kiedy go stosować?
+#### 🔹 23. 🔴 Czym jest object pooling i kiedy go stosować?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -441,7 +441,7 @@ Przykłady: connection pooling (HikariCP), ByteBuffer pools (Netty), thread pool
 
 ---
 
-#### 🔹 24. Czym jest CDN i jak poprawia wydajność?
+#### 🔹 24. 🔴 Czym jest CDN i jak poprawia wydajność?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -460,7 +460,7 @@ Ważne: poprawna konfiguracja cache headers (`Cache-Control`, `Vary`, `ETag`).
 
 ---
 
-#### 🔹 25. Czym są SLI, SLO i SLA w kontekście wydajności?
+#### 🔹 25. 🟢 Czym są SLI, SLO i SLA w kontekście wydajności?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 

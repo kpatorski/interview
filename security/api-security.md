@@ -52,7 +52,7 @@ Each layer works independently. If the guard misses a fake ID, the camera still 
 
 ## How It Works — Step by Step
 
-### Step 1: Encrypt the Channel (TLS)
+### Step 1: Encrypt the Channel (TLS) `🟢 middle`
 
 **The problem**: Data on the internet passes through dozens of intermediate servers. Any one of them can read it if sent in plaintext.
 
@@ -69,13 +69,13 @@ Strict-Transport-Security: max-age=31536000; includeSubDomains
 
 ---
 
-### Step 2: Verify Identity (Authentication)
+### Step 2: Verify Identity (Authentication) `🟢 middle`
 
 **The problem**: Who is knocking? The API is public — anyone can send a request.
 
 Three types of callers, three strategies:
 
-#### User from a browser/mobile app → OAuth2 + JWT
+#### User from a browser/mobile app → OAuth2 + JWT `🟢 middle`
 
 ```
 1. User clicks "Login" in the app
@@ -89,7 +89,7 @@ Three types of callers, three strategies:
 Why JWT? Because the cryptographic signature guarantees authenticity without an extra network hop.
 Key detail: short TTL (5–15 minutes) — if the token leaks, it expires quickly.
 
-#### Service to service (M2M) → OAuth2 Client Credentials
+#### Service to service (M2M) → OAuth2 Client Credentials `🔴 senior`
 
 ```
 Billing Service → requests a token: POST /token
@@ -102,7 +102,7 @@ Billing Service → requests a token: POST /token
 
 There is no human user — the service acts on its own behalf.
 
-#### External partner → API Key
+#### External partner → API Key `🟢 middle`
 
 ```
 X-API-Key: sk_live_abc123xyz
@@ -112,7 +112,7 @@ Simpler than OAuth2, but the key doesn't expire automatically — must be rotate
 
 ---
 
-### Step 3: Check Permissions (Authorization)
+### Step 3: Check Permissions (Authorization) `🟢 middle`
 
 **The problem**: You know who is calling — but what are they allowed to do? A logged-in user should not see other users' data.
 
@@ -133,7 +133,7 @@ public List<Order> getMyOrders(Authentication auth) {
 
 ---
 
-### Step 4: Validate Every Byte of Input
+### Step 4: Validate Every Byte of Input `🟢 middle`
 
 **The problem**: A client can send literally anything as JSON. `"amount": -99999` or `"name": "<script>alert('xss')</script>"`.
 
@@ -163,7 +163,7 @@ When validation fails, Spring returns `400 Bad Request` automatically — before
 
 ---
 
-### Step 5: Limit Traffic (Rate Limiting)
+### Step 5: Limit Traffic (Rate Limiting) `🟢 middle`
 
 **The problem**: A single script can send 50,000 requests per second. Your service will go down. Every other legitimate client goes down with it. This is called a DoS (Denial of Service) attack.
 
@@ -183,7 +183,7 @@ X-RateLimit-Reset: 1718352000
 
 ---
 
-### Step 6: Add Security Headers
+### Step 6: Add Security Headers `🟢 middle`
 
 Small HTTP headers that tell the browser how to behave. Each one protects against a specific attack:
 
@@ -215,7 +215,7 @@ http.headers(headers -> headers
 
 ---
 
-### Step 7: Log Everything (Audit Log)
+### Step 7: Log Everything (Audit Log) `🔴 senior`
 
 **Why**: when something goes wrong (security breach, bug, client dispute), you need to know what happened. In regulated environments (fintech, healthcare) it's also a legal requirement.
 
@@ -239,7 +239,7 @@ http.headers(headers -> headers
 
 ---
 
-### Step 8: Put an API Gateway at the Front
+### Step 8: Put an API Gateway at the Front `🔴 senior`
 
 **The problem**: your service shouldn't have to handle all of the above separately — these are cross-cutting concerns.
 
@@ -262,7 +262,7 @@ Your service receives an already-authenticated, pre-processed request and can fo
 
 ---
 
-### Step 9: Keep Security Up to Date
+### Step 9: Keep Security Up to Date `🔴 senior`
 
 Security is not a state — it's a process.
 
@@ -273,7 +273,7 @@ Security is not a state — it's a process.
 
 ---
 
-## Technical Terms Glossary
+## Technical Terms Glossary `🟢 middle + 🔴 senior`
 
 | Term | What it is (simply) |
 |---|---|
@@ -294,7 +294,7 @@ Security is not a state — it's a process.
 
 ---
 
-## Layer Map — Who Does What
+## Layer Map — Who Does What `🔴 senior`
 
 ```
                     INTERNET
@@ -314,7 +314,7 @@ Security is not a state — it's a process.
 
 ---
 
-## Most Common Gaps (OWASP API Security Top 10)
+## Most Common Gaps (OWASP API Security Top 10) `🔴 senior`
 
 | # | Vulnerability | How to protect |
 |---|---|---|

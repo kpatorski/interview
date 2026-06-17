@@ -25,7 +25,7 @@
 
 ## 1️⃣ Myślenie Architektoniczne
 
-#### 🔹 1. Czym są trade-offs w architekturze?
+#### 🔹 1. 🔴 Czym są trade-offs w architekturze?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -42,7 +42,7 @@ Architekt powinien jasno rozumieć konsekwencje wyborów.
 
 ---
 
-#### 🔹 2. Jak rozumieć CAP w praktyce projektowej?
+#### 🔹 2. 🔴 Jak rozumieć CAP w praktyce projektowej?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -61,7 +61,7 @@ Projekt musi uwzględniać konsekwencje chwilowej niespójności.
 
 ## 2️⃣ Projektowanie pod Skalę
 
-#### 🔹 3. Czym jest skalowalność funkcjonalna vs techniczna?
+#### 🔹 3. 🔴 Czym jest skalowalność funkcjonalna vs techniczna?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -76,7 +76,7 @@ Obie są kluczowe dla systemów długowiecznych.
 
 ---
 
-#### 🔹 4. Czym jest latency budget?
+#### 🔹 4. 🔴 Czym jest latency budget?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -94,7 +94,7 @@ Pomaga kontrolować zależności i unikać kaskadowych opóźnień.
 
 ## 3️⃣ Projektowanie na Awarię
 
-#### 🔹 5. Co oznacza "design for failure"?
+#### 🔹 5. 🔴 Co oznacza "design for failure"?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -111,7 +111,7 @@ System powinien:
 
 ---
 
-#### 🔹 6. Czym jest graceful degradation?
+#### 🔹 6. 🔴 Czym jest graceful degradation?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -126,7 +126,7 @@ Przykład:
 
 ## 4️⃣ Backpressure i Przepływ Danych
 
-#### 🔹 7. Czym jest backpressure na poziomie systemowym?
+#### 🔹 7. 🔴 Czym jest backpressure na poziomie systemowym?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -146,7 +146,7 @@ Mechanizmy:
 
 ## 5️⃣ Failure Modes i Analiza Ryzyka
 
-#### 🔹 8. Jak analizować failure modes systemu?
+#### 🔹 8. 🔴 Jak analizować failure modes systemu?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -167,7 +167,7 @@ Celem jest zwiększenie odporności systemu.
 
 ## 6️⃣ Myślenie Długoterminowe
 
-#### 🔹 9. Jak podejmować decyzje technologiczne długoterminowo?
+#### 🔹 9. 🔴 Jak podejmować decyzje technologiczne długoterminowo?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -182,7 +182,7 @@ Najlepsza technologia to taka, którą zespół potrafi utrzymać przez lata.
 
 ---
 
-#### 🔹 10. Jak zaprojektować URL shortener?
+#### 🔹 10. 🔴 Jak zaprojektować URL shortener?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -200,7 +200,7 @@ Redirect 301 (permanent, browser cache) vs 302 (temporary, zawsze odpytuje serwe
 
 ---
 
-#### 🔹 11. Jak zaprojektować rate limiter?
+#### 🔹 11. 🔴 Jak zaprojektować rate limiter?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -223,7 +223,7 @@ Distributed rate limiting: Redis centralny, ale dodaje latency — rozważ lokal
 
 ---
 
-#### 🔹 12. Jak zaprojektować system powiadomień?
+#### 🔹 12. 🔴 Jak zaprojektować system powiadomień?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -244,7 +244,7 @@ Ważne:
 
 ---
 
-#### 🔹 13. Czym jest PACELC theorem?
+#### 🔹 13. 🔴 Czym jest PACELC theorem?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -261,7 +261,7 @@ CAP mówi co robisz przy awarii. PACELC mówi co robisz na co dzień.
 
 ---
 
-#### 🔹 14. Jak zaimplementować Distributed Lock?
+#### 🔹 14. 🔴 Jak zaimplementować Distributed Lock?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -282,7 +282,7 @@ Alternatywy: ZooKeeper (ZNode ephemeral), PostgreSQL advisory locks.
 
 ---
 
-#### 🔹 15. Czym jest Leader Election?
+#### 🔹 15. 🔴 Czym jest Leader Election?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -297,7 +297,7 @@ Spring: `@SchedulerLock` (ShedLock) dla prostszych przypadków.
 
 ---
 
-#### 🔹 16. Jak generować unikalne ID at scale?
+#### 🔹 16. 🔴 Jak generować unikalne ID at scale?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -314,7 +314,7 @@ Unikaj: auto-increment z jednej bazy przy shardingu — bottleneck i nie unikaln
 
 ---
 
-#### 🔹 17. Czym jest Fan-out pattern?
+#### 🔹 17. 🔴 Czym jest Fan-out pattern?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -332,7 +332,7 @@ W praktyce: hybryda — fan-out on write dla zwykłych użytkowników, on read d
 
 ---
 
-#### 🔹 18. Read-heavy vs write-heavy — jak wpływa na design?
+#### 🔹 18. 🔴 Read-heavy vs write-heavy — jak wpływa na design?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -351,7 +351,7 @@ W praktyce: hybryda — fan-out on write dla zwykłych użytkowników, on read d
 
 ---
 
-#### 🔹 19. Czym są consistency patterns w systemach rozproszonych?
+#### 🔹 19. 🔴 Czym są consistency patterns w systemach rozproszonych?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -367,7 +367,7 @@ Wybór zależy od wymagań biznesowych — system bankowy = strong, social media
 
 ---
 
-#### 🔹 20. Jak projektować sharding strategię bazy danych?
+#### 🔹 20. 🔴 Jak projektować sharding strategię bazy danych?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -386,7 +386,7 @@ Wyzwania:
 
 ---
 
-#### 🔹 21. Jak zaprojektować system obsługujący milion użytkowników?
+#### 🔹 21. 🔴 Jak zaprojektować system obsługujący milion użytkowników?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -406,7 +406,7 @@ Kluczowe: nie skacz do kroku 9 od razu.
 
 ---
 
-#### 🔹 22. Czym jest Event Storming?
+#### 🔹 22. 🔴 Czym jest Event Storming?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -424,7 +424,7 @@ Wynik: mapa domeny, identyfikacja Bounded Contexts, gotowość do podziału na s
 
 ---
 
-#### 🔹 23. Jak projektować system pod high availability (HA)?
+#### 🔹 23. 🔴 Jak projektować system pod high availability (HA)?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -443,7 +443,7 @@ RTO (Recovery Time Objective) i RPO (Recovery Point Objective) definiują wymaga
 
 ---
 
-#### 🔹 24. Czym jest data pipeline architecture?
+#### 🔹 24. 🔴 Czym jest data pipeline architecture?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -459,7 +459,7 @@ Narzędzia:
 
 ---
 
-#### 🔹 25. Jak ocenić architekturę systemu podczas code review / design review?
+#### 🔹 25. 🔴 Jak ocenić architekturę systemu podczas code review / design review?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
