@@ -19,6 +19,8 @@ const CATEGORIES = [
   { file: '10-performance.md', id: 'perf',   label: 'Performance' },
   { file: '11-system-design.md',id:'sys',    label: 'System Design' },
   { file: '12-public-api.md',  id:'api',    label: 'Public API Design' },
+  { file: '13-angular.md',    id:'angular', label: 'Angular' },
+  { file: '14-react.md',      id:'react',   label: 'React' },
 ];
 
 function stripHtmlTags(text) {
