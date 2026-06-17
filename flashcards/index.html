@@ -200,14 +200,14 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe 
     <label class="lvl-opt">
       <input type="radio" name="lvl" value="middle" id="r-middle">
       <div class="lvl-opt-info">
-        <div class="lvl-opt-title">🟢 Middle</div>
+        <div class="lvl-opt-title">🧑‍💻 Middle</div>
         <div class="lvl-opt-sub" id="lvl-mid-sub"></div>
       </div>
     </label>
     <label class="lvl-opt">
       <input type="radio" name="lvl" value="all" id="r-all" checked>
       <div class="lvl-opt-info">
-        <div class="lvl-opt-title">🟢+🔴 Wszystkie poziomy</div>
+        <div class="lvl-opt-title">🧑‍💻+🧙‍♂️ Wszystkie poziomy</div>
         <div class="lvl-opt-sub" id="lvl-all-sub"></div>
       </div>
     </label>
@@ -405,7 +405,7 @@ function startStudy(catId) {
 
   let lbl = 'Wszystkie kategorie';
   if (catId !== '__all__') { const c = DATA.categories.find(x => x.id === catId); if (c) lbl = c.label; }
-  const lvlBadge = curLevel === 'middle' ? ' 🟢' : '';
+  const lvlBadge = curLevel === 'middle' ? ' 🧑‍💻' : '';
   document.getElementById('ss-cat').textContent = lbl + lvlBadge;
 
   showScreen('ss'); showCard();

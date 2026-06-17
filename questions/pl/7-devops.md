@@ -24,7 +24,7 @@
 
 ## 1️⃣ Kontenery i Artefakty
 
-#### 🔹 1. 🟢 Czym jest kontener (Docker) i czym różni się od VM?
+#### 🔹 1. 🧑‍💻 Czym jest kontener (Docker) i czym różni się od VM?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -42,7 +42,7 @@ Kontenery są lepsze do skalowania aplikacji, VM częściej do silnej izolacji.
 
 ---
 
-#### 🔹 2. 🟢 Co powinno znaleźć się w dobrym Dockerfile dla aplikacji Java?
+#### 🔹 2. 🧑‍💻 Co powinno znaleźć się w dobrym Dockerfile dla aplikacji Java?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -59,7 +59,7 @@ Cel: mały obraz, szybki build, bezpieczeństwo.
 
 ## 2️⃣ CI/CD
 
-#### 🔹 3. 🟢 Czym jest CI/CD i jakie są typowe etapy pipeline?
+#### 🔹 3. 🧑‍💻 Czym jest CI/CD i jakie są typowe etapy pipeline?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -83,7 +83,7 @@ Typowe etapy:
 
 ## 3️⃣ Monitoring i Observability
 
-#### 🔹 4. 🟢 Czym różni się monitoring od observability?
+#### 🔹 4. 🧑‍💻 Czym różni się monitoring od observability?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -100,7 +100,7 @@ Trzy filary observability:
 
 ---
 
-#### 🔹 5. 🟢 Co to jest structured logging i dlaczego jest ważny?
+#### 🔹 5. 🧑‍💻 Co to jest structured logging i dlaczego jest ważny?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -119,7 +119,7 @@ Ułatwia:
 
 ---
 
-#### 🔹 6. 🟢 Czym jest distributed tracing?
+#### 🔹 6. 🧑‍💻 Czym jest distributed tracing?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -142,7 +142,7 @@ Pozwala diagnozować:
 
 ## 4️⃣ Health Checks i Deploy
 
-#### 🔹 7. 🟢 Czym różni się liveness od readiness?
+#### 🔹 7. 🧑‍💻 Czym różni się liveness od readiness?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -158,7 +158,7 @@ W Kubernetes są to osobne probe.
 
 ---
 
-#### 🔹 8. 🟢 Blue/Green vs Canary — czym się różnią?
+#### 🔹 8. 🧑‍💻 Blue/Green vs Canary — czym się różnią?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -176,7 +176,7 @@ Canary:
 
 ## 5️⃣ Skalowanie
 
-#### 🔹 9. 🟢 Horizontal vs Vertical scaling — różnice i konsekwencje
+#### 🔹 9. 🧑‍💻 Horizontal vs Vertical scaling — różnice i konsekwencje
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -193,7 +193,7 @@ W praktyce preferuje się horizontal scaling.
 
 ---
 
-#### 🔹 10. 🔴 Czym są Kubernetes Deployment vs StatefulSet?
+#### 🔹 10. 🧙‍♂️ Czym są Kubernetes Deployment vs StatefulSet?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -211,7 +211,7 @@ Zasada: aplikacje Java powinny być stateless i uruchamiane jako Deployment.
 
 ---
 
-#### 🔹 11. 🟢 Czym są resource requests i limits w Kubernetes?
+#### 🔹 11. 🧑‍💻 Czym są resource requests i limits w Kubernetes?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -234,7 +234,7 @@ Ważne dla JVM:
 
 ---
 
-#### 🔹 12. 🟢 Jakie są typy Service w Kubernetes?
+#### 🔹 12. 🧑‍💻 Jakie są typy Service w Kubernetes?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -247,7 +247,7 @@ Headless Service (ClusterIP=None): bezpośredni DNS do podów — używany przez
 
 ---
 
-#### 🔹 13. 🟢 ConfigMap vs Secret w Kubernetes
+#### 🔹 13. 🧑‍💻 ConfigMap vs Secret w Kubernetes
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -263,7 +263,7 @@ Nie commituj sekretów — używaj sealed-secrets lub External Secrets.
 
 ---
 
-#### 🔹 14. 🔴 Czym jest HPA (Horizontal Pod Autoscaler)?
+#### 🔹 14. 🧙‍♂️ Czym jest HPA (Horizontal Pod Autoscaler)?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -287,7 +287,7 @@ Pułapki:
 
 ---
 
-#### 🔹 15. 🟢 Czym jest Kubernetes Ingress?
+#### 🔹 15. 🧑‍💻 Czym jest Kubernetes Ingress?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -310,7 +310,7 @@ TLS terminowany na Ingress (certyfikaty przez cert-manager + Let's Encrypt).
 
 ---
 
-#### 🔹 16. 🟢 Czym jest GitOps?
+#### 🔹 16. 🧑‍💻 Czym jest GitOps?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -325,7 +325,7 @@ Zalety:
 
 ---
 
-#### 🔹 17. 🔴 Czym jest Infrastructure as Code (IaC)?
+#### 🔹 17. 🧙‍♂️ Czym jest Infrastructure as Code (IaC)?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -343,7 +343,7 @@ Korzyści:
 
 ---
 
-#### 🔹 18. 🔴 Jak przeprowadzić zero-downtime deployment?
+#### 🔹 18. 🧙‍♂️ Jak przeprowadzić zero-downtime deployment?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -357,7 +357,7 @@ Baza danych: migracje muszą być kompatybilne wstecznie (expand-contract patter
 
 ---
 
-#### 🔹 19. 🔴 Jak zarządzać migracjami bazy w CI/CD?
+#### 🔹 19. 🧙‍♂️ Jak zarządzać migracjami bazy w CI/CD?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -375,7 +375,7 @@ Nigdy nie modyfikuj istniejącej migracji Flyway — dodaj nową.
 
 ---
 
-#### 🔹 20. 🔴 Czym jest Chaos Engineering?
+#### 🔹 20. 🧙‍♂️ Czym jest Chaos Engineering?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -393,7 +393,7 @@ Ważne: zacznij od non-prod, przejdź do prod stopniowo.
 
 ---
 
-#### 🔹 21. 🔴 Czym są SLI, SLO i SLA?
+#### 🔹 21. 🧙‍♂️ Czym są SLI, SLO i SLA?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -408,7 +408,7 @@ Gdy error budget wyczerpany → freeze nowych features, focus na reliability.
 
 ---
 
-#### 🔹 22. 🟢 Jak zarządzać sekretami w Kubernetes produkcyjnie?
+#### 🔹 22. 🧑‍💻 Jak zarządzać sekretami w Kubernetes produkcyjnie?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -422,7 +422,7 @@ Zawsze: rotacja sekretów, audit kto i kiedy odczytał.
 
 ---
 
-#### 🔹 23. 🔴 Czym jest container image security?
+#### 🔹 23. 🧙‍♂️ Czym jest container image security?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -437,7 +437,7 @@ Supply chain: nie używaj obrazów `latest`, przypinaj do digesta SHA.
 
 ---
 
-#### 🔹 24. 🔴 Czym jest Service Mesh i czym różni się od API Gateway?
+#### 🔹 24. 🧙‍♂️ Czym jest Service Mesh i czym różni się od API Gateway?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -451,7 +451,7 @@ Oba rozwiązują różne warstwy — często stosowane razem (Gateway + Istio/Li
 
 ---
 
-#### 🔹 25. 🔴 Czym jest multi-environment configuration strategy?
+#### 🔹 25. 🧙‍♂️ Czym jest multi-environment configuration strategy?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 

@@ -56,7 +56,7 @@ Each layer works independently. If the guard misses a fake ID, the camera still 
 
 ### Step 1: Encrypt the Channel (TLS)
 
-**🟢 middle**
+**🧑‍💻 middle**
 
 Data on the internet passes through dozens of intermediate servers. Without encryption, any one of them can read it. TLS (what sits behind `https://`) creates an encrypted tunnel — nobody in between sees the content.
 
@@ -72,7 +72,7 @@ Without this: an attacker on the same Wi-Fi (café, airport) reads every token a
 
 ### Step 2: Verify Identity (Authentication)
 
-**🟢 middle — Users: OAuth2 + JWT**
+**🧑‍💻 middle — Users: OAuth2 + JWT**
 
 The user logs in through an Authorization Server (Keycloak, Auth0, Cognito — not your app). The server issues a JWT: a small, digitally signed document containing the user's identity.
 
@@ -86,7 +86,7 @@ The user logs in through an Authorization Server (Keycloak, Auth0, Cognito — n
 
 Short TTL (5–15 minutes) is critical: if the token leaks, it goes stale quickly.
 
-**🟢 middle — External Partners: API Keys**
+**🧑‍💻 middle — External Partners: API Keys**
 
 ```
 X-API-Key: sk_live_abc123xyz
@@ -94,7 +94,7 @@ X-API-Key: sk_live_abc123xyz
 
 Simpler than OAuth2. The key doesn't expire automatically — you must rotate it manually and revoke it immediately if compromised. Use for trusted third-party integrations with a limited surface area.
 
-**🔴 senior — How JWT signature verification works (JWKS)**
+**🧙‍♂️ senior — How JWT signature verification works (JWKS)**
 
 Your service doesn't call the Authorization Server on every request. Instead, it fetches the server's public keys once (from the JWKS endpoint) and verifies the JWT signature locally. This makes the system stateless and fast, but means a revoked token stays valid until it expires — which is why short TTL matters.
 
@@ -109,7 +109,7 @@ SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 }
 ```
 
-**🔴 senior — Service-to-Service (M2M): OAuth2 Client Credentials**
+**🧙‍♂️ senior — Service-to-Service (M2M): OAuth2 Client Credentials**
 
 When a service needs to call another service without a human user, it uses its own identity (client_id + client_secret) to obtain a token.
 
@@ -128,7 +128,7 @@ In Kubernetes, prefer Workload Identity (IRSA on AWS, Workload Identity on GKE) 
 
 ### Step 3: Check Permissions (Authorization)
 
-**🟢 middle — Authentication ≠ Authorization**
+**🧑‍💻 middle — Authentication ≠ Authorization**
 
 Authentication tells you *who* is calling. Authorization tells you *what they are allowed to do*. A logged-in user should not see another user's orders.
 
@@ -143,11 +143,11 @@ public List<Order> getMyOrders(Authentication auth) {
 }
 ```
 
-**🟢 middle — The classic mistake: IDOR**
+**🧑‍💻 middle — The classic mistake: IDOR**
 
 `GET /orders/12345` — if your code doesn't check that order 12345 belongs to the logged-in user, any authenticated user can increment the ID and read someone else's data. Authentication passed; authorization failed. This is OWASP #1.
 
-**🔴 senior — Fine-grained authorization: @PostAuthorize and domain objects**
+**🧙‍♂️ senior — Fine-grained authorization: @PostAuthorize and domain objects**
 
 `@PreAuthorize` runs *before* the method and can only see the input. `@PostAuthorize` runs *after* and can inspect the return value — useful when ownership can only be confirmed after loading the resource:
 
@@ -161,7 +161,7 @@ public Order getOrder(@PathVariable Long id) {
 
 For complex rules (e.g., "admin sees all, manager sees their team's, user sees their own"), Spring Security ACL or a policy engine (OPA, Casbin) replaces scattered `if` checks.
 
-**🔴 senior — Role vs Scope vs Claim-based authorization**
+**🧙‍♂️ senior — Role vs Scope vs Claim-based authorization**
 
 | Strategy | Best for |
 |---|---|
@@ -173,7 +173,7 @@ For complex rules (e.g., "admin sees all, manager sees their team's, user sees t
 
 ### Step 4: Validate Every Byte of Input
 
-**🟢 middle — Basic Bean Validation**
+**🧑‍💻 middle — Basic Bean Validation**
 
 A client can send literally anything as JSON. Validate at the HTTP boundary before any business logic runs.
 
@@ -192,7 +192,7 @@ public ResponseEntity<OrderResponse> placeOrder(@Valid @RequestBody CreateOrderR
 
 **Never trust input from outside** — even from "trusted" internal services. Always validate at HTTP boundaries.
 
-**🔴 senior — Custom constraint annotations**
+**🧙‍♂️ senior — Custom constraint annotations**
 
 When built-in annotations aren't enough (e.g., validate a bank account number format), write your own:
 
@@ -213,7 +213,7 @@ public class IbanValidator implements ConstraintValidator<ValidIban, String> {
 }
 ```
 
-**🔴 senior — Validation at domain level vs API level**
+**🧙‍♂️ senior — Validation at domain level vs API level**
 
 Bean Validation catches format errors (negative amount, blank field). Business invariants live in the domain:
 
@@ -231,7 +231,7 @@ Two distinct concerns, two distinct places. Don't mix them.
 
 ### Step 5: Limit Traffic (Rate Limiting)
 
-**🟢 middle — The problem and the response**
+**🧑‍💻 middle — The problem and the response**
 
 A single script can send 50,000 requests per second, taking your service down for everyone. Count requests per client; when the limit is exceeded:
 
@@ -245,7 +245,7 @@ X-RateLimit-Reset: 1718352000
 
 `Retry-After: 60` is essential. Without it, clients retry immediately → thundering herd → overload compounds. With it, they back off for 60 seconds.
 
-**🔴 senior — Algorithms and distributed implementation**
+**🧙‍♂️ senior — Algorithms and distributed implementation**
 
 | Algorithm | Characteristic |
 |---|---|
@@ -265,7 +265,7 @@ RateLimiter limiter = RateLimiter.of("orders-api",
         .build());
 ```
 
-**🔴 senior — Tiered limits**
+**🧙‍♂️ senior — Tiered limits**
 
 Different clients get different limits:
 - Free tier: 100 req/min
@@ -278,7 +278,7 @@ Separate limits per endpoint: `POST /payments` is far more expensive than `GET /
 
 ### Step 6: Add Security Headers
 
-**🟢 middle — What to add and why**
+**🧑‍💻 middle — What to add and why**
 
 Each header protects against one specific attack:
 
@@ -300,7 +300,7 @@ http.headers(headers -> headers
 );
 ```
 
-**🔴 senior — Content Security Policy at depth**
+**🧙‍♂️ senior — Content Security Policy at depth**
 
 A permissive CSP (`default-src 'self'`) is a starting point. Production CSPs are complex because real apps load fonts from Google, analytics from third parties, etc. Nonces prevent inline script injection while allowing specific trusted scripts:
 
@@ -318,7 +318,7 @@ Use `Content-Security-Policy-Report-Only` first to collect violations before enf
 
 ### Step 7: Log Everything (Audit Log)
 
-**🟢 middle — What to log and what NOT to log**
+**🧑‍💻 middle — What to log and what NOT to log**
 
 When something goes wrong (security breach, client dispute), you need a record. Every request gets logged:
 
@@ -333,7 +333,7 @@ Never log: passwords, tokens, card numbers, SSN. If you need to confirm a token 
 // ✅ "authTokenPresent": true
 ```
 
-**🔴 senior — Structured logging with Correlation ID**
+**🧙‍♂️ senior — Structured logging with Correlation ID**
 
 Every request gets a unique `traceId` generated at entry (or taken from the incoming `X-Correlation-ID` header). Propagate it to all downstream calls and include it in every log line:
 
@@ -346,7 +346,7 @@ MDC.put("traceId", request.getHeader("X-Correlation-ID") != null
 
 This lets you reconstruct the entire journey of a single request across 10 microservices in Splunk with one query: `traceId="abc-123"`.
 
-**🔴 senior — Compliance requirements**
+**🧙‍♂️ senior — Compliance requirements**
 
 In regulated environments (fintech, healthcare), audit logs are not optional:
 - **Immutability**: logs must not be modifiable after the fact (write to append-only storage, ship to SIEM immediately).
@@ -358,7 +358,7 @@ In regulated environments (fintech, healthcare), audit logs are not optional:
 
 ### Step 8: Put an API Gateway at the Front
 
-**🟢 middle — The concept**
+**🧑‍💻 middle — The concept**
 
 Your service shouldn't implement TLS termination, JWT validation, rate limiting, and request logging separately — these are cross-cutting concerns that belong at the infrastructure level. An API Gateway sits in front:
 
@@ -374,7 +374,7 @@ Client → [API Gateway] → [Your Service]
 
 Your service receives an already-authenticated request and focuses purely on business logic.
 
-**🔴 senior — Responsibilities: gateway vs service**
+**🧙‍♂️ senior — Responsibilities: gateway vs service**
 
 | Concern | Gateway | Service |
 |---|---|---|
@@ -387,7 +387,7 @@ Your service receives an already-authenticated request and focuses purely on bus
 
 A service that relies on the gateway for authorization is unsafe — if you add a direct route (debug endpoint, internal network), authorization disappears. Always authorize at the service level too.
 
-**🔴 senior — Choosing a gateway**
+**🧙‍♂️ senior — Choosing a gateway**
 
 | Gateway | Best for |
 |---|---|
@@ -400,7 +400,7 @@ A service that relies on the gateway for authorization is unsafe — if you add 
 
 ### Step 9: Keep Security Up to Date
 
-**🟢 middle — Dependency scanning**
+**🧑‍💻 middle — Dependency scanning**
 
 Your app's libraries have vulnerabilities discovered after you shipped. Check them regularly:
 - **Dependabot** (GitHub): opens PRs automatically when CVEs are found.
@@ -408,7 +408,7 @@ Your app's libraries have vulnerabilities discovered after you shipped. Check th
 
 If a critical CVE appears, patch within 24 hours — don't wait for the next sprint.
 
-**🔴 senior — Secret rotation**
+**🧙‍♂️ senior — Secret rotation**
 
 Secrets (API keys, DB passwords, JWT signing keys) should be rotated on a schedule and immediately on suspicion of compromise:
 
@@ -423,7 +423,7 @@ vault write database/config/mydb
 
 App checks out new credentials before each startup (or via Vault Agent sidecar in Kubernetes). No long-lived secrets.
 
-**🔴 senior — Pen testing and threat modeling**
+**🧙‍♂️ senior — Pen testing and threat modeling**
 
 Before a major release or once per quarter:
 1. **Threat modeling** (STRIDE) — enumerate attack surfaces before writing code.
@@ -436,7 +436,7 @@ Results go into the backlog with severity labels (CVSS score). Critical/High blo
 
 ## Technical Terms Glossary
 
-**🟢 middle — Core terms**
+**🧑‍💻 middle — Core terms**
 
 | Term | What it is |
 |---|---|
@@ -449,7 +449,7 @@ Results go into the backlog with severity labels (CVSS score). Critical/High blo
 | **DoS** | Denial of Service — flooding a service with requests to take it down |
 | **Bean Validation** | Spring/Jakarta mechanism for validating objects via annotations (`@NotBlank`, `@Positive`) |
 
-**🔴 senior — Advanced terms**
+**🧙‍♂️ senior — Advanced terms**
 
 | Term | What it is |
 |---|---|
@@ -466,7 +466,7 @@ Results go into the backlog with severity labels (CVSS score). Critical/High blo
 
 ## Layer Map — Who Does What
 
-**🟢 middle — Mental model**
+**🧑‍💻 middle — Mental model**
 
 ```
         INTERNET
@@ -484,7 +484,7 @@ Results go into the backlog with severity labels (CVSS score). Critical/High blo
    └─────────────────┘
 ```
 
-**🔴 senior — Request lifecycle through security layers**
+**🧙‍♂️ senior — Request lifecycle through security layers**
 
 ```
 Request arrives
@@ -504,7 +504,7 @@ Request arrives
 
 ## Most Common Gaps (OWASP API Security Top 10)
 
-**🟢 middle — Know these exist**
+**🧑‍💻 middle — Know these exist**
 
 | # | Vulnerability | One-line fix |
 |---|---|---|
@@ -514,7 +514,7 @@ Request arrives
 | 5 | **Broken Function Level Authorization** | Admin endpoints need a dedicated scope |
 | 8 | **Security Misconfiguration** | Disable debug endpoints, never expose stack traces |
 
-**🔴 senior — These require deeper understanding**
+**🧙‍♂️ senior — These require deeper understanding**
 
 | # | Vulnerability | What makes it hard |
 |---|---|---|

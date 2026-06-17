@@ -22,7 +22,7 @@
 
 ## 1️⃣ Podstawy Kryptografii
 
-#### 🔹 1. 🟢 Czym różni się szyfrowanie od haszowania?
+#### 🔹 1. 🧑‍💻 Czym różni się szyfrowanie od haszowania?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -40,7 +40,7 @@ Hasło nie powinno być szyfrowane — powinno być haszowane.
 
 ---
 
-#### 🔹 2. 🟢 Czym jest salt i dlaczego jest ważny?
+#### 🔹 2. 🧑‍💻 Czym jest salt i dlaczego jest ważny?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -56,7 +56,7 @@ Każde hasło powinno mieć unikalny salt.
 
 ## 2️⃣ TLS i Transport
 
-#### 🔹 3. 🟢 Jak działa TLS w skrócie?
+#### 🔹 3. 🧑‍💻 Jak działa TLS w skrócie?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -76,7 +76,7 @@ Chroni przed:
 
 ## 3️⃣ OWASP i Najczęstsze Ataki
 
-#### 🔹 4. 🟢 Czym jest SQL Injection?
+#### 🔹 4. 🧑‍💻 Czym jest SQL Injection?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -92,7 +92,7 @@ Zapobieganie:
 
 ---
 
-#### 🔹 5. 🟢 Czym jest XSS?
+#### 🔹 5. 🧑‍💻 Czym jest XSS?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -110,7 +110,7 @@ Zapobieganie:
 
 ---
 
-#### 🔹 6. 🟢 Czym jest CSRF?
+#### 🔹 6. 🧑‍💻 Czym jest CSRF?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -125,7 +125,7 @@ Ochrona:
 
 ## 4️⃣ Autoryzacja i Dostęp
 
-#### 🔹 7. 🟢 Czym jest RBAC vs ABAC?
+#### 🔹 7. 🧑‍💻 Czym jest RBAC vs ABAC?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -139,7 +139,7 @@ ABAC daje większą elastyczność kosztem złożoności.
 
 ---
 
-#### 🔹 8. 🟢 Jak zabezpieczać sekrety w systemie?
+#### 🔹 8. 🧑‍💻 Jak zabezpieczać sekrety w systemie?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -157,7 +157,7 @@ Zasada: najmniejsze możliwe uprawnienia (least privilege).
 
 ---
 
-#### 🔹 9. 🟢 Jaka jest struktura JWT i jak go weryfikować?
+#### 🔹 9. 🧑‍💻 Jaka jest struktura JWT i jak go weryfikować?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -176,7 +176,7 @@ Nigdy nie ufaj payload bez weryfikacji podpisu. Nie przechowuj danych wrażliwyc
 
 ---
 
-#### 🔹 10. 🟢 Jakie są przepływy OAuth2?
+#### 🔹 10. 🧑‍💻 Jakie są przepływy OAuth2?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -192,7 +192,7 @@ Senior powinien wiedzieć: Authorization Code + PKCE dla aplikacji user-facing, 
 
 ---
 
-#### 🔹 11. 🟢 Czym jest PKCE i dlaczego jest ważne?
+#### 🔹 11. 🧑‍💻 Czym jest PKCE i dlaczego jest ważne?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -209,7 +209,7 @@ Obowiązkowe dla SPA i mobile apps.
 
 ---
 
-#### 🔹 12. 🔴 Czym jest OIDC?
+#### 🔹 12. 🧙‍♂️ Czym jest OIDC?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -227,7 +227,7 @@ Keycloak, Auth0, Google, AWS Cognito implementują OIDC.
 
 ---
 
-#### 🔹 13. 🔴 Czym jest Broken Access Control (OWASP #1)?
+#### 🔹 13. 🧙‍♂️ Czym jest Broken Access Control (OWASP #1)?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -245,7 +245,7 @@ Mitygacja:
 
 ---
 
-#### 🔹 14. 🟢 Czym jest SSRF (Server-Side Request Forgery)?
+#### 🔹 14. 🧑‍💻 Czym jest SSRF (Server-Side Request Forgery)?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -260,7 +260,7 @@ Mitygacja:
 
 ---
 
-#### 🔹 15. 🔴 Jakie security headers powinien zwracać serwer?
+#### 🔹 15. 🧙‍♂️ Jakie security headers powinien zwracać serwer?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -274,7 +274,7 @@ Spring Security ustawia większość domyślnie. Sprawdź przez [securityheaders
 
 ---
 
-#### 🔹 16. 🟢 Czym jest Injection (OWASP Top 10)?
+#### 🔹 16. 🧑‍💻 Czym jest Injection (OWASP Top 10)?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -293,7 +293,7 @@ Mitygacja:
 
 ---
 
-#### 🔹 17. 🟢 Czym jest Security Misconfiguration?
+#### 🔹 17. 🧑‍💻 Czym jest Security Misconfiguration?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -314,7 +314,7 @@ Mitygacja:
 
 ---
 
-#### 🔹 18. 🟢 Jak wdrożyć audit logging?
+#### 🔹 18. 🧑‍💻 Jak wdrożyć audit logging?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -332,7 +332,7 @@ Ważne:
 
 ---
 
-#### 🔹 19. 🔴 Czym jest zasada least privilege?
+#### 🔹 19. 🧙‍♂️ Czym jest zasada least privilege?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -348,7 +348,7 @@ Ogranicza blast radius przy kompromitacji komponentu.
 
 ---
 
-#### 🔹 20. 🟢 Czym jest secret rotation i jak ją zautomatyzować?
+#### 🔹 20. 🧑‍💻 Czym jest secret rotation i jak ją zautomatyzować?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -365,7 +365,7 @@ Zero-downtime rotation: najpierw dodaj nowy sekret, poczekaj na propagację, usu
 
 ---
 
-#### 🔹 21. 🔴 Czym jest supply chain security?
+#### 🔹 21. 🧙‍♂️ Czym jest supply chain security?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -384,7 +384,7 @@ Mitygacja:
 
 ---
 
-#### 🔹 22. 🔴 Czym jest Zero Trust Architecture?
+#### 🔹 22. 🧙‍♂️ Czym jest Zero Trust Architecture?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -403,7 +403,7 @@ Kontrast z tradycyjnym modelem: "twierdza" z zaufanym wnętrzem.
 
 ---
 
-#### 🔹 23. 🔴 Jak chronić przed Broken Authentication?
+#### 🔹 23. 🧙‍♂️ Jak chronić przed Broken Authentication?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -424,7 +424,7 @@ Mitygacja:
 
 ---
 
-#### 🔹 24. 🟢 Czym jest path traversal?
+#### 🔹 24. 🧑‍💻 Czym jest path traversal?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -440,7 +440,7 @@ Mitygacja:
 
 ---
 
-#### 🔹 25. 🟢 Czym jest Sensitive Data Exposure?
+#### 🔹 25. 🧑‍💻 Czym jest Sensitive Data Exposure?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 

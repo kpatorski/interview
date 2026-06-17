@@ -26,19 +26,19 @@ function stripHtmlTags(text) {
   return text.replace(/<span[^>]*>([^<]*)<\/span>/g, '$1');
 }
 
-const LEVEL = { '🟢': 'middle', '🔴': 'senior' };
+const LEVEL = { '🧑‍💻': 'middle', '🧙‍♂️': 'senior' };
 
 function parseCards(content, catId) {
-  // Match all question headers: #### 🔹 N. [🟢|🔴] Question text
+  // Match all question headers: #### 🔹 N. [🧑‍💻|🧙‍♂️] Question text
   const headerRe = /^#### 🔹 \d+\.?\s+(.+)$/gm;
   const headers = [...content.matchAll(headerRe)];
 
   const cards = [];
   for (let i = 0; i < headers.length; i++) {
     const raw = headers[i][1].trim();
-    const lvMatch = raw.match(/^(🟢|🔴)\s+/);
+    const lvMatch = raw.match(/^(🧑‍💻|🧙‍♂️)\s+/);
     const level = lvMatch ? LEVEL[lvMatch[1]] : 'middle';
-    const question = raw.replace(/^(🟢|🔴)\s+/, '');
+    const question = raw.replace(/^(🧑‍💻|🧙‍♂️)\s+/, '');
 
     const bodyStart = headers[i].index + headers[i][0].length + 1;
     const bodyEnd = i + 1 < headers.length ? headers[i + 1].index : content.length;

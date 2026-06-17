@@ -24,7 +24,7 @@
 
 ## 1️⃣ Fundamenty Mikroserwisów
 
-#### 🔹 1. 🔴 Jak wyznaczać granice mikroserwisów?
+#### 🔹 1. 🧙‍♂️ Jak wyznaczać granice mikroserwisów?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -40,7 +40,7 @@ Zły znak:
 
 ---
 
-#### 🔹 2. 🔴 Synchroniczna vs asynchroniczna komunikacja — kiedy co?
+#### 🔹 2. 🧙‍♂️ Synchroniczna vs asynchroniczna komunikacja — kiedy co?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -59,7 +59,7 @@ W praktyce często miesza się oba podejścia.
 
 ---
 
-#### 🔹 3. 🟢 Czym jest API Gateway?
+#### 🔹 3. 🧑‍💻 Czym jest API Gateway?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -82,7 +82,7 @@ Ryzyko:
 
 ## 2️⃣ Odporność i Stabilność
 
-#### 🔹 4. 🟢 Czym jest Circuit Breaker?
+#### 🔹 4. 🧑‍💻 Czym jest Circuit Breaker?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -97,7 +97,7 @@ Stosowany przy komunikacji synchronicznej.
 
 ---
 
-#### 🔹 5. 🟢 Czym jest retry i jakie są ryzyka?
+#### 🔹 5. 🧑‍💻 Czym jest retry i jakie są ryzyka?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -116,7 +116,7 @@ Dobre praktyki:
 
 ---
 
-#### 🔹 6. 🟢 Czym jest idempotency i jak ją osiągnąć?
+#### 🔹 6. 🧑‍💻 Czym jest idempotency i jak ją osiągnąć?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -135,7 +135,7 @@ Techniki:
 
 ## 3️⃣ Spójność w systemie rozproszonym
 
-#### 🔹 7. 🔴 Czym jest Saga?
+#### 🔹 7. 🧙‍♂️ Czym jest Saga?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -149,7 +149,7 @@ Rodzaje:
 
 ---
 
-#### 🔹 8. 🔴 Czym jest Outbox Pattern?
+#### 🔹 8. 🧙‍♂️ Czym jest Outbox Pattern?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -166,7 +166,7 @@ Zapobiega utracie eventów.
 
 ---
 
-#### 🔹 9. 🔴 Dlaczego współdzielona baza danych między mikroserwisami jest problemem?
+#### 🔹 9. 🧙‍♂️ Dlaczego współdzielona baza danych między mikroserwisami jest problemem?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -182,7 +182,7 @@ Zasada: Database per service.
 
 ## 4️⃣ Obserwowalność
 
-#### 🔹 10. 🟢 Czym jest observability w mikroserwisach?
+#### 🔹 10. 🧑‍💻 Czym jest observability w mikroserwisach?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -197,7 +197,7 @@ Bez observability mikroserwisy są trudne w utrzymaniu.
 
 ---
 
-#### 🔹 11. 🔴 Czym jest Service Mesh?
+#### 🔹 11. 🧙‍♂️ Czym jest Service Mesh?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -214,7 +214,7 @@ Sidecar proxy (np. Envoy) obok każdego poda przejmuje cały ruch.
 
 ---
 
-#### 🔹 12. 🔴 Czym jest Service Discovery?
+#### 🔹 12. 🧙‍♂️ Czym jest Service Discovery?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -230,7 +230,7 @@ W Kubernetes: DNS-based discovery przez Service objects (ClusterIP).
 
 ---
 
-#### 🔹 13. 🟢 Czym jest Bulkhead Pattern?
+#### 🔹 13. 🧑‍💻 Czym jest Bulkhead Pattern?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -244,7 +244,7 @@ Realizacja: Resilience4j `Bulkhead`, Hystrix `ThreadPoolBulkhead`.
 
 ---
 
-#### 🔹 14. 🔴 Czym jest Rate Limiting i jak go implementować?
+#### 🔹 14. 🧙‍♂️ Czym jest Rate Limiting i jak go implementować?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -259,7 +259,7 @@ Implementacja: Redis (INCR + EXPIRE), API Gateway (Kong, Nginx), Resilience4j `R
 
 ---
 
-#### 🔹 15. 🟢 Jak wersjonować API w mikroserwisach?
+#### 🔹 15. 🧑‍💻 Jak wersjonować API w mikroserwisach?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -275,7 +275,7 @@ Dobre praktyki:
 
 ---
 
-#### 🔹 16. 🟢 Czym jest wzorzec Choreography vs Orchestration w Sadze?
+#### 🔹 16. 🧑‍💻 Czym jest wzorzec Choreography vs Orchestration w Sadze?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -291,7 +291,7 @@ W praktyce: małe sagas → choreography; złożone, wieloetapowe → orchestrat
 
 ---
 
-#### 🔹 17. 🔴 Jak zapewnić mTLS między serwisami?
+#### 🔹 17. 🧙‍♂️ Jak zapewnić mTLS między serwisami?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -306,7 +306,7 @@ Ważne przy zero-trust networking.
 
 ---
 
-#### 🔹 18. 🔴 Czym jest Distributed Configuration?
+#### 🔹 18. 🧙‍♂️ Czym jest Distributed Configuration?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -325,7 +325,7 @@ Problemy do rozwiązania:
 
 ---
 
-#### 🔹 19. 🔴 Jak testować mikroserwisy?
+#### 🔹 19. 🧙‍♂️ Jak testować mikroserwisy?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -340,7 +340,7 @@ Unikać: testowanie kilku serwisów razem w pełnym środowisku — zbyt kruche 
 
 ---
 
-#### 🔹 20. 🟢 Kiedy mikroserwisy to zły wybór?
+#### 🔹 20. 🧑‍💻 Kiedy mikroserwisy to zły wybór?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -358,7 +358,7 @@ Złe sygnały:
 
 ---
 
-#### 🔹 21. 🔴 Co to jest Conway's Law?
+#### 🔹 21. 🧙‍♂️ Co to jest Conway's Law?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -372,7 +372,7 @@ Inverse Conway Maneuver: najpierw zaprojektuj pożądaną architekturę, potem d
 
 ---
 
-#### 🔹 22. 🔴 Czym jest Dead Letter Queue (DLQ)?
+#### 🔹 22. 🧙‍♂️ Czym jest Dead Letter Queue (DLQ)?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -387,7 +387,7 @@ Obowiązkowy element każdego produkcyjnego systemu event-driven.
 
 ---
 
-#### 🔹 23. 🔴 Jak obsługiwać distributed tracing w mikroserwisach?
+#### 🔹 23. 🧙‍♂️ Jak obsługiwać distributed tracing w mikroserwisach?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -402,7 +402,7 @@ Stack: OpenTelemetry → Jaeger / Zipkin / Tempo.
 
 ---
 
-#### 🔹 24. 🟢 Czym jest timeout propagation i dlaczego jest ważne?
+#### 🔹 24. 🧑‍💻 Czym jest timeout propagation i dlaczego jest ważne?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -417,7 +417,7 @@ Rozwiązanie: gRPC deadline propagation, `Context` z deadlinem, nagłówki `X-Re
 
 ---
 
-#### 🔹 25. 🔴 Czym jest Event-Driven Architecture?
+#### 🔹 25. 🧙‍♂️ Czym jest Event-Driven Architecture?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
