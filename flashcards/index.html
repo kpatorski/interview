@@ -392,8 +392,9 @@ function hideLvlDlg() {
 
 function startWithLevel() {
   curLevel = document.querySelector('input[name="lvl"]:checked')?.value || 'all';
+  const catId = pendingCatId;
   hideLvlDlg();
-  startStudy(pendingCatId);
+  startStudy(catId);
 }
 
 function startStudy(catId) {
