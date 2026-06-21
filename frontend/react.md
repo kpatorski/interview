@@ -1,7 +1,7 @@
 ---
 render_with_liquid: false
 ---
-
+{% raw %}
 # ⚛️ React — Comprehensive Study Notes
 
 <!-- TOC -->
@@ -1602,3 +1602,5 @@ Features:
 - **TanStack Query** — library for server state: fetching, caching, background sync
 - **Zustand** — minimal global state; no Provider, no boilerplate
 - **useLayoutEffect** — like useEffect but synchronous before browser paint; for DOM measurements
+
+{% endraw %}

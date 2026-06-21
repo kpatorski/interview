@@ -1,7 +1,7 @@
 ---
 render_with_liquid: false
 ---
-
+{% raw %}
 # 🅰️ Angular — Comprehensive Study Notes
 
 <!-- TOC -->
@@ -1650,3 +1650,5 @@ Features:
 - **Hydration** — process of Angular attaching event listeners to server-rendered HTML
 - **Standalone bootstrap** — Angular 17+ app without root NgModule;
   `bootstrapApplication(AppComponent, { providers: [...] })`
+
+{% endraw %}
