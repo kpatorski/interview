@@ -356,6 +356,138 @@ apiUrl: string
 The `[()]` syntax is nicknamed "banana in a box" — brackets `[]` for property binding, parentheses `()` for event
 binding, together `[()]`.
 
+**🧙‍♂️ senior — Under the hood: ControlValueAccessor (CVA)**
+
+`[(ngModel)]` doesn't magically know how to read/write to any DOM element. Angular uses the
+**ControlValueAccessor** interface as a bridge between the form model and the native element. Every
+form element (`<input>`, `<select>`, `<textarea>`) has a matching CVA class that Angular attaches
+automatically via the element's CSS selector.
+
+**Three actors:**
+
+```
+NgModel directive        ControlValueAccessor        Native DOM element
+(the coordinator)        (the bridge / adapter)      (<input>, <select>…)
+       │                         │                          │
+       │── writeValue(val) ─────►│── element.value = val ──►│
+       │                         │                          │
+       │◄── onChange(newVal) ────│◄── (input/change event)──│
+```
+
+**When Angular compiles `<input [(ngModel)]="name">`:**
+1. Angular creates an `NgModel` directive instance
+2. `NgModel` looks up the `NG_VALUE_ACCESSOR` injection token — Angular finds `DefaultValueAccessor` (it's decorated with `{ provide: NG_VALUE_ACCESSOR, useExisting: DefaultValueAccessor, multi: true }`)
+3. `NgModel` calls `cva.registerOnChange(fn)` — CVA will call `fn(newVal)` whenever the `input` event fires
+4. `NgModel` calls `cva.registerOnTouched(fn)` — CVA calls `fn()` on `blur`
+5. **DOM → model:** user types → `input` fires → CVA calls `fn(newVal)` → `NgModel` updates form model → `ngModelChange` fires → `name` in your component is updated
+6. **Model → DOM:** `name` changes programmatically → `NgModel` calls `cva.writeValue(name)` → CVA sets `element.value = name`
+
+**The ControlValueAccessor interface:**
+
+```typescript
+interface ControlValueAccessor {
+  // Angular → DOM: called when the form model value changes; update the DOM display
+  writeValue(value: any): void;
+
+  // Register Angular's callback; call it with new value whenever DOM changes
+  registerOnChange(fn: (value: any) => void): void;
+
+  // Register Angular's callback; call it when the element loses focus
+  registerOnTouched(fn: () => void): void;
+
+  // Optional: called when control is programmatically enabled/disabled
+  setDisabledState?(isDisabled: boolean): void;
+}
+```
+
+> **Key insight:** `formControlName` (reactive forms) uses the *same* CVA mechanism.
+> Both `ngModel` and `formControlName` are just different directive-level coordinators;
+> the CVA bridge to the DOM is identical.
+
+---
+
+**Ściągawka: Który element ma jaki ControlValueAccessor?**
+
+| Klasa CVA | Selektor HTML | Zdarzenie DOM | Zwracany typ |
+|-----------|--------------|---------------|--------------|
+| `DefaultValueAccessor` | `<input>` (text, email, password, search, tel, url…), `<textarea>` | `input`, `blur` | `string` |
+| `CheckboxControlValueAccessor` | `<input type="checkbox">` | `change` | `boolean` |
+| `RadioControlValueAccessor` | `<input type="radio">` | `change` | wartość `value` atrybutu (string) |
+| `SelectControlValueAccessor` | `<select>` (jednokrotny wybór) | `change`, `blur` | `string` |
+| `SelectMultipleControlValueAccessor` | `<select multiple>` | `change`, `blur` | `string[]` |
+| `NumberValueAccessor` | `<input type="number">` | `input`, `blur` | `number` (lub `null` dla pustego) |
+| `RangeValueAccessor` | `<input type="range">` | `input`, `change`, `blur` | `number` |
+
+Źródła: [Angular docs — ControlValueAccessor](https://angular.dev/api/forms/ControlValueAccessor),
+[Built-in CVA source](https://github.com/angular/angular/tree/main/packages/forms/src/directives)
+
+---
+
+**Implementacja własnego CVA — custom form control:**
+
+Gdy tworzysz własny komponent wejściowy (np. date picker, phone field, rating widget), musisz
+zaimplementować CVA żeby działało z `ngModel` i `formControlName`.
+
+```typescript
+@Component({
+  selector: 'app-star-rating',
+  standalone: true,
+  template: `
+    <span *ngFor="let i of [1,2,3,4,5]"
+          (click)="setValue(i)"
+          [class.filled]="i <= value">★</span>
+  `,
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => StarRatingComponent),
+      multi: true   // ← multi: true jest obowiązkowe dla NG_VALUE_ACCESSOR
+    }
+  ]
+})
+export class StarRatingComponent implements ControlValueAccessor {
+  value = 0;
+  private onChange: (v: number) => void = () => {};
+  private onTouched: () => void = () => {};
+
+  // Angular → komponent: ustaw wartość
+  writeValue(value: number): void {
+    this.value = value ?? 0;
+  }
+
+  // Zarejestruj callback Angular → wywołuj go gdy wartość się zmieni
+  registerOnChange(fn: (v: number) => void): void {
+    this.onChange = fn;
+  }
+
+  // Zarejestruj callback Angular → wywołuj go przy blur
+  registerOnTouched(fn: () => void): void {
+    this.onTouched = fn;
+  }
+
+  // Opcjonalne: obsługa disabled state
+  setDisabledState(disabled: boolean): void {
+    // np. this.disabled = disabled;
+  }
+
+  setValue(rating: number): void {
+    this.value = rating;
+    this.onChange(rating);   // ← powiadom Angular o zmianie
+    this.onTouched();        // ← oznacz jako touched
+  }
+}
+
+// Użycie — działa identycznie jak <input>:
+// Template-driven:  <app-star-rating [(ngModel)]="product.rating">
+// Reactive:         <app-star-rating formControlName="rating">
+```
+
+**Pułapka — `forwardRef`:** potrzebne gdy klasa jest zarejestrowana w `providers` zanim
+JavaScript zdąży ją w pełni zdefiniować (circular reference w tym samym pliku). Bez niego
+`useExisting: StarRatingComponent` zwróci `undefined`.
+
+---
+
 **🧙‍♂️ senior** — Distinguish **property binding** `[value]` (sets a DOM *property*) from **attribute binding**
 `[attr.colspan]` (sets an HTML *attribute*). DOM properties and HTML attributes are not the same thing. SVG elements and
 ARIA attributes have no matching DOM property → you must use `[attr.aria-label]`, `[attr.viewBox]`, etc. Using plain
