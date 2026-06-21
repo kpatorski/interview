@@ -623,3 +623,47 @@ useLayoutEffect(() => {
 **Uwaga:** `useLayoutEffect` w SSR generuje warning (serwer nie ma DOM) — użyj `useEffect` dla kodu kompatybilnego z SSR lub sprawdź `typeof window !== 'undefined'`.
 
 ---
+
+#### 🔹 26. 🧑‍💻 When to use `useReducer` instead of `useState`?
+
+✅ <span style="color:transparent">Odpowiedź</span>
+
+`useReducer` manages state through a **pure reducer function** `(state, action) → newState`, identical to Redux. Use it when `useState` starts to feel messy.
+
+```tsx
+type State = { count: number; step: number };
+type Action = { type: 'increment' } | { type: 'setStep'; payload: number } | { type: 'reset' };
+
+function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case 'increment': return { ...state, count: state.count + state.step };
+    case 'setStep':   return { ...state, step: action.payload };
+    case 'reset':     return { count: 0, step: 1 };
+  }
+}
+
+function Counter() {
+  const [state, dispatch] = useReducer(reducer, { count: 0, step: 1 });
+  return (
+    <>
+      <p>{state.count}</p>
+      <button onClick={() => dispatch({ type: 'increment' })}>+{state.step}</button>
+      <button onClick={() => dispatch({ type: 'reset' })}>Reset</button>
+    </>
+  );
+}
+```
+
+**Use `useReducer` when:**
+- Multiple `useState` values change together (they're really one state object)
+- Next state depends on the previous state in a complex way
+- State has many possible transitions (like a form with validate/submit/reset)
+- You want to extract and test state logic independently from the component
+
+**Use `useState` when:**
+- State is a single independent value
+- Updates are simple (toggle, increment, set string)
+
+`useReducer` + `useContext` is a lightweight alternative to Redux for shared state that doesn't need middleware or time-travel debugging.
+
+---

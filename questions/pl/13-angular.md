@@ -631,3 +631,147 @@ Module Federation to funkcja Webpack 5 umożliwiająca wielu niezależnym aplika
 5. Dokumentuj, która warstwa jest właścicielem jakiego stanu
 
 ---
+
+#### 🔹 26. 🧙‍♂️ What is ControlValueAccessor and how does `[(ngModel)]` work under the hood?
+
+✅ <span style="color:transparent">Odpowiedź</span>
+
+`[(ngModel)]` doesn't magically talk to DOM elements — Angular uses the **ControlValueAccessor (CVA)** interface as a bridge. Every built-in form element has a matching CVA class registered via `NG_VALUE_ACCESSOR`.
+
+**Three actors:**
+```
+NgModel directive     ControlValueAccessor      Native DOM element
+(coordinator)         (bridge / adapter)         (<input>, <select>…)
+      │                       │                         │
+      │── writeValue(val) ───►│── element.value = val ──►│
+      │◄── onChange(newVal) ──│◄── (input event) ────────│
+```
+
+**Built-in CVA cheat sheet:**
+
+| CVA class | HTML element | Value type |
+|-----------|-------------|-----------|
+| `DefaultValueAccessor` | `<input>` text/email/…, `<textarea>` | `string` |
+| `CheckboxControlValueAccessor` | `<input type="checkbox">` | `boolean` |
+| `NumberValueAccessor` | `<input type="number">` | `number` |
+| `SelectControlValueAccessor` | `<select>` | `string` |
+
+**`formControlName` uses the same CVA mechanism** — `ngModel` and reactive forms are just different coordinators; the CVA bridge is identical.
+
+**When to write a custom CVA:** when building a custom input widget (date picker, star rating, phone field) that must work with `ngModel` / `formControlName`. Implement `writeValue`, `registerOnChange`, `registerOnTouched`, and register via `NG_VALUE_ACCESSOR`.
+
+---
+
+#### 🔹 27. 🧑‍💻 What is `<ng-template>` and what is a template reference variable (`#name`)?
+
+✅ <span style="color:transparent">Odpowiedź</span>
+
+**`<ng-template>`** is an invisible container — a recipe for a chunk of HTML that does *not render by default*. The browser never sees the tag in the DOM. Angular stamps it into the DOM only when instructed (by a structural directive or `NgTemplateOutlet`).
+
+Every `*` structural directive (`*ngIf`, `*ngFor`) expands into a `<ng-template>` behind the scenes:
+```html
+<!-- What you write: -->
+<div *ngIf="isLoggedIn">Welcome!</div>
+
+<!-- What Angular sees: -->
+<ng-template [ngIf]="isLoggedIn">
+  <div>Welcome!</div>
+</ng-template>
+```
+
+**Template reference variable (`#name`)** is a local label attached to an element. It makes that element accessible anywhere within the same template:
+
+```html
+<input #searchInput type="text">
+<button (click)="search(searchInput.value)">Search</button>
+```
+
+**`*ngIf` with `else` — how it uses both:**
+```html
+<div *ngIf="heroes.length > 0; else noHeroes">
+  Found {{ heroes.length }} heroes
+</div>
+<ng-template #noHeroes>
+  <p>No heroes found.</p>
+</ng-template>
+```
+`#noHeroes` labels the template; `else noHeroes` tells `*ngIf` which template to stamp when the condition is false.
+
+---
+
+#### 🔹 28. 🧑‍💻 What is the difference between HTML Attribute and DOM Property? When to use `[attr.*]`?
+
+✅ <span style="color:transparent">Odpowiedź</span>
+
+They look similar but are completely different things:
+
+| | HTML Attribute | DOM Property |
+|--|---------------|-------------|
+| Where | `.html` source file | Browser memory (JS object) |
+| Role | *Initial* value | *Current* value |
+| Type | Always `string` | `boolean`, `number`, `object`… |
+| Changes after user input? | No | Yes |
+
+**The classic example:**
+```html
+<input id="my-input" type="text" value="Start">
+```
+```javascript
+// User types "Hello":
+el.getAttribute('value')  // → "Start"  ← HTML didn't change
+el.value                  // → "Hello"  ← current DOM state
+```
+
+**Why Angular binds to DOM Properties by default:** it allows passing any JS type (array, object, boolean) — not just strings.
+
+**When to use `[attr.*]`:** when a DOM property doesn't exist for that attribute:
+```html
+<!-- ARIA attributes have no DOM property: -->
+<button [attr.aria-label]="label">×</button>
+
+<!-- SVG attributes: -->
+<rect [attr.width]="w" [attr.viewBox]="vb">
+```
+
+Using `[aria-label]` (property binding) instead of `[attr.aria-label]` throws a runtime error: "Can't bind to 'aria-label' since it isn't a known property".
+
+---
+
+#### 🔹 29. 🧑‍💻 What is the Angular 17+ `@if`/`@for` syntax and how does it differ from `*ngIf`/`*ngFor`?
+
+✅ <span style="color:transparent">Odpowiedź</span>
+
+Angular 17 introduced **built-in control flow** — `@if`, `@for`, `@switch` are native template constructs that replace structural directives. No import required.
+
+```html
+<!-- @if — no ng-template or #label needed for else: -->
+@if (heroes.length > 0) {
+  <p>Found {{ heroes.length }} heroes</p>
+} @else {
+  <p>No heroes.</p>
+}
+
+<!-- @for — track is mandatory (like trackBy, but enforced): -->
+@for (hero of heroes; track hero.id) {
+  <li>{{ hero.name }}</li>
+} @empty {
+  <li>No items</li>
+}
+
+<!-- @switch: -->
+@switch (status) {
+  @case ('active') { <span class="green">Active</span> }
+  @default { <span>Unknown</span> }
+}
+```
+
+**Key differences from `*ngIf` / `*ngFor`:**
+- No `CommonModule` or `NgIf`/`NgFor` import needed
+- `@else` is a plain block — no `<ng-template #ref>` required
+- `@for` requires `track` (Angular enforces good practice by default)
+- `@for` has built-in `@empty` block for empty collections
+- Better type narrowing inside `@if` blocks
+
+**When to use which:** use `@if`/`@for` in all new Angular 17+ code. Use `*ngIf`/`*ngFor` only when maintaining older codebases.
+
+---
