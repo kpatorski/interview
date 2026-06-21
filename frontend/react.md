@@ -1,3 +1,7 @@
+---
+render_with_liquid: false
+---
+
 # ⚛️ React — Comprehensive Study Notes
 
 <!-- TOC -->
