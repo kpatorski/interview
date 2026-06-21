@@ -621,28 +621,9 @@ Every structural directive does the same thing: it wraps the element in a `<ng-t
 
 ---
 
-**What is `<ng-template>`?**
+**`*ngIf` with `else` — and what the heck is `#noHeroes`?**
 
-`<ng-template>` is an **invisible container** — a recipe for a chunk of HTML that by default *does not render*. The browser never sees the `<ng-template>` tag in the DOM. Angular treats its content as a template to be stamped out conditionally or repeatedly.
-
-Think of it as a rubber stamp: the stamp itself does nothing — you have to press it onto paper (stamp it) before anything appears.
-
----
-
-**What is `#noHeroes`? — Template Reference Variable**
-
-`#variableName` is a **local variable in the template**. It works like a sticky label — it gives an element a name you can reference *anywhere in the same template*.
-
-```html
-<input #searchInput type="text">
-<button (click)="search(searchInput.value)">Search</button>
-```
-
-`#searchInput` creates a variable `searchInput` pointing to the `<input>` DOM element. You can use it anywhere in the same template.
-
----
-
-**`*ngIf` with `else` — step by step:**
+Look at this code first, then we'll unpack every unfamiliar piece:
 
 ```html
 <div *ngIf="heroes.length > 0; else noHeroes">
@@ -653,14 +634,51 @@ Think of it as a rubber stamp: the stamp itself does nothing — you have to pre
 </ng-template>
 ```
 
-Read this as:
-1. `*ngIf="heroes.length > 0"` — if condition is true → render `<div>` into the DOM
-2. `; else noHeroes` — if false → find the `<ng-template>` labelled `#noHeroes` and stamp *its* content instead
-3. `<ng-template #noHeroes>` — the "no results" recipe; `#noHeroes` is the label you attach to it
+Three things here that need explaining: `<ng-template>`, `#noHeroes`, and why `else` works this way.
+
+---
+
+**What is `<ng-template>`?**
+
+`<ng-template>` is an **invisible container** — a recipe for a chunk of HTML that by default *does not render*. The browser never sees the `<ng-template>` tag in the DOM. Angular treats its content as a template to be stamped out conditionally or repeatedly.
+
+Think of it as a rubber stamp: the stamp itself does nothing — you have to press it onto paper (stamp it) before anything appears.
+
+---
+
+**What is `#noHeroes`? — Template Reference Variable**
+
+`#variableName` is a **local label you attach to an element in the template**. It gives that element a name you can reference *anywhere in the same template*.
+
+```html
+<!-- Simple example — reading a DOM element's value: -->
+<input #searchInput type="text">
+<button (click)="search(searchInput.value)">Search</button>
+```
+
+`#searchInput` creates a variable pointing to the `<input>` DOM element. Angular resolves it at compile time — no JS code needed.
+
+When you write `#noHeroes` on a `<ng-template>`, you're labelling that particular stamp so `*ngIf` can find and use it.
+
+---
+
+**Reading the full example step by step:**
+
+```html
+<div *ngIf="heroes.length > 0; else noHeroes">  ← 1
+  Found {{ heroes.length }} heroes
+</div>
+<ng-template #noHeroes>                          ← 2
+  <p>No heroes found.</p>
+</ng-template>
+```
+
+1. `*ngIf="heroes.length > 0; else noHeroes"` — if condition is true → render `<div>` into the DOM; if false → find the template labelled `#noHeroes` and stamp *its* content instead
+2. `<ng-template #noHeroes>` — the "no results" recipe, labelled `noHeroes` so `*ngIf` can locate it
 
 **Why not a plain `else`?** Because HTML has no conditional mechanism. Angular needs the alternative DOM *defined somewhere* — that's exactly what `<ng-template>` with a template reference variable provides.
 
-> **Angular 17+ simplification:** `@if`/`@else` blocks work like real language constructs with no `<ng-template>` needed (see below).
+> **Angular 17+ simplification:** `@if`/`@else` blocks work like real language constructs — no `<ng-template>` or `#label` needed (see below).
 
 ---
 
