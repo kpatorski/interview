@@ -409,27 +409,26 @@ interface ControlValueAccessor {
 
 ---
 
-**Ściągawka: Który element ma jaki ControlValueAccessor?**
+**Cheat sheet: which element uses which ControlValueAccessor?**
 
-| Klasa CVA | Selektor HTML | Zdarzenie DOM | Zwracany typ |
-|-----------|--------------|---------------|--------------|
+| CVA class | HTML selector | DOM event | Value type |
+|-----------|--------------|-----------|-----------|
 | `DefaultValueAccessor` | `<input>` (text, email, password, search, tel, url…), `<textarea>` | `input`, `blur` | `string` |
 | `CheckboxControlValueAccessor` | `<input type="checkbox">` | `change` | `boolean` |
-| `RadioControlValueAccessor` | `<input type="radio">` | `change` | wartość `value` atrybutu (string) |
-| `SelectControlValueAccessor` | `<select>` (jednokrotny wybór) | `change`, `blur` | `string` |
+| `RadioControlValueAccessor` | `<input type="radio">` | `change` | `value` attribute (string) |
+| `SelectControlValueAccessor` | `<select>` (single) | `change`, `blur` | `string` |
 | `SelectMultipleControlValueAccessor` | `<select multiple>` | `change`, `blur` | `string[]` |
-| `NumberValueAccessor` | `<input type="number">` | `input`, `blur` | `number` (lub `null` dla pustego) |
+| `NumberValueAccessor` | `<input type="number">` | `input`, `blur` | `number` (or `null` when empty) |
 | `RangeValueAccessor` | `<input type="range">` | `input`, `change`, `blur` | `number` |
 
-Źródła: [Angular docs — ControlValueAccessor](https://angular.dev/api/forms/ControlValueAccessor),
+Sources: [Angular docs — ControlValueAccessor](https://angular.dev/api/forms/ControlValueAccessor),
 [Built-in CVA source](https://github.com/angular/angular/tree/main/packages/forms/src/directives)
 
 ---
 
-**Implementacja własnego CVA — custom form control:**
+**Implementing a custom CVA — custom form control:**
 
-Gdy tworzysz własny komponent wejściowy (np. date picker, phone field, rating widget), musisz
-zaimplementować CVA żeby działało z `ngModel` i `formControlName`.
+When you build a custom input component (e.g. date picker, phone field, star rating widget), you must implement CVA so it works with `ngModel` and `formControlName`.
 
 ```typescript
 @Component({
@@ -444,7 +443,7 @@ zaimplementować CVA żeby działało z `ngModel` i `formControlName`.
     {
       provide: NG_VALUE_ACCESSOR,
       useExisting: forwardRef(() => StarRatingComponent),
-      multi: true   // ← multi: true jest obowiązkowe dla NG_VALUE_ACCESSOR
+      multi: true   // ← multi: true is mandatory for NG_VALUE_ACCESSOR
     }
   ]
 })
@@ -453,139 +452,137 @@ export class StarRatingComponent implements ControlValueAccessor {
   private onChange: (v: number) => void = () => {};
   private onTouched: () => void = () => {};
 
-  // Angular → komponent: ustaw wartość
+  // Angular → component: set the value
   writeValue(value: number): void {
     this.value = value ?? 0;
   }
 
-  // Zarejestruj callback Angular → wywołuj go gdy wartość się zmieni
+  // Register Angular's callback — call it when value changes
   registerOnChange(fn: (v: number) => void): void {
     this.onChange = fn;
   }
 
-  // Zarejestruj callback Angular → wywołuj go przy blur
+  // Register Angular's callback — call it on blur
   registerOnTouched(fn: () => void): void {
     this.onTouched = fn;
   }
 
-  // Opcjonalne: obsługa disabled state
+  // Optional: handle disabled state
   setDisabledState(disabled: boolean): void {
-    // np. this.disabled = disabled;
+    // e.g. this.disabled = disabled;
   }
 
   setValue(rating: number): void {
     this.value = rating;
-    this.onChange(rating);   // ← powiadom Angular o zmianie
-    this.onTouched();        // ← oznacz jako touched
+    this.onChange(rating);   // ← notify Angular of the change
+    this.onTouched();        // ← mark as touched
   }
 }
 
-// Użycie — działa identycznie jak <input>:
+// Usage — works identically to <input>:
 // Template-driven:  <app-star-rating [(ngModel)]="product.rating">
 // Reactive:         <app-star-rating formControlName="rating">
 ```
 
-**Pułapka — `forwardRef`:** potrzebne gdy klasa jest zarejestrowana w `providers` zanim
-JavaScript zdąży ją w pełni zdefiniować (circular reference w tym samym pliku). Bez niego
-`useExisting: StarRatingComponent` zwróci `undefined`.
+**Gotcha — `forwardRef`:** needed when a class is registered in `providers` before JavaScript has fully defined it (circular reference in the same file). Without it, `useExisting: StarRatingComponent` returns `undefined`.
 
 ---
 
-**🧙‍♂️ senior — HTML Attribute vs DOM Property — dwa różne światy**
+**🧙‍♂️ senior — HTML Attribute vs DOM Property — two different worlds**
 
-To jedna z najczęściej mylonych rzeczy w webdevie. W języku polskim oba słowa tłumaczymy jako "atrybut", ale w kodzie to zupełnie odrębne byty.
+This is one of the most confused things in web development. Both words translate to "attribute" in many languages, but in code they are completely separate concepts.
 
-**Prosta zasada:**
-- **HTML Attribute** = stan *początkowy*, żyje w pliku `.html`, zawsze `string`
-- **DOM Property** = stan *aktualny*, żyje w pamięci przeglądarki jako obiekt JS, może być `boolean`, `number`, `object`
+**Simple rule:**
+- **HTML Attribute** = *initial* state, lives in the `.html` file, always a `string`
+- **DOM Property** = *current* state, lives in browser memory as a JS object, can be `boolean`, `number`, `object`
 
-**Analogia:** wyobraź sobie formularz papierowy (HTML Attribute) i bazę danych (DOM Property). Formularz wypełniasz raz na początku — to wartość inicjalna. Baza danych jest aktualizowana na żywo gdy coś się zmienia. Formularz papierowy się nie zmienia nawet gdy rekord w bazie już wygląda inaczej.
+**Analogy:** think of a paper form (HTML Attribute) and a database (DOM Property). You fill in the paper form once at the start — that's the initial value. The database gets updated live as things change. The paper form never changes even when the database record looks completely different.
 
 ---
 
-**Przykład który wszystko wyjaśnia — `<input value="Start">`:**
+**The example that explains everything — `<input value="Start">`:**
 
 ```html
-<input id="moj-input" type="text" value="Start">
+<input id="my-input" type="text" value="Start">
 ```
 
-Gdy strona się ładuje — obie wartości są równe `"Start"`:
+When the page loads — both values equal `"Start"`:
 ```javascript
-const el = document.getElementById('moj-input');
+const el = document.getElementById('my-input');
 el.getAttribute('value')  // → "Start"  (HTML attribute)
 el.value                  // → "Start"  (DOM property)
 ```
 
-Teraz użytkownik wpisuje w pole słowo `"Cześć"`:
+Now the user types `"Hello"` into the field:
 ```javascript
-el.getAttribute('value')  // → "Start"  ← NADAL! HTML się nie zmienił.
-el.value                  // → "Cześć"  ← aktualny stan w pamięci
+el.getAttribute('value')  // → "Start"  ← STILL! The HTML didn't change.
+el.value                  // → "Hello"  ← current state in memory
 
-el.defaultValue           // → "Start"  ← alias do getAttribute('value')
+el.defaultValue           // → "Start"  ← alias for getAttribute('value')
 ```
 
-HTML attribute `value` reprezentuje wartość *domyślną* (`defaultValue`). DOM property `value` to to, co widzisz teraz w polu.
+The HTML attribute `value` represents the *default* value (`defaultValue`). The DOM property `value` is what you see in the field right now.
 
 ---
 
-**Tabela: attribute vs property — kluczowe różnice**
+**Attribute vs Property — key differences**
 
-| Cecha | HTML Attribute | DOM Property |
-|-------|---------------|-------------|
-| Gdzie istnieje | Kod źródłowy HTML / `.html` | Pamięć przeglądarki (obiekt JS) |
-| Rola | Wartość *inicjalna* | Wartość *aktualna* |
-| Typ | Zawsze `string` | `boolean`, `number`, `object`, `string`… |
-| Zmienia się po interakcji? | Nie | Tak |
-| API JavaScript | `element.getAttribute('name')` | `element.name` |
-| Jak ustawić w Angularze | `[attr.name]="expr"` | `[name]="expr"` |
+| Aspect | HTML Attribute | DOM Property |
+|--------|---------------|-------------|
+| Where it lives | HTML source / `.html` file | Browser memory (JS object) |
+| Role | *Initial* value | *Current* value |
+| Type | Always `string` | `boolean`, `number`, `object`, `string`… |
+| Changes after user interaction? | No | Yes |
+| JavaScript API | `element.getAttribute('name')` | `element.name` |
+| How to set in Angular | `[attr.name]="expr"` | `[name]="expr"` |
 
 ---
 
-**Dlaczego Angular binduje do DOM Properties, nie HTML Attributes:**
+**Why Angular binds to DOM Properties, not HTML Attributes:**
 
 ```html
-<!-- ✅ Property binding — Angular ustawia element.disabled = true/false -->
+<!-- ✅ Property binding — Angular sets element.disabled = true/false -->
 <button [disabled]="isFormInvalid">Submit</button>
 
-<!-- ✅ Property binding — przekazuje tablicę (nie string!) -->
+<!-- ✅ Property binding — passes an array (not a string!) -->
 <app-chart [data]="chartData"></app-chart>
 
-<!-- ✅ Property binding — przekazuje obiekt -->
+<!-- ✅ Property binding — passes an object -->
 <app-user-card [user]="currentUser"></app-user-card>
 ```
 
-Gdyby Angular bindował do HTML attributes, mógłby przekazywać tylko stringi. Bindowanie do DOM properties pozwala przekazywać **dowolne typy JS** — tablice, obiekty, booleany — bez żadnej serializacji. To dlatego Angular domyślnie używa `[property]="expr"`, a nie `attr.property="expr"`.
+If Angular bound to HTML attributes, it could only pass strings. Binding to DOM properties allows passing **any JS type** — arrays, objects, booleans — with no serialization. That's why Angular defaults to `[property]="expr"`, not `attr.property="expr"`.
 
 ---
 
-**Kiedy musisz użyć attribute binding `[attr.*]`:**
+**When you must use attribute binding `[attr.*]`:**
 
-Niektóre atrybuty HTML *nie mają* odpowiadającej im DOM property. Najczęstsze przypadki:
+Some HTML attributes have *no corresponding DOM property*. Most common cases:
 
 ```html
-<!-- ARIA — dostępność: nie ma DOM property "aria-label" -->
+<!-- ARIA — accessibility: no DOM property "aria-label" exists -->
 <button [attr.aria-label]="buttonLabel">×</button>
 
-<!-- SVG — większość atrybutów SVG nie ma DOM property -->
+<!-- SVG — most SVG attributes have no DOM property -->
 <svg><rect [attr.width]="rectWidth" [attr.viewBox]="viewBox"></svg>
 
-<!-- colspan / rowspan w tabelach -->
+<!-- colspan / rowspan in tables -->
 <td [attr.colspan]="columnSpan">...</td>
 
-<!-- Niestandardowe atrybuty data-* (choć zwykle lepiej użyć [attr.data-id]) -->
+<!-- Custom data-* attributes -->
 <div [attr.data-testid]="testId">...</div>
 ```
 
-**Błąd gdy używasz property binding na nieistniejącej property:**
+**Error when you use property binding on a non-existent property:**
 ```html
 <!-- ❌ Runtime error: "Can't bind to 'aria-label' since it isn't a known property of 'button'" -->
 <button [aria-label]="label">×</button>
 
-<!-- ✅ Poprawnie: użyj attr. prefiksu -->
+<!-- ✅ Correct: use the attr. prefix -->
 <button [attr.aria-label]="label">×</button>
 ```
 
-**Mnemotechnika:** jeśli nie jesteś pewien czy element ma daną DOM property — sprawdź w DevTools konsoli: `document.querySelector('twój-element').` i tab-complete. Jeśli nie widzisz property → użyj `[attr.*]`.
+**Memory trick:** if you're unsure whether an element has a given DOM property — check in DevTools console: `document.querySelector('your-element').` and tab-complete. If the property isn't there → use `[attr.*]`.
 
 ---
 
