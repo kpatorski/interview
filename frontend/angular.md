@@ -1148,6 +1148,370 @@ Browser
 
 ---
 
+## Architecture & Best Practices
+
+### SOLID in Angular
+
+Angular's architecture makes SOLID more explicit than React — decorators, DI, and NgModules provide natural enforcement points. But the principles are the same; Angular just gives you more tools to apply them.
+
+---
+
+**S — Single Responsibility: one class, one job**
+
+Every component, service, directive, and pipe should have one reason to change.
+
+```typescript
+// ❌ Service doing too much
+@Injectable({ providedIn: 'root' })
+export class UserService {
+  getUser(id: string) { /* HTTP */ }
+  validateEmail(email: string) { /* validation logic */ }
+  formatUserName(user: User) { /* formatting */ }
+  sendWelcomeEmail(user: User) { /* email sending */ }
+}
+
+// ✅ Split by responsibility
+@Injectable({ providedIn: 'root' })
+export class UserApiService {         // data access only
+  getUser(id: string): Observable<User> { return this.http.get<User>(...); }
+}
+
+@Injectable({ providedIn: 'root' })
+export class UserValidationService {  // validation only
+  isValidEmail(email: string): boolean { /* ... */ }
+}
+
+export const formatUserName = (user: User) => `${user.firstName} ${user.lastName}`;
+// Pure function, no class needed for a formatter
+```
+
+**Apply to components:** a component that fetches data, sorts it, handles form state, and renders three different UI blocks needs to be split. Ask: "what is the *one thing* that would cause me to change this class?"
+
+---
+
+**O — Open/Closed: extend via composition and DI, not modification**
+
+Angular components and services should be extended by providing new implementations, not by adding `if` branches to existing code.
+
+```typescript
+// ❌ Brittle — every new export format requires modifying ExportService
+@Injectable({ providedIn: 'root' })
+export class ExportService {
+  export(data: any[], format: 'csv' | 'excel' | 'pdf') {
+    if (format === 'csv') { /* ... */ }
+    else if (format === 'excel') { /* ... */ }
+    else if (format === 'pdf') { /* ... */ }
+  }
+}
+
+// ✅ Open for extension via strategy pattern + DI
+interface Exporter { export(data: any[]): void; }
+
+@Injectable() export class CsvExporter implements Exporter { export(data) { /* csv */ } }
+@Injectable() export class PdfExporter implements Exporter { export(data) { /* pdf */ } }
+
+// Component receives whichever exporter is injected — no modification needed for new formats
+@Component({ providers: [{ provide: Exporter, useClass: CsvExporter }] })
+export class ReportComponent {
+  constructor(private exporter: Exporter) {}
+  export() { this.exporter.export(this.data); }
+}
+```
+
+---
+
+**L — Liskov Substitution: components and services should be interchangeable**
+
+If a component accepts `@Input() items: Item[]`, two different implementations of that component should be usable wherever the first one is used. In Angular, this mostly applies to services: any class implementing an interface should be injectable in place of another.
+
+```typescript
+// Token-based injection — any class implementing HeroRepository is valid
+export abstract class HeroRepository {
+  abstract getAll(): Observable<Hero[]>;
+  abstract getById(id: string): Observable<Hero>;
+}
+
+@Injectable()
+export class ApiHeroRepository extends HeroRepository {
+  constructor(private http: HttpClient) { super(); }
+  getAll() { return this.http.get<Hero[]>('/api/heroes'); }
+  getById(id) { return this.http.get<Hero>(`/api/heroes/${id}`); }
+}
+
+@Injectable()
+export class MockHeroRepository extends HeroRepository {
+  getAll() { return of([{ id: '1', name: 'Test Hero' }]); }
+  getById(id) { return of({ id, name: 'Test Hero' }); }
+}
+
+// In production: { provide: HeroRepository, useClass: ApiHeroRepository }
+// In tests:      { provide: HeroRepository, useClass: MockHeroRepository }
+// Component never changes — it depends on the abstraction
+```
+
+---
+
+**I — Interface Segregation: components should not depend on what they don't use**
+
+Don't pass fat objects to components that only need a few fields. Create specific `@Input()` contracts.
+
+```typescript
+// ❌ UserCardComponent receives User (20 fields) but uses 3
+@Component({ template: `<img [src]="user.avatarUrl"><span>{{ user.name }}</span>` })
+export class UserCardComponent {
+  @Input() user!: User;  // entire domain object — re-renders on any User field change
+}
+
+// ✅ Specific contract — only what the template uses
+interface UserCardData {
+  name: string;
+  avatarUrl: string;
+  isOnline: boolean;
+}
+
+@Component({
+  template: `<img [src]="data.avatarUrl"><span [class.online]="data.isOnline">{{ data.name }}</span>`,
+  changeDetection: ChangeDetectionStrategy.OnPush
+})
+export class UserCardComponent {
+  @Input() data!: UserCardData;  // minimal, OnPush-friendly
+}
+```
+
+---
+
+**D — Dependency Inversion: depend on abstractions, inject through DI**
+
+Angular's DI container is designed specifically for this principle. Components and services should depend on interfaces/tokens, not concrete classes.
+
+```typescript
+// The injection token is the abstraction
+const HERO_REPOSITORY = new InjectionToken<HeroRepository>('HeroRepository');
+
+// Service depends on the token, not the implementation
+@Injectable({ providedIn: 'root' })
+export class HeroFacade {
+  constructor(@Inject(HERO_REPOSITORY) private repo: HeroRepository) {}
+
+  loadHeroes(): Observable<Hero[]> { return this.repo.getAll(); }
+}
+
+// Provide different implementations for different environments:
+// main.ts (production):  { provide: HERO_REPOSITORY, useClass: ApiHeroRepository }
+// test setup:            { provide: HERO_REPOSITORY, useClass: MockHeroRepository }
+```
+
+This is Angular's killer feature: the DI system enforces DIP at the framework level.
+
+---
+
+### Smart / Dumb Component Split
+
+The most important architectural pattern in Angular. It directly enables `OnPush` on all presentational components, which is the #1 performance optimization.
+
+```
+Smart (Container) Component
+├── Injects services via constructor DI
+├── Owns state (via BehaviorSubject, Signal, or NgRx)
+├── Makes HTTP calls (through services, not directly)
+├── Passes data down via @Input() to dumb components
+├── Handles @Output() events from dumb components
+└── Generally uses default CD (or OnPush with markForCheck)
+
+Dumb (Presentational) Component
+├── Receives ALL data via @Input()
+├── Emits events via @Output() — no direct service calls
+├── Zero DI of domain services in constructor
+├── changeDetection: ChangeDetectionStrategy.OnPush ← always
+└── Easy to test, Storybook-friendly, reusable
+```
+
+```typescript
+// ✅ Smart container — owns data, delegates rendering
+@Component({
+  template: `
+    <app-hero-list
+      [heroes]="heroes$ | async"
+      [loading]="loading$ | async"
+      (heroDeleted)="onDelete($event)">
+    </app-hero-list>
+  `
+})
+export class HeroListPageComponent {
+  heroes$ = this.heroService.getAll();
+  loading$ = this.heroService.loading$;
+  constructor(private heroService: HeroService) {}
+  onDelete(id: number) { this.heroService.delete(id).subscribe(); }
+}
+
+// ✅ Dumb component — pure rendering, OnPush
+@Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
+    <app-spinner *ngIf="loading"></app-spinner>
+    <ul *ngIf="!loading">
+      <li *ngFor="let hero of heroes; trackBy: trackById">
+        {{ hero.name }}
+        <button (click)="heroDeleted.emit(hero.id)">Delete</button>
+      </li>
+    </ul>
+  `
+})
+export class HeroListComponent {
+  @Input() heroes: Hero[] | null = [];
+  @Input() loading: boolean | null = false;
+  @Output() heroDeleted = new EventEmitter<number>();
+  trackById = (_: number, hero: Hero) => hero.id;
+}
+```
+
+---
+
+### Service Design Principles
+
+**One service per domain aggregate.** Group by domain concept (Hero, User, Cart), not by HTTP verb.
+
+```typescript
+// ❌ Technical grouping — meaningless split
+class HeroGetService {}
+class HeroPostService {}
+class HeroDeleteService {}
+
+// ✅ Domain grouping — cohesive boundary
+class HeroService {
+  getAll(): Observable<Hero[]> { ... }
+  getById(id: string): Observable<Hero> { ... }
+  create(hero: Partial<Hero>): Observable<Hero> { ... }
+  update(id: string, patch: Partial<Hero>): Observable<Hero> { ... }
+  delete(id: string): Observable<void> { ... }
+}
+```
+
+**Layers in a service:**
+1. **API/Repository** — raw HTTP calls, DTO mapping; knows about endpoints and HTTP
+2. **Domain service / Facade** — orchestrates multiple repositories, owns business rules; knows about domain
+3. **State service** — BehaviorSubject / Signal holding current UI state; knows about what components need
+
+Don't mix layers. An HTTP repository should never know about `BehaviorSubject`.
+
+```typescript
+// Layer 1: API — only HTTP concerns
+@Injectable({ providedIn: 'root' })
+export class HeroApiService {
+  constructor(private http: HttpClient) {}
+  fetchAll(): Observable<HeroDto[]> { return this.http.get<HeroDto[]>('/api/heroes'); }
+}
+
+// Layer 2: Domain service — maps DTOs, owns rules
+@Injectable({ providedIn: 'root' })
+export class HeroService {
+  constructor(private api: HeroApiService) {}
+  getAll(): Observable<Hero[]> {
+    return this.api.fetchAll().pipe(map(dtos => dtos.map(fromDto)));  // DTO → domain
+  }
+}
+
+// Layer 3: State — what the component tree needs
+@Injectable({ providedIn: 'root' })
+export class HeroStateService {
+  private _heroes$ = new BehaviorSubject<Hero[]>([]);
+  readonly heroes$ = this._heroes$.asObservable();
+
+  constructor(private heroService: HeroService) {}
+  load() { this.heroService.getAll().subscribe(h => this._heroes$.next(h)); }
+}
+```
+
+---
+
+### When to Extract a Component
+
+| Signal | Action |
+|--------|--------|
+| Reused in 2+ places | Extract immediately |
+| Template > ~100 lines | Likely needs splitting |
+| "and" in description | Split by responsibility |
+| Has independent loading/error state | Extract to smart component |
+| Can be independently `OnPush` | Extract to dumb component |
+| Would benefit from isolated testing | Extract |
+
+---
+
+### Folder Structure — Feature-Based
+
+Avoid organizing by layer (`components/`, `services/`, `pipes/`). Organize by **feature** — all code for a domain lives together.
+
+```
+src/app/
+├── core/                           # Singleton services, interceptors, guards
+│   ├── auth/
+│   │   ├── auth.service.ts
+│   │   ├── auth.interceptor.ts
+│   │   └── auth.guard.ts
+│   ├── error-handler.service.ts
+│   └── core.providers.ts           # exported for bootstrapApplication
+│
+├── shared/                         # Reusable dumb components, pipes, directives
+│   ├── components/
+│   │   ├── spinner/
+│   │   ├── button/
+│   │   └── modal/
+│   ├── pipes/
+│   │   └── truncate.pipe.ts
+│   └── shared.module.ts            # or index.ts for standalone
+│
+├── features/
+│   ├── heroes/
+│   │   ├── components/
+│   │   │   ├── hero-list-page/     # smart
+│   │   │   │   └── hero-list-page.component.ts
+│   │   │   └── hero-list/          # dumb
+│   │   │       └── hero-list.component.ts
+│   │   ├── services/
+│   │   │   ├── hero-api.service.ts
+│   │   │   └── hero.service.ts
+│   │   ├── models/
+│   │   │   └── hero.model.ts
+│   │   └── heroes.routes.ts        # lazy-loaded routes for this feature
+│   │
+│   └── admin/
+│       └── ...
+│
+└── app.routes.ts                   # top-level: lazy loads feature routes
+```
+
+**The public API pattern** — each feature exports only what other features need:
+```typescript
+// features/heroes/index.ts
+export { HeroListPageComponent } from './components/hero-list-page/hero-list-page.component';
+export { HeroService } from './services/hero.service';
+export type { Hero } from './models/hero.model';
+// HeroApiService is internal — not exported
+```
+
+---
+
+### Naming Conventions
+
+| What | Convention | Example |
+|------|-----------|---------|
+| Component file | kebab-case + `.component.ts` | `hero-card.component.ts` |
+| Component class | PascalCase + `Component` | `HeroCardComponent` |
+| Service file | kebab-case + `.service.ts` | `hero.service.ts` |
+| Service class | PascalCase + `Service` | `HeroService` |
+| Pipe | kebab-case + `.pipe.ts` | `truncate.pipe.ts` |
+| Directive | kebab-case + `.directive.ts` | `highlight.directive.ts` |
+| Model / Interface | PascalCase | `Hero`, `HeroDto` |
+| Route guard | kebab-case + `.guard.ts` | `auth.guard.ts` |
+| Interceptor | kebab-case + `.interceptor.ts` | `auth.interceptor.ts` |
+| Feature route file | feature-name + `.routes.ts` | `heroes.routes.ts` |
+| Smart component suffix | `Page` or `Container` | `HeroListPageComponent` |
+| Selector prefix | `app-` (or your team's prefix) | `app-hero-card` |
+| Observable property | `$` suffix | `heroes$`, `loading$` |
+| BehaviorSubject (private) | `_` prefix + `$` suffix | `_heroes$` |
+
+---
+
 ## What to Build — Crash Course Path
 
 Three projects that cover ~80% of Angular interview scenarios. Build in order.

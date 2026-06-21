@@ -1155,6 +1155,326 @@ Async side effects: useEffect
 
 ---
 
+## Architecture & Best Practices
+
+### SOLID in React
+
+SOLID is not just for backend. The same five principles apply to components and hooks — often more visibly, because bad separation bloats components to hundreds of lines very quickly.
+
+---
+
+**S — Single Responsibility: one component, one job**
+
+A component has one responsibility if you can describe it *without the word "and"*. The moment you say "this component fetches users **and** renders the table **and** manages the modal" — split it.
+
+```tsx
+// ❌ One component doing everything
+function UserDashboard() {
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/users').then(r => r.json()).then(setUsers).finally(() => setLoading(false));
+  }, []);
+
+  return (
+    <div>
+      {loading ? <Spinner /> : <table>...</table>}
+      {modalOpen && <UserEditModal user={selectedUser} />}
+    </div>
+  );
+}
+
+// ✅ Each piece has one job
+function UserDashboard() {
+  return (
+    <div>
+      <UserTable />          {/* displays + handles selection */}
+      <UserEditModal />      {/* editing logic isolated here */}
+    </div>
+  );
+}
+
+function UserTable() {
+  const { users, loading } = useUsers();  // fetching is a custom hook's job
+  // ...
+}
+```
+
+**Apply to hooks too:** a custom hook called `useUserDashboard` that manages fetching, sorting, filtering, and modal state violates SRP. Split: `useUsers()`, `useSortedList()`, `useModal()`.
+
+---
+
+**O — Open/Closed: extend via composition, not modification**
+
+A component is open for extension (new variants) but closed for modification (don't touch the internals to add a variant). Achieve this with **props** and **composition** — not with `if (type === 'X')` branching.
+
+```tsx
+// ❌ Closed to extension — add a new type = modify the component
+function Button({ type }: { type: 'default' | 'icon' | 'loading' | 'danger' }) {
+  if (type === 'icon') return <button><Icon /></button>;
+  if (type === 'loading') return <button><Spinner /></button>;
+  if (type === 'danger') return <button className="danger">...</button>;
+  return <button>Default</button>;
+}
+
+// ✅ Open for extension — compose without modifying
+function Button({ children, variant = 'default', onClick, disabled = false }: ButtonProps) {
+  return (
+    <button
+      className={`btn btn--${variant}`}
+      onClick={onClick}
+      disabled={disabled}
+    >
+      {children}
+    </button>
+  );
+}
+
+// New variants without touching Button:
+<Button variant="danger"><TrashIcon /> Delete</Button>
+<Button disabled><Spinner /> Saving...</Button>
+```
+
+---
+
+**L — Liskov Substitution: components should be interchangeable where contracted**
+
+In React, this means: if a component accepts `{ items: Item[] }`, any two implementations accepting the same props should be interchangeable in the parent. Don't silently ignore props or add hidden required context.
+
+Practical consequence: **don't hardcode data sources inside presentational components**. Pass data via props so you can swap the source (HTTP, mock, localStorage) without changing the presentational component.
+
+```tsx
+// ❌ HeroList always fetches — can't reuse with different data
+function HeroList() {
+  const [heroes] = useHeroesFromApi(); // hardcoded
+  return <ul>{heroes.map(h => <li>{h.name}</li>)}</ul>;
+}
+
+// ✅ HeroList just renders — data source is substitutable
+function HeroList({ heroes }: { heroes: Hero[] }) {
+  return <ul>{heroes.map(h => <li key={h.id}>{h.name}</li>)}</ul>;
+}
+// Now works with API data, mocked data, local state — anything
+```
+
+---
+
+**I — Interface Segregation: don't force components to accept what they don't use**
+
+Don't pass the whole `User` object to a component that only needs `user.name` and `user.avatarUrl`. Narrow props:
+1. Prevent re-renders when unrelated fields change
+2. Make the component's contract explicit
+3. Make it reusable with any object that has `name` + `avatarUrl`, not just `User`
+
+```tsx
+// ❌ Fat interface — component only uses 2 fields but must receive the whole User
+interface UserCardProps { user: User }  // User has 20 fields
+
+// ✅ Segregated interface — takes only what it uses
+interface UserCardProps {
+  name: string;
+  avatarUrl: string;
+}
+// Bonus: React.memo(UserCard) only re-renders if name or avatarUrl changes
+```
+
+---
+
+**D — Dependency Inversion: depend on abstractions, not concrete implementations**
+
+In React, DI is achieved through **props**, **Context**, and **custom hooks** — the component declares *what shape* it needs, not *where it comes from*.
+
+```tsx
+// ❌ Component depends on concrete implementation
+function HeroList() {
+  const heroes = useHeroesFromRemoteAPI(); // concrete — can't test without HTTP
+  return <ul>{heroes.map(h => <li>{h.name}</li>)}</ul>;
+}
+
+// ✅ Inversion — dependency is injected from outside
+interface HeroRepository {
+  getAll(): Promise<Hero[]>;
+}
+
+function HeroList({ repository }: { repository: HeroRepository }) {
+  const { data: heroes } = useFetch(() => repository.getAll());
+  return <ul>{heroes?.map(h => <li key={h.id}>{h.name}</li>)}</ul>;
+}
+
+// Test: inject a mock
+<HeroList repository={{ getAll: async () => mockHeroes }} />
+
+// Production: inject real implementation
+<HeroList repository={new ApiHeroRepository()} />
+```
+
+---
+
+### Smart / Dumb Component Split
+
+This is the most impactful structural pattern in React. Every UI feature has two kinds of logic — business/data logic and rendering logic. Separate them into different components.
+
+```
+Smart (Container) Component
+├── Talks to services / stores / APIs
+├── Owns state and side effects
+├── Passes data down via props
+├── Handles callbacks from dumb components
+└── Can be harder to reuse (tied to a specific feature)
+
+Dumb (Presentational) Component
+├── Receives all data via props
+├── Returns JSX — that's it
+├── No useEffect, no fetching, no side effects
+├── Wrapped in React.memo (OnPush equivalent)
+└── Easy to reuse, easy to test, easy to preview in Storybook
+```
+
+```tsx
+// ✅ Smart component — owns data, passes to dumb
+function HeroListPage() {
+  const { heroes, loading, error, deleteHero } = useHeroes(); // all logic in hook
+
+  if (loading) return <PageSpinner />;
+  if (error) return <ErrorMessage error={error} />;
+
+  return <HeroList heroes={heroes} onDelete={deleteHero} />;
+}
+
+// ✅ Dumb component — renders props, emits events
+const HeroList = React.memo(function HeroList({
+  heroes,
+  onDelete,
+}: {
+  heroes: Hero[];
+  onDelete: (id: number) => void;
+}) {
+  return (
+    <ul>
+      {heroes.map(hero => (
+        <HeroCard key={hero.id} hero={hero} onDelete={onDelete} />
+      ))}
+    </ul>
+  );
+});
+```
+
+**Rule of thumb:** if a component has both `useEffect` and more than 50 lines of JSX — it's trying to be smart and dumb at the same time. Split it.
+
+---
+
+### When to Extract a Component
+
+| Signal | Action |
+|--------|--------|
+| Used in 2+ places | Extract immediately |
+| Template > ~100 lines | Probably needs splitting |
+| "and" in the description | Split by responsibility |
+| Has its own loading/error state | Candidate for extraction |
+| You'd want to test it in isolation | Extract to make it testable |
+| Conditionally rendered large block | Extract into its own component |
+
+---
+
+### When to Extract a Custom Hook
+
+| Signal | Action |
+|--------|--------|
+| Same `useEffect` + `useState` pattern in 2+ components | Extract to hook |
+| Business logic mixed with rendering logic | Extract logic to hook |
+| Component has 3+ `useState` declarations | Consider `useReducer` or a hook |
+| Testing the logic requires rendering | Logic belongs in a hook, not a component |
+
+```tsx
+// Before: business logic tangled in the component
+function ProductPage({ id }: { id: string }) {
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    setLoading(true);
+    fetchProduct(id).then(setProduct).catch(setError).finally(() => setLoading(false));
+  }, [id]);
+
+  // ...50 lines of render
+}
+
+// After: logic in a hook, component focuses on rendering
+function useProduct(id: string) {
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+  useEffect(() => { /* ... */ }, [id]);
+  return { product, loading, error };
+}
+
+function ProductPage({ id }: { id: string }) {
+  const { product, loading, error } = useProduct(id);
+  // clean render logic only
+}
+```
+
+---
+
+### Folder Structure — Feature-Based
+
+Avoid organizing by type (`components/`, `hooks/`, `services/`). Organize by **feature** — everything related to a domain lives together:
+
+```
+src/
+├── features/
+│   ├── auth/
+│   │   ├── components/         LoginForm.tsx, SignupForm.tsx
+│   │   ├── hooks/              useAuth.ts, useLoginForm.ts
+│   │   ├── services/           authService.ts
+│   │   ├── types.ts            AuthUser, LoginCredentials
+│   │   └── index.ts            public API — what other features can import
+│   ├── heroes/
+│   │   ├── components/         HeroList.tsx (dumb), HeroListPage.tsx (smart)
+│   │   ├── hooks/              useHeroes.ts, useHeroDetail.ts
+│   │   ├── api/                heroApi.ts (fetch calls)
+│   │   └── index.ts
+│   └── cart/
+│       └── ...
+├── shared/
+│   ├── components/             Button, Input, Modal, Spinner (no feature-specific logic)
+│   ├── hooks/                  useFetch, useDebounce, useLocalStorage
+│   └── utils/                  formatDate, validators
+└── App.tsx
+```
+
+**The barrel file (`index.ts`)** controls the public API:
+```ts
+// features/heroes/index.ts
+export { HeroListPage } from './components/HeroListPage';
+export { useHeroes } from './hooks/useHeroes';
+export type { Hero } from './types';
+// HeroCard and heroApi are internal — not exported
+```
+
+Other features import from `features/heroes`, not from `features/heroes/components/HeroCard` directly. This enforces encapsulation.
+
+---
+
+### Naming Conventions
+
+| What | Convention | Example |
+|------|-----------|---------|
+| Component file | PascalCase | `HeroCard.tsx` |
+| Hook file | camelCase prefixed `use` | `useHeroes.ts` |
+| Utility/service | camelCase | `heroApi.ts`, `formatDate.ts` |
+| Type / Interface | PascalCase | `Hero`, `HeroCardProps` |
+| Context | PascalCase + `Context` | `AuthContext`, `CartContext` |
+| Store (Zustand) | `use` + PascalCase + `Store` | `useCartStore` |
+| Page/Route component | PascalCase + `Page` | `HeroListPage`, `LoginPage` |
+| Container component | PascalCase + `Container` | optional, some teams use it |
+
+---
+
 ## What to Build — Crash Course Path
 
 These three projects cover ~80% of interview scenarios. Build them in order — each builds on the previous.
