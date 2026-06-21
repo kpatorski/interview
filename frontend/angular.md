@@ -15,6 +15,9 @@ render_with_liquid: false
     * [2. Dependency Injection (DI)](#2-dependency-injection-di)
     * [3. Data Binding](#3-data-binding)
     * [4. Directives & Pipes](#4-directives--pipes)
+      * [Structural directives: `*ngIf`, `*ngFor`, `*ngSwitch`](#structural-directives-ngif-ngfor-ngswitch)
+      * [Attribute directives: `ngClass`, `ngStyle` and custom](#attribute-directives-ngclass-ngstyle-and-custom)
+      * [Pipes — display formatting without polluting the component](#pipes--display-formatting-without-polluting-the-component)
     * [5. Modules vs Standalone Components](#5-modules-vs-standalone-components)
     * [6. RxJS & Observables](#6-rxjs--observables)
     * [7. Change Detection](#7-change-detection)
@@ -488,131 +491,494 @@ JavaScript zdąży ją w pełni zdefiniować (circular reference w tym samym pli
 
 ---
 
-**🧙‍♂️ senior** — Distinguish **property binding** `[value]` (sets a DOM *property*) from **attribute binding**
-`[attr.colspan]` (sets an HTML *attribute*). DOM properties and HTML attributes are not the same thing. SVG elements and
-ARIA attributes have no matching DOM property → you must use `[attr.aria-label]`, `[attr.viewBox]`, etc. Using plain
-property binding there causes a runtime error.
+**🧙‍♂️ senior — HTML Attribute vs DOM Property — dwa różne światy**
+
+To jedna z najczęściej mylonych rzeczy w webdevie. W języku polskim oba słowa tłumaczymy jako "atrybut", ale w kodzie to zupełnie odrębne byty.
+
+**Prosta zasada:**
+- **HTML Attribute** = stan *początkowy*, żyje w pliku `.html`, zawsze `string`
+- **DOM Property** = stan *aktualny*, żyje w pamięci przeglądarki jako obiekt JS, może być `boolean`, `number`, `object`
+
+**Analogia:** wyobraź sobie formularz papierowy (HTML Attribute) i bazę danych (DOM Property). Formularz wypełniasz raz na początku — to wartość inicjalna. Baza danych jest aktualizowana na żywo gdy coś się zmienia. Formularz papierowy się nie zmienia nawet gdy rekord w bazie już wygląda inaczej.
+
+---
+
+**Przykład który wszystko wyjaśnia — `<input value="Start">`:**
+
+```html
+<input id="moj-input" type="text" value="Start">
+```
+
+Gdy strona się ładuje — obie wartości są równe `"Start"`:
+```javascript
+const el = document.getElementById('moj-input');
+el.getAttribute('value')  // → "Start"  (HTML attribute)
+el.value                  // → "Start"  (DOM property)
+```
+
+Teraz użytkownik wpisuje w pole słowo `"Cześć"`:
+```javascript
+el.getAttribute('value')  // → "Start"  ← NADAL! HTML się nie zmienił.
+el.value                  // → "Cześć"  ← aktualny stan w pamięci
+
+el.defaultValue           // → "Start"  ← alias do getAttribute('value')
+```
+
+HTML attribute `value` reprezentuje wartość *domyślną* (`defaultValue`). DOM property `value` to to, co widzisz teraz w polu.
+
+---
+
+**Tabela: attribute vs property — kluczowe różnice**
+
+| Cecha | HTML Attribute | DOM Property |
+|-------|---------------|-------------|
+| Gdzie istnieje | Kod źródłowy HTML / `.html` | Pamięć przeglądarki (obiekt JS) |
+| Rola | Wartość *inicjalna* | Wartość *aktualna* |
+| Typ | Zawsze `string` | `boolean`, `number`, `object`, `string`… |
+| Zmienia się po interakcji? | Nie | Tak |
+| API JavaScript | `element.getAttribute('name')` | `element.name` |
+| Jak ustawić w Angularze | `[attr.name]="expr"` | `[name]="expr"` |
+
+---
+
+**Dlaczego Angular binduje do DOM Properties, nie HTML Attributes:**
+
+```html
+<!-- ✅ Property binding — Angular ustawia element.disabled = true/false -->
+<button [disabled]="isFormInvalid">Submit</button>
+
+<!-- ✅ Property binding — przekazuje tablicę (nie string!) -->
+<app-chart [data]="chartData"></app-chart>
+
+<!-- ✅ Property binding — przekazuje obiekt -->
+<app-user-card [user]="currentUser"></app-user-card>
+```
+
+Gdyby Angular bindował do HTML attributes, mógłby przekazywać tylko stringi. Bindowanie do DOM properties pozwala przekazywać **dowolne typy JS** — tablice, obiekty, booleany — bez żadnej serializacji. To dlatego Angular domyślnie używa `[property]="expr"`, a nie `attr.property="expr"`.
+
+---
+
+**Kiedy musisz użyć attribute binding `[attr.*]`:**
+
+Niektóre atrybuty HTML *nie mają* odpowiadającej im DOM property. Najczęstsze przypadki:
+
+```html
+<!-- ARIA — dostępność: nie ma DOM property "aria-label" -->
+<button [attr.aria-label]="buttonLabel">×</button>
+
+<!-- SVG — większość atrybutów SVG nie ma DOM property -->
+<svg><rect [attr.width]="rectWidth" [attr.viewBox]="viewBox"></svg>
+
+<!-- colspan / rowspan w tabelach -->
+<td [attr.colspan]="columnSpan">...</td>
+
+<!-- Niestandardowe atrybuty data-* (choć zwykle lepiej użyć [attr.data-id]) -->
+<div [attr.data-testid]="testId">...</div>
+```
+
+**Błąd gdy używasz property binding na nieistniejącej property:**
+```html
+<!-- ❌ Runtime error: "Can't bind to 'aria-label' since it isn't a known property of 'button'" -->
+<button [aria-label]="label">×</button>
+
+<!-- ✅ Poprawnie: użyj attr. prefiksu -->
+<button [attr.aria-label]="label">×</button>
+```
+
+**Mnemotechnika:** jeśli nie jesteś pewien czy element ma daną DOM property — sprawdź w DevTools konsoli: `document.querySelector('twój-element').` i tab-complete. Jeśli nie widzisz property → użyj `[attr.*]`.
 
 ---
 
 ### 4. Directives & Pipes
 
-**🧑‍💻 middle** — Directives are instructions attached to HTML elements that change how Angular renders them.
+**🧑‍💻 middle** — A directive is an instruction you attach to an HTML element: "when you see this CSS selector in a template, do something with that element." Directives are invisible in the DOM — they are pure behavior attached to elements.
 
-**Structural directives** add or remove elements from the DOM. They start with `*` (syntactic sugar for`<ng-template>`):
+Angular has two types of directives with completely different roles:
+- **Structural** — decide *whether* an element exists in the DOM at all
+- **Attribute** — decide *how* an existing element looks or behaves
+
+**When to use which:**
+- Use a **structural directive** (`*ngIf`, `@if`, `*ngFor`, `@for`) when you want to show/hide or repeat elements
+- Use an **attribute directive** (`[ngClass]`, `[ngStyle]`, custom) when the element stays in the DOM but you want to change its appearance or add behavior
+- Use a **pipe** (`| date`, `| currency`, custom) when you want to format/transform a value purely for display, without touching the underlying data
+
+---
+
+#### Structural directives: `*ngIf`, `*ngFor`, `*ngSwitch`
+
+**Why the asterisk `*`?**
+
+The asterisk is syntactic sugar. When Angular compiles `*ngIf="condition"` it expands it to:
 
 ```html
-<!-- *ngIf: show/hide element based on condition -->
+<!-- What you write: -->
+<div *ngIf="isLoggedIn">Welcome!</div>
+
+<!-- What Angular actually sees after expanding *: -->
+<ng-template [ngIf]="isLoggedIn">
+  <div>Welcome!</div>
+</ng-template>
+```
+
+Every structural directive does the same thing: it wraps the element in a `<ng-template>` and controls whether that template gets stamped into the DOM.
+
+---
+
+**What is `<ng-template>`?**
+
+`<ng-template>` is an **invisible container** — a recipe for a chunk of HTML that by default *does not render*. The browser never sees the `<ng-template>` tag in the DOM. Angular treats its content as a template to be stamped out conditionally or repeatedly.
+
+Think of it as a rubber stamp: the stamp itself does nothing — you have to press it onto paper (stamp it) before anything appears.
+
+---
+
+**What is `#noHeroes`? — Template Reference Variable**
+
+`#variableName` is a **local variable in the template**. It works like a sticky label — it gives an element a name you can reference *anywhere in the same template*.
+
+```html
+<input #searchInput type="text">
+<button (click)="search(searchInput.value)">Search</button>
+```
+
+`#searchInput` creates a variable `searchInput` pointing to the `<input>` DOM element. You can use it anywhere in the same template.
+
+---
+
+**`*ngIf` with `else` — step by step:**
+
+```html
 <div *ngIf="heroes.length > 0; else noHeroes">
-    Found {{ heroes.length }} heroes
+  Found {{ heroes.length }} heroes
 </div>
-<ng-template #noHeroes><p>No heroes found.</p></ng-template>
+<ng-template #noHeroes>
+  <p>No heroes found.</p>
+</ng-template>
+```
 
-<!-- *ngFor: repeat element for each item in a list -->
-<li *ngFor="let hero of heroes; trackBy: trackById; let i = index">
+Read this as:
+1. `*ngIf="heroes.length > 0"` — if condition is true → render `<div>` into the DOM
+2. `; else noHeroes` — if false → find the `<ng-template>` labelled `#noHeroes` and stamp *its* content instead
+3. `<ng-template #noHeroes>` — the "no results" recipe; `#noHeroes` is the label you attach to it
+
+**Why not a plain `else`?** Because HTML has no conditional mechanism. Angular needs the alternative DOM *defined somewhere* — that's exactly what `<ng-template>` with a template reference variable provides.
+
+> **Angular 17+ simplification:** `@if`/`@else` blocks work like real language constructs with no `<ng-template>` needed (see below).
+
+---
+
+**`*ngFor` — iterating over a list:**
+
+```html
+<ul>
+  <li *ngFor="let hero of heroes; let i = index; trackBy: trackById">
     {{ i + 1 }}. {{ hero.name }}
-</li>
+  </li>
+</ul>
+```
 
-<!-- Angular 17+ built-in control flow (no NgModule import needed): -->
-@if (heroes.length > 0) { <p>Found heroes</p> }
+Broken down:
+- `let hero of heroes` — for each item in `heroes`, create a local variable `hero`
+- `let i = index` — optional: `i` = the current element's index (0, 1, 2…)
+- `trackBy: trackById` — **why this matters:** see below
+
+**What is `trackBy` and why do we need it?**
+
+By default, when a list changes (e.g. new data arrives from an API), Angular compares items *by object reference*. Even if the data is identical, new JS objects mean Angular destroys and recreates the entire DOM list.
+
+`trackBy` tells Angular: "don't compare by reference — compare by this value (e.g. `id`)."
+
+```typescript
+// In the component:
+trackById(index: number, hero: Hero): number {
+  return hero.id; // Angular uses hero.id as identity, not the object reference
+}
+```
+
+```html
+<!-- Angular now knows that a hero with id=5 is "the same" hero
+     even if it arrived as a new JS object from the API -->
+<li *ngFor="let hero of heroes; trackBy: trackById">{{ hero.name }}</li>
+```
+
+Without `trackBy`: API refresh → entire DOM list destroyed and recreated → focus lost, animations broken, slow.
+With `trackBy`: API refresh → Angular only updates changed items → fast.
+
+---
+
+**Angular 17+ — new `@if` / `@for` syntax (built-in, no imports needed):**
+
+```html
+<!-- No need to import CommonModule / NgIf -->
+@if (heroes.length > 0) {
+  <p>Found {{ heroes.length }} heroes</p>
+} @else {
+  <p>No heroes.</p>
+}
+
 @for (hero of heroes; track hero.id) {
-<li>{{ hero.name }}</li> }
+  <li>{{ hero.name }}</li>
+} @empty {
+  <li>No items</li>
+}
+
+@switch (status) {
+  @case ('active') { <span class="green">Active</span> }
+  @case ('inactive') { <span class="gray">Inactive</span> }
+  @default { <span>Unknown</span> }
+}
 ```
 
-**Attribute directives** change the appearance or behavior of existing elements:
+`@for` requires `track` (equivalent of `trackBy`) — Angular 17 enforced good practice from the start.
+
+**When to use `*ngIf` vs `@if`:** Use `@if` in all new code (Angular 17+). Use `*ngIf` only in existing codebases that haven't migrated yet.
+
+---
+
+#### Attribute directives: `ngClass`, `ngStyle` and custom
+
+**Attribute directives do not change the DOM structure** — they change *how* an existing element looks or behaves.
 
 ```html
+<!-- ngClass: add/remove CSS classes based on an expression -->
+<div [ngClass]="{
+  'btn--active':   isActive,
+  'btn--disabled': !isEnabled,
+  'btn--large':    size === 'lg'
+}">Button</div>
 
-<div [ngClass]="{ 'active': isActive, 'disabled': !isEnabled }">...</div>
-<div [ngStyle]="{ 'color': textColor, 'font-size': fontSize + 'px' }">...</div>
+<!-- Simpler when toggling a single class: -->
+<div [class.active]="isActive">Button</div>
+
+<!-- ngStyle: set inline styles dynamically -->
+<div [ngStyle]="{ 'color': textColor, 'font-size': fontSize + 'px' }">Text</div>
+
+<!-- Simpler: -->
+<div [style.color]="textColor">Text</div>
 ```
 
-**Custom directive:**
+**When to write a custom attribute directive:**
+
+When you want to attach reusable *behavior* to any element without creating a new component. Examples: hover highlight, auto-focus on modal open, number formatting inside an input, tooltip, drag-and-drop handle.
+
+If you need **structure** (wrapping, conditional rendering) → structural directive.
+If you need **reusable UI with its own template** → component.
+If you need **behavior attached to any existing element** → attribute directive.
 
 ```typescript
-
-@Directive({ selector: '[appHighlight]', standalone: true })
+@Directive({
+  selector: '[appHighlight]', // attaches to any element with this attribute
+  standalone: true
+})
 export class HighlightDirective {
-    @HostListener('mouseenter') onEnter() {
-        this.el.nativeElement.style.backgroundColor = 'yellow';
-    }
+  @Input() appHighlight = 'yellow'; // pass a color: <p appHighlight="pink">
 
-    @HostListener('mouseleave') onLeave() {
-        this.el.nativeElement.style.backgroundColor = '';
-    }
+  @HostListener('mouseenter') onEnter() {
+    this.el.nativeElement.style.backgroundColor = this.appHighlight;
+  }
+  @HostListener('mouseleave') onLeave() {
+    this.el.nativeElement.style.backgroundColor = '';
+  }
 
-    constructor(private el: ElementRef) {}
+  constructor(private el: ElementRef) {}
 }
 
-// Usage: <p appHighlight>Hover me</p>
+// Usage:
+// <p appHighlight>Hover me (yellow)</p>
+// <p appHighlight="lightblue">Hover me (blue)</p>
 ```
 
-**Pipes** transform values in templates without modifying the source data. Think of them as display formatters:
+`@HostListener` registers an event listener on the *host* element (the one the directive is attached to). Angular automatically removes it when the directive is destroyed — zero memory leaks.
 
-```html
-{{ createdAt | date:'dd.MM.yyyy' }}         <!-- "21.06.2026" -->
-{{ price | currency:'PLN':'symbol':'1.2-2'}} <!-- "3 999,00 zł" -->
-{{ name | uppercase }}                       <!-- "ALICE" -->
-{{ description | slice:0:100 }}             <!-- first 100 chars -->
-{{ heroes$ | async }}                        <!-- subscribes to Observable, auto-unsubscribes -->
-```
+---
 
-**Custom pipe:**
+#### Pipes — display formatting without polluting the component
+
+**Why pipes at all?** Imagine you have a date `2026-06-21T14:30:00Z` and want to show it as `21.06.2026`. You could:
 
 ```typescript
-
-@Pipe({ name: 'truncate', pure: true, standalone: true })
-export class TruncatePipe implements PipeTransform {
-    transform(value: string, limit = 50, ellipsis = '…'): string {
-        return value.length > limit ? value.slice(0, limit) + ellipsis : value;
-    }
+// ❌ In the component: display logic mixed with business logic
+get formattedDate() {
+  return this.order.createdAt.toLocaleDateString('pl-PL', { ... });
 }
-
-// Usage: {{ longText | truncate:30 }}
 ```
 
-**🧙‍♂️ senior — pure vs impure pipes:**
+```html
+<!-- ✅ Pipe: formatting logic lives in one reusable place -->
+{{ order.createdAt | date:'dd.MM.yyyy' }}
+```
 
-- `pure: true` (default) — Angular calls the pipe only when the **reference** of the input changes. Fast.
-- `pure: false` — Angular calls the pipe on **every change detection cycle**, regardless. Use only when the input object
-  mutates internally (mutable array/map contents). Expensive — can severely impact performance if the transform is slow.
+A pipe is a pure transform function `(value, ...params) → formatted value` that lives in the template after the `|` symbol. It never mutates the source data.
 
-`AsyncPipe` is impure by nature but handles subscriptions safely (auto-subscribes on first use, auto-unsubscribes on
-destroy). Always prefer `| async` in templates over manual subscriptions.
+**When to use a pipe vs a method:**
+- Use a **pipe** when you're only changing *how a value is displayed* (dates, currencies, truncation, capitalization)
+- Use a **component method or getter** when the transformation involves business logic, state, or side effects
+- Use **`| async`** whenever you display data from an Observable — it auto-subscribes and auto-unsubscribes
+
+**Built-in pipes:**
+
+```html
+{{ createdAt | date:'dd.MM.yyyy' }}           <!-- "21.06.2026" -->
+{{ createdAt | date:'dd.MM.yyyy HH:mm' }}     <!-- "21.06.2026 14:30" -->
+{{ price | currency:'PLN':'symbol':'1.2-2' }} <!-- "3 999,00 zł" -->
+{{ name | uppercase }}                        <!-- "ALICE" -->
+{{ name | lowercase }}                        <!-- "alice" -->
+{{ longText | slice:0:100 }}                  <!-- first 100 chars -->
+{{ bigObject | json }}                        <!-- debug: dump as JSON -->
+{{ heroes$ | async }}                         <!-- subscribe to Observable, auto-unsubscribe -->
+```
+
+Pipes chain left to right:
+```html
+{{ name | lowercase | titlecase }}  <!-- "alice kowalski" → "Alice Kowalski" -->
+```
+
+**Custom pipe — step by step:**
+
+```typescript
+@Pipe({
+  name: 'truncate',  // the name used in templates: {{ text | truncate }}
+  pure: true,        // default; see senior section below for what this means
+  standalone: true
+})
+export class TruncatePipe implements PipeTransform {
+  // Angular calls transform() with the value and any colon-separated params
+  transform(value: string, limit = 50, ellipsis = '…'): string {
+    if (!value) return '';
+    return value.length > limit
+      ? value.slice(0, limit) + ellipsis
+      : value;
+  }
+}
+
+// Usage:
+// {{ longText | truncate }}           → limit=50 (default)
+// {{ longText | truncate:30 }}        → limit=30
+// {{ longText | truncate:30:'...' }}  → limit=30, custom ellipsis
+```
+
+---
+
+**🧙‍♂️ senior — `pure: true` vs `pure: false` — the performance trap**
+
+Angular does not call a pipe on every single change — that would be catastrophically slow. Instead:
+
+**`pure: true` (default):** Angular calls `transform()` only when the *reference* of the input value changes. If you pass an array `heroes` and add an element via `push()` — the array reference doesn't change → the pipe *does not re-run* → you see the old value.
+
+```typescript
+// ❌ pure pipe won't see this change:
+this.heroes.push(newHero);  // same array, same reference
+
+// ✅ pure pipe will see this:
+this.heroes = [...this.heroes, newHero];  // new array = new reference
+```
+
+**`pure: false`:** Angular calls `transform()` on *every change detection cycle* — even when you click anywhere on the page. Use only when absolutely necessary (mutable collections you cannot replace with immutable updates).
+
+**`AsyncPipe`** is impure internally (it must react to every Observable emission), but Angular handles subscriptions safely. Always prefer `| async` over manual subscriptions in templates.
+
+```html
+<!-- ✅ async pipe: auto-subscribe, auto-unsubscribe, no memory leaks -->
+<li *ngFor="let hero of heroes$ | async">{{ hero.name }}</li>
+
+<!-- vs ❌ manual subscription: remember to unsubscribe in ngOnDestroy! -->
+```
 
 ---
 
 ### 5. Modules vs Standalone Components
 
-**🧑‍💻 middle** — Angular originally used **NgModules** to group related components, directives, pipes, and services.
-Angular 14+ introduced **standalone components** that declare their own dependencies directly.
+**🧑‍💻 middle** — To understand NgModule, you first need to understand the problem it solves.
 
-**NgModule (traditional):**
+**The problem: Angular needs to know what each template "sees"**
+
+When Angular compiles an HTML template, it encounters tags like `<app-hero-card>`, `*ngIf`, `| date`. It needs to know: what is `app-hero-card`? Which component class? Where does `*ngIf` come from?
+
+Without any registration system, Angular would have to load *the entire application* to answer these questions. NgModule was the solution: declare what exists and what is visible during template compilation.
+
+---
+
+**NgModule — four arrays and what each one does:**
 
 ```typescript
-
 @NgModule({
-    declarations: [HeroListComponent, HeroCardComponent],  // owned by this module
-    imports: [BrowserModule, HttpClientModule, RouterModule],
-    providers: [HeroService],
-    exports: [HeroCardComponent],   // make available to other modules
-    bootstrap: [AppComponent]       // only in root module
+  // 1. declarations: "these classes BELONG to this module"
+  //    Register components, directives and pipes whose
+  //    TEMPLATES should be compiled in the context of this module.
+  //    Each class can only be declared in ONE module.
+  declarations: [HeroListComponent, HeroCardComponent, TruncatePipe],
+
+  // 2. imports: "these modules share their exports with us"
+  //    Allows templates in declarations to use directives,
+  //    components and pipes from the imported modules.
+  imports: [BrowserModule, HttpClientModule, RouterModule, SharedModule],
+
+  // 3. providers: "these services are available via DI in this module"
+  //    (rarely needed — prefer providedIn: 'root' in services)
+  providers: [HeroService],
+
+  // 4. exports: "these classes are available to modules that import us"
+  //    Without exports, other modules cannot use HeroCardComponent
+  //    even if they import HeroModule.
+  exports: [HeroCardComponent, TruncatePipe],
+
+  // bootstrap: root module only — which component starts the app
+  bootstrap: [AppComponent]
 })
-export class AppModule {}
+export class HeroModule {}
 ```
 
-**Standalone (Angular 14+, default in Angular 17+):**
+**Analogy:** NgModule is like an npm package — you declare what's in it (`declarations`), what it needs from outside (`imports`), and what it exposes to others (`exports`).
+
+---
+
+**Problems with NgModule (that led Angular to create standalone):**
+
+1. **Verbose boilerplate** — every new component must be added to a module's `declarations`
+2. **Cryptic "not found" errors** — forgetting to declare a component gives you an unhelpful "unknown element" error
+3. **Painful lazy loading** — you need a dedicated module for each lazy-loaded route
+4. **Circular imports** — modules importing each other cause mysterious runtime errors
+
+---
+
+**Standalone Component (Angular 14+, default since Angular 17)**
+
+A standalone component declares its own dependencies — it doesn't need a module.
 
 ```typescript
-
 @Component({
-    standalone: true,
-    selector: 'app-hero-card',
-    imports: [CommonModule, RouterModule],  // import directly what the template needs
-    template: `...`
+  standalone: true,          // ← this one line changes everything
+  selector: 'app-hero-card',
+  imports: [                 // ← instead of being in a module, imports go here
+    NgIf,                    //   import just what you need (better tree-shaking)
+    RouterModule,
+    TruncatePipe,            // import standalone pipes/components directly
+  ],
+  template: `
+    <h2>{{ hero.name | truncate:30 }}</h2>
+    <a [routerLink]="['/hero', hero.id]">Details</a>
+  `
 })
-export class HeroCardComponent {}
+export class HeroCardComponent {
+  @Input() hero!: Hero;
+}
 ```
+
+**When to use NgModule vs standalone:**
+- **New project** → always use standalone (it's the Angular default)
+- **Existing NgModule codebase** → migrate gradually; they coexist without issues
+- **Library publishing** → standalone components are easier to consume without forcing module imports
+- **Lazy loading a feature** → with standalone, `loadComponent` replaces `loadChildren` + a dedicated module
+
+**NgModule vs Standalone — comparison:**
+
+| Aspect | NgModule | Standalone |
+|--------|----------|-----------|
+| Where you declare template dependencies | In the module (`imports`) | In the component itself (`imports`) |
+| Do you need a module? | Yes | No |
+| Lazy loading | `loadChildren` → module | `loadComponent` → component directly |
+| Tree-shaking | Weaker (entire module loaded) | Better (only used imports) |
+| Boilerplate | High | Low |
 
 **Bootstrapping a standalone app (`main.ts`):**
 
@@ -623,16 +989,17 @@ import { provideHttpClient } from '@angular/common/http';
 import { routes } from './app.routes';
 
 bootstrapApplication(AppComponent, {
-    providers: [
-        provideRouter(routes),
-        provideHttpClient(),
-    ]
+  providers: [
+    provideRouter(routes),      // replaces RouterModule.forRoot(routes)
+    provideHttpClient(),        // replaces HttpClientModule
+    provideAnimations(),        // replaces BrowserAnimationsModule
+  ]
 });
 ```
 
-**🧙‍♂️ senior** — Standalone components improve tree-shaking (unused imports are eliminated from the bundle) and
-simplify lazy loading — you can `loadComponent` directly instead of wrapping each feature in a module. Angular 17 makes
-standalone the default for `ng generate`. Existing NgModule codebases work fine; migration is gradual.
+The `provide*` functions replace modules — they are tree-shakeable and have no module overhead.
+
+**🧙‍♂️ senior** — Standalone components change the loading tree: instead of `loadChildren: () => import('./hero/hero.module').then(m => m.HeroModule)` you write `loadComponent: () => import('./hero/hero.component').then(m => m.HeroComponent)`. Each standalone component has its own injector scope — you can provide services in a `loadComponent` route's `providers` array so they only live as long as that route is active, giving you scoped service instances without any module setup.
 
 ---
 
