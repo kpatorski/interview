@@ -445,7 +445,8 @@ function showCard() {
   document.getElementById('ss-a').innerHTML='';
   document.getElementById('ss-a').classList.remove('show');
   document.getElementById('ss-div').classList.remove('show');
-  document.getElementById('ss-mode').textContent=isNew(card.id)?'🆕 Nowa fiszka':'🔁 Powtórka';
+  const lvlLbl = card.level==='senior' ? '🧙‍♂️ Senior' : '🧑‍💻 Mid';
+  document.getElementById('ss-mode').textContent=(isNew(card.id)?'🆕 Nowa fiszka':'🔁 Powtórka')+' · '+lvlLbl;
   document.getElementById('ss-flip').style.display='block';
   document.getElementById('ss-rate').classList.remove('show');
   document.getElementById('card-area').scrollTop=0;
@@ -655,7 +656,8 @@ async function buildFlashcardPdf(label, cards, filename) {
 
     doc.setTextColor(140);
     doc.setFontSize(5.5);
-    doc.text(label, x + padX, yTop + padTop + 1.4);
+    const lvlLbl = card.level === 'senior' ? 'Senior' : 'Mid';
+    doc.text(`${label} · ${lvlLbl}`, x + padX, yTop + padTop + 1.4);
 
     doc.setTextColor(20);
     const q = fitFontSize(doc, card.q, innerW, cellH - padTop - padBottom - labelSpace, 9, 4.5);
