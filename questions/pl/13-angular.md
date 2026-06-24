@@ -14,7 +14,7 @@
 
 ## 1️⃣ Fundamentals
 
-#### 🔹 1. 🧑‍💻 Co to jest Angular i czym różni się od React i Vue?
+#### 🔹 1. 🧑‍💻 ⭐⭐⭐ Co to jest Angular i czym różni się od React i Vue?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -32,7 +32,7 @@ Kiedy Angular: duże zespoły enterprise, Java/C# background (podobny DI model),
 
 ---
 
-#### 🔹 2. 🧑‍💻 Czym jest komponent w Angularze i jaki jest jego cykl życia?
+#### 🔹 2. 🧑‍💻 ⭐⭐⭐ Czym jest komponent w Angularze i jaki jest jego cykl życia?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -62,7 +62,7 @@ export class HeroComponent implements OnInit, OnDestroy {
 
 ---
 
-#### 🔹 3. 🧑‍💻 Co to jest Dependency Injection (DI) i jak Angular go implementuje?
+#### 🔹 3. 🧑‍💻 ⭐⭐⭐ Co to jest Dependency Injection (DI) i jak Angular go implementuje?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -89,7 +89,7 @@ Podanie serwisu w `@Component` tworzy nową instancję (nie singleton) — ważn
 
 ---
 
-#### 🔹 4. 🧑‍💻 Jakie typy data bindingu oferuje Angular?
+#### 🔹 4. 🧑‍💻 ⭐⭐⭐ Jakie typy data bindingu oferuje Angular?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -112,7 +112,7 @@ Angular ma 4 rodzaje wiązań:
 
 ---
 
-#### 🔹 5. 🧑‍💻 Czym jest NgModule i do czego służy?
+#### 🔹 5. 🧑‍💻 ⭐⭐ Czym jest NgModule i do czego służy?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -133,7 +133,7 @@ export class AppModule {}
 
 ---
 
-#### 🔹 6. 🧑‍💻 Czym różnią się dyrektywy strukturalne od atrybutowych?
+#### 🔹 6. 🧑‍💻 ⭐⭐ Czym różnią się dyrektywy strukturalne od atrybutowych?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -157,7 +157,7 @@ export class HighlightDirective {
 
 ---
 
-#### 🔹 7. 🧑‍💻 Czym są Pipe'y i jak stworzyć własny?
+#### 🔹 7. 🧑‍💻 ⭐⭐ Czym są Pipe'y i jak stworzyć własny?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -178,7 +178,7 @@ export class TruncatePipe implements PipeTransform {
 
 ---
 
-#### 🔹 8. 🧑‍💻 Jak działa routing w Angularze?
+#### 🔹 8. 🧑‍💻 ⭐⭐ Jak działa routing w Angularze?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -205,7 +205,7 @@ Nawigacja: `this.router.navigate(['/hero', id])` lub `<a routerLink="/hero/1">`.
 
 ---
 
-#### 🔹 9. 🧑‍💻 Czym różnią się formularze template-driven od reactive?
+#### 🔹 9. 🧑‍💻 ⭐⭐ Czym różnią się formularze template-driven od reactive?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -230,7 +230,7 @@ Zasada: reactive forms dla wszystkiego poza najprostszymi formularzami.
 
 ---
 
-#### 🔹 10. 🧑‍💻 Jak wykonywać żądania HTTP w Angularze?
+#### 🔹 10. 🧑‍💻 ⭐⭐ Jak wykonywać żądania HTTP w Angularze?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -257,7 +257,7 @@ Zawsze anuluj subskrypcje lub używaj `async` pipe w szablonach (auto-unsubscrib
 
 ---
 
-#### 🔹 11. 🧑‍💻 Co to jest Observable (RxJS) i jak Angular go używa?
+#### 🔹 11. 🧑‍💻 ⭐⭐ Co to jest Observable (RxJS) i jak Angular go używa?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -282,7 +282,7 @@ this.searchTerm$.pipe(
 
 ---
 
-#### 🔹 12. 🧑‍💻 Co to jest @ViewChild i @ContentChild?
+#### 🔹 12. 🧑‍💻 ⭐⭐ Co to jest @ViewChild i @ContentChild?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -306,7 +306,7 @@ Dostępne odpowiednio po `ngAfterViewInit` / `ngAfterContentInit`.
 
 ---
 
-#### 🔹 13. 🧑‍💻 Czym jest standalone component (Angular 14+)?
+#### 🔹 13. 🧑‍💻 ⭐⭐ Czym jest standalone component (Angular 14+)?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -332,7 +332,7 @@ export class HeroComponent {}
 
 ## 2️⃣ Components & Templates (Senior)
 
-#### 🔹 14. 🧙‍♂️ Jak działa Change Detection? Kiedy stosować strategię OnPush?
+#### 🔹 14. 🧙‍♂️ ⭐⭐⭐ Jak działa Change Detection? Kiedy stosować strategię OnPush?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -359,7 +359,7 @@ Change Detection (CD) uruchamia się po każdym zdarzeniu (click, HTTP response,
 
 ---
 
-#### 🔹 15. 🧙‍♂️ Czym różnią się Subject, BehaviorSubject i ReplaySubject?
+#### 🔹 15. 🧙‍♂️ ⭐⭐ Czym różnią się Subject, BehaviorSubject i ReplaySubject?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -383,7 +383,7 @@ setUser(user: User) { this._user$.next(user); }
 
 ---
 
-#### 🔹 16. 🧙‍♂️ Kiedy używać switchMap, mergeMap, concatMap i exhaustMap?
+#### 🔹 16. 🧙‍♂️ ⭐⭐ Kiedy używać switchMap, mergeMap, concatMap i exhaustMap?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -404,7 +404,7 @@ Wszystkie flattenują zagnieżdżone Observable, ale różnią się obsługą ko
 
 ---
 
-#### 🔹 17. 🧙‍♂️ Jak Angular obsługuje wycieki pamięci z subskrypcji?
+#### 🔹 17. 🧙‍♂️ ⭐⭐ Jak Angular obsługuje wycieki pamięci z subskrypcji?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -437,7 +437,7 @@ ngOnDestroy() { this.destroy$.next(); this.destroy$.complete(); }
 
 ---
 
-#### 🔹 18. 🧙‍♂️ Czym jest NgRx i kiedy warto go użyć zamiast serwisów?
+#### 🔹 18. 🧙‍♂️ ⭐⭐ Czym jest NgRx i kiedy warto go użyć zamiast serwisów?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -461,7 +461,7 @@ NgRx to zarządzanie stanem na wzorcu Redux, zbudowane na RxJS. Kluczowe element
 
 ---
 
-#### 🔹 19. 🧙‍♂️ Jak działa lazy loading z PreloadingStrategy?
+#### 🔹 19. 🧙‍♂️ ⭐ Jak działa lazy loading z PreloadingStrategy?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -488,7 +488,7 @@ const routes: Routes = [
 
 ---
 
-#### 🔹 20. 🧙‍♂️ Jak zoptymalizować wydajność aplikacji Angular?
+#### 🔹 20. 🧙‍♂️ ⭐⭐ Jak zoptymalizować wydajność aplikacji Angular?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -510,7 +510,7 @@ const routes: Routes = [
 
 ---
 
-#### 🔹 21. 🧙‍♂️ Czym są Angular Signals (Angular 16+)?
+#### 🔹 21. 🧙‍♂️ ⭐⭐ Czym są Angular Signals (Angular 16+)?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -536,7 +536,7 @@ increment() { this.count.update(v => v + 1); }
 
 ---
 
-#### 🔹 22. 🧙‍♂️ Co to jest Angular Universal (SSR) i kiedy stosować?
+#### 🔹 22. 🧙‍♂️ ⭐ Co to jest Angular Universal (SSR) i kiedy stosować?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -555,7 +555,7 @@ Angular Universal renderuje aplikację na serwerze Node.js — wysyła gotowy HT
 
 ---
 
-#### 🔹 23. 🧙‍♂️ Jak testować komponenty i serwisy w Angularze?
+#### 🔹 23. 🧙‍♂️ ⭐⭐ Jak testować komponenty i serwisy w Angularze?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -591,7 +591,7 @@ expect(fixture.nativeElement.querySelector('h1').textContent).toContain('Heroes'
 
 ---
 
-#### 🔹 24. 🧙‍♂️ Czym jest Module Federation i kiedy stosować mikrofrontendy?
+#### 🔹 24. 🧙‍♂️ ⭐ Czym jest Module Federation i kiedy stosować mikrofrontendy?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -610,7 +610,7 @@ Module Federation to funkcja Webpack 5 umożliwiająca wielu niezależnym aplika
 
 ---
 
-#### 🔹 25. 🧙‍♂️ Jak zaprojektować strategię zarządzania stanem w dużej aplikacji Angular?
+#### 🔹 25. 🧙‍♂️ ⭐⭐ Jak zaprojektować strategię zarządzania stanem w dużej aplikacji Angular?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -632,7 +632,7 @@ Module Federation to funkcja Webpack 5 umożliwiająca wielu niezależnym aplika
 
 ---
 
-#### 🔹 26. 🧙‍♂️ What is ControlValueAccessor and how does `[(ngModel)]` work under the hood?
+#### 🔹 26. 🧙‍♂️ ⭐ What is ControlValueAccessor and how does `[(ngModel)]` work under the hood?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -662,7 +662,7 @@ NgModel directive     ControlValueAccessor      Native DOM element
 
 ---
 
-#### 🔹 27. 🧑‍💻 What is `<ng-template>` and what is a template reference variable (`#name`)?
+#### 🔹 27. 🧑‍💻 ⭐ What is `<ng-template>` and what is a template reference variable (`#name`)?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -699,7 +699,7 @@ Every `*` structural directive (`*ngIf`, `*ngFor`) expands into a `<ng-template>
 
 ---
 
-#### 🔹 28. 🧑‍💻 What is the difference between HTML Attribute and DOM Property? When to use `[attr.*]`?
+#### 🔹 28. 🧑‍💻 ⭐ What is the difference between HTML Attribute and DOM Property? When to use `[attr.*]`?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -737,7 +737,7 @@ Using `[aria-label]` (property binding) instead of `[attr.aria-label]` throws a 
 
 ---
 
-#### 🔹 29. 🧑‍💻 What is the Angular 17+ `@if`/`@for` syntax and how does it differ from `*ngIf`/`*ngFor`?
+#### 🔹 29. 🧑‍💻 ⭐⭐ What is the Angular 17+ `@if`/`@for` syntax and how does it differ from `*ngIf`/`*ngFor`?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 

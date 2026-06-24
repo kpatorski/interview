@@ -43,6 +43,13 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe 
 .foot{display:flex;gap:10px;margin-top:22px;padding-bottom:16px;flex-wrap:wrap;}
 .lnk{font-size:.7rem;color:var(--muted);background:none;border:none;cursor:pointer;text-decoration:underline;}
 
+/* ── PDF BUTTONS ── */
+.cat-pdf-row{display:flex;gap:6px;margin-top:7px;}
+.pdf-btn{font-size:.62rem;padding:3px 8px;border-radius:6px;border:1px solid var(--border);
+  background:none;color:var(--muted);cursor:pointer;white-space:nowrap;}
+.pdf-btn:hover:not(:disabled){border-color:var(--accent);color:var(--accent);}
+.pdf-btn:disabled{opacity:.3;cursor:default;}
+
 /* ── LEVEL DIALOG ── */
 .lvl-opt{display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:10px;
   border:1px solid var(--border);cursor:pointer;transition:border-color .15s;margin-bottom:8px;}
@@ -218,6 +225,33 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe 
   </div>
 </div>
 
+<!-- PDF RANGE DIALOG -->
+<div class="overlay" id="pdf-range-dlg">
+  <div class="dlg">
+    <h3 id="pdf-range-title" style="margin-bottom:6px;"></h3>
+    <p id="pdf-range-hint" style="margin-bottom:14px;"></p>
+    <label class="lvl-opt">
+      <input type="radio" name="pdf-range-mode" value="all" id="pr-all" checked onchange="updatePdfRangeInput()">
+      <div class="lvl-opt-info">
+        <div class="lvl-opt-title">Wszystkie fiszki</div>
+      </div>
+    </label>
+    <label class="lvl-opt">
+      <input type="radio" name="pdf-range-mode" value="range" id="pr-range" onchange="updatePdfRangeInput()">
+      <div class="lvl-opt-info">
+        <div class="lvl-opt-title">Wybrany zakres numerów</div>
+        <div class="lvl-opt-sub">np. 1-15,23,30-32 (numery jak na karcie)</div>
+      </div>
+    </label>
+    <input type="text" id="pdf-range-input" placeholder="np. 1-15,23,30-32" disabled
+      style="width:100%;margin-top:8px;padding:9px 11px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:.85rem;">
+    <div class="dlg-btns" style="margin-top:14px;">
+      <button class="btn-cancel" onclick="hidePdfRangeDlg()">Anuluj</button>
+      <button class="btn-confirm" style="background:var(--accent);color:#0f172a" onclick="confirmPdfRange()">📄 Generuj</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ─── Data & state ─────────────────────────────────────────────────────────────
 let DATA = null;
@@ -310,6 +344,7 @@ function renderHome() {
       else ok++;
     }
     totDue+=due; totNew+=nw; totOk+=ok;
+    const midCount = cat.cards.filter(c=>c.level==='middle').length;
 
     const el = document.createElement('div');
     el.className='cat-item'+(due===0&&nw===0?' dim':'');
@@ -321,7 +356,12 @@ function renderHome() {
     else badge=`<span class="badge bdg-ok">✓ gotowe</span>`;
 
     el.innerHTML=`<div class="cat-info"><div class="cat-name">${cat.label}</div>`+
-      `<div class="cat-meta">${ok}/${cat.cards.length} poznanych</div></div>${badge}`;
+      `<div class="cat-meta">${ok}/${cat.cards.length} poznanych</div>`+
+      `<div class="cat-pdf-row">`+
+        `<button class="pdf-btn" ${midCount?'':'disabled'} onclick="event.stopPropagation();openPdfRangeDlg('${cat.id}','middle',this)">📄 PDF mid (${midCount})</button>`+
+        `<button class="pdf-btn" onclick="event.stopPropagation();openPdfRangeDlg('${cat.id}','all',this)">📄 PDF all (${cat.cards.length})</button>`+
+      `</div>`+
+    `</div>${badge}`;
     list.appendChild(el);
   }
 
@@ -348,6 +388,10 @@ function catCards(catId) {
   if (catId === '__all__') DATA.categories.forEach(c => all.push(...c.cards));
   else { const c = DATA.categories.find(x => x.id === catId); if (c) all = c.cards; }
   return all;
+}
+
+function cardNumber(card) {
+  return parseInt(card.id.match(/(\d+)$/)[1], 10) + 1; // card.id = `${catId}-${index in full category}`
 }
 
 function filterByLevel(cards, level) {
@@ -432,7 +476,9 @@ function showCard() {
   document.getElementById('ss-a').innerHTML='';
   document.getElementById('ss-a').classList.remove('show');
   document.getElementById('ss-div').classList.remove('show');
-  document.getElementById('ss-mode').textContent=isNew(card.id)?'🆕 Nowa fiszka':'🔁 Powtórka';
+  const lvlLbl = card.level==='senior' ? '🧙‍♂️ Senior' : '🧑‍💻 Mid';
+  const starsLbl = '★'.repeat(card.stars||2) + '☆'.repeat(3-(card.stars||2));
+  document.getElementById('ss-mode').textContent=(isNew(card.id)?'🆕 Nowa fiszka':'🔁 Powtórka')+' · '+lvlLbl+' · '+starsLbl;
   document.getElementById('ss-flip').style.display='block';
   document.getElementById('ss-rate').classList.remove('show');
   document.getElementById('card-area').scrollTop=0;
@@ -540,6 +586,208 @@ function renderMd(md) {
   closeLists();
   if (inCode&&codeLines.length) out+=`<pre><code>${escH(codeLines.join('\n'))}</code></pre>`;
   return out;
+}
+
+// ─── PDF export ───────────────────────────────────────────────────────────────
+let jsPdfPromise = null;
+function ensureJsPDF() {
+  if (window.jspdf) return Promise.resolve();
+  if (jsPdfPromise) return jsPdfPromise;
+  jsPdfPromise = new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = './vendor/jspdf.umd.min.js';
+    s.onload = resolve;
+    s.onerror = () => { jsPdfPromise = null; reject(new Error('jsPDF load failed')); };
+    document.head.appendChild(s);
+  });
+  return jsPdfPromise;
+}
+
+let dejaVuFontPromise = null;
+function arrayBufferToBase64(buf) {
+  let binary = '';
+  const bytes = new Uint8Array(buf);
+  const chunk = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunk) binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
+  return btoa(binary);
+}
+function ensureDejaVuFont(doc) {
+  if (!dejaVuFontPromise) {
+    dejaVuFontPromise = fetch('./vendor/DejaVuSans.ttf').then(r => r.arrayBuffer()).then(arrayBufferToBase64);
+  }
+  return dejaVuFontPromise.then(base64 => {
+    doc.addFileToVFS('DejaVuSans.ttf', base64);
+    doc.addFont('DejaVuSans.ttf', 'DejaVuSans', 'normal');
+    doc.setFont('DejaVuSans', 'normal');
+  });
+}
+
+function simplifyMd(md) {
+  return md.split('\n').map(line => {
+    let t = line.trim();
+    if (!t) return '';
+    if (/^```/.test(t)) return '';
+    if (/^-{3,}$/.test(t)) return '';
+    t = t.replace(/<span[^>]*>([^<]*)<\/span>/g, '$1');
+    const h = t.match(/^#{1,6}\s+(.+)$/);
+    if (h) t = h[1];
+    t = t.replace(/^[-*]\s+/, '• ');
+    t = t.replace(/^>\s?/, '');
+    t = t.replace(/\*\*([^*\n]+)\*\*/g, '$1');
+    t = t.replace(/\*([^*\n]+)\*/g, '$1');
+    t = t.replace(/`([^`\n]+)`/g, '$1');
+    t = t.replace(/~~([^~]+)~~/g, '$1');
+    return t;
+  }).filter(Boolean).join('\n');
+}
+
+function fitFontSize(doc, text, maxW, maxH, maxSize, minSize) {
+  for (let size = maxSize; size >= minSize; size -= 0.5) {
+    doc.setFontSize(size);
+    const lines = doc.splitTextToSize(text, maxW);
+    const lineH = size * 0.3528 * 1.15;
+    if (lines.length * lineH <= maxH) return { size, lines, lineH };
+  }
+  doc.setFontSize(minSize);
+  const lineH = minSize * 0.3528 * 1.15;
+  const maxLines = Math.max(1, Math.floor(maxH / lineH));
+  let lines = doc.splitTextToSize(text, maxW);
+  if (lines.length > maxLines) {
+    lines = lines.slice(0, maxLines);
+    lines[maxLines - 1] = lines[maxLines - 1].replace(/.{0,3}$/, '…');
+  }
+  return { size: minSize, lines, lineH };
+}
+
+async function buildFlashcardPdf(label, cards, filename) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  await ensureDejaVuFont(doc);
+  const margin = 8;
+  const cols = 3, rows = 5;
+  const cellW = (210 - 2 * margin) / cols;
+  const cellH = (297 - 2 * margin) / rows;
+  const perPage = cols * rows;
+  const padX = 2.5, padTop = 2.2, padBottom = 1.5, labelSpace = 4.2;
+  const innerW = cellW - 2 * padX;
+
+  function headerFor(card) {
+    const lvlLbl = card.level === 'senior' ? 'Senior' : 'Mid';
+    return `${label} · ${cardNumber(card)} · ${lvlLbl}`;
+  }
+
+  function drawCell(col, row, headerText, starsCount, bodyText, maxFont, minFont) {
+    const x = margin + col * cellW;
+    const y = margin + row * cellH;
+
+    doc.setDrawColor(180);
+    doc.setLineWidth(0.15);
+    doc.rect(x, y, cellW, cellH);
+
+    doc.setTextColor(140);
+    doc.setFontSize(5.5);
+    doc.text(headerText, x + padX, y + padTop + 1.4);
+    const starsStr = '★'.repeat(starsCount) + '☆'.repeat(3 - starsCount);
+    doc.text(starsStr, x + cellW - padX, y + padTop + 1.4, { align: 'right' });
+
+    doc.setTextColor(20);
+    const fit = fitFontSize(doc, bodyText, innerW, cellH - padTop - padBottom - labelSpace, maxFont, minFont);
+    doc.setFontSize(fit.size);
+    doc.text(fit.lines, x + padX, y + padTop + labelSpace + fit.size * 0.3528, { lineHeightFactor: 1.15 });
+  }
+
+  for (let i = 0; i < cards.length; i += perPage) {
+    const batch = cards.slice(i, i + perPage);
+    if (i > 0) doc.addPage(); // front of a new sheet
+
+    batch.forEach((card, idx) => { // front side: questions
+      const col = idx % cols, row = Math.floor(idx / cols);
+      drawCell(col, row, headerFor(card), card.stars || 2, card.q, 9, 4.5);
+    });
+
+    doc.addPage(); // back of the same sheet
+    batch.forEach((card, idx) => { // back side: answers, columns mirrored across the long edge
+      const col = idx % cols, row = Math.floor(idx / cols);
+      const mirroredCol = cols - 1 - col;
+      drawCell(mirroredCol, row, headerFor(card), card.stars || 2, simplifyMd(card.a), 8, 4);
+    });
+  }
+
+  doc.save(filename);
+}
+
+let pendingPdf = null;
+
+function openPdfRangeDlg(catId, level, btn) {
+  const cat = DATA.categories.find(c => c.id === catId);
+  if (!cat) return;
+  pendingPdf = { catId, level, btn };
+  document.getElementById('pdf-range-title').textContent = `${cat.label} · PDF (${level === 'middle' ? 'mid' : 'all'})`;
+  document.getElementById('pdf-range-hint').textContent = `Numery fiszek w tej kategorii: 1–${cat.cards.length}`;
+  document.getElementById('pr-all').checked = true;
+  document.getElementById('pdf-range-input').value = '';
+  updatePdfRangeInput();
+  document.getElementById('pdf-range-dlg').classList.add('show');
+}
+
+function hidePdfRangeDlg() {
+  document.getElementById('pdf-range-dlg').classList.remove('show');
+  pendingPdf = null;
+}
+
+function updatePdfRangeInput() {
+  const isRange = document.getElementById('pr-range').checked;
+  const input = document.getElementById('pdf-range-input');
+  input.disabled = !isRange;
+  if (isRange) input.focus();
+}
+
+function parseRangeSpec(spec) {
+  const nums = new Set();
+  for (let part of spec.split(',')) {
+    part = part.trim();
+    if (!part) continue;
+    const range = part.match(/^(\d+)\s*-\s*(\d+)$/);
+    if (range) {
+      let [a, b] = [parseInt(range[1], 10), parseInt(range[2], 10)];
+      if (a > b) [a, b] = [b, a];
+      for (let n = a; n <= b; n++) nums.add(n);
+    } else if (/^\d+$/.test(part)) {
+      nums.add(parseInt(part, 10));
+    }
+  }
+  return nums;
+}
+
+function confirmPdfRange() {
+  if (!pendingPdf) return;
+  const { catId, level, btn } = pendingPdf;
+  let numbers = null;
+  if (document.getElementById('pr-range').checked) {
+    numbers = parseRangeSpec(document.getElementById('pdf-range-input').value);
+    if (!numbers.size) { alert('Podaj poprawny zakres, np. 1-15,23,30-32'); return; }
+  }
+  hidePdfRangeDlg();
+  generatePdf(catId, level, btn, numbers);
+}
+
+async function generatePdf(catId, level, btn, numbers) {
+  const cat = DATA.categories.find(c => c.id === catId);
+  if (!cat) return;
+  let cards = filterByLevel(cat.cards, level);
+  if (numbers) cards = cards.filter(c => numbers.has(cardNumber(c)));
+  if (!cards.length) { alert('Brak fiszek do wygenerowania (sprawdź zakres numerów).'); return; }
+
+  const orig = btn.textContent;
+  btn.disabled = true; btn.textContent = '⏳ Generuję…';
+  try {
+    await ensureJsPDF();
+    await buildFlashcardPdf(cat.label, cards, `fiszki-${catId}-${level}.pdf`);
+  } catch (e) {
+    alert('Błąd generowania PDF: ' + e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = orig;
+  }
 }
 
 // ─── Screen management ────────────────────────────────────────────────────────

@@ -13,7 +13,7 @@
 
 ## 1️⃣ Fundamentals
 
-#### 🔹 1. 🧑‍💻 Co to jest React i jaki problem rozwiązuje?
+#### 🔹 1. 🧑‍💻 ⭐⭐⭐ Co to jest React i jaki problem rozwiązuje?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -29,7 +29,7 @@ React to biblioteka JavaScript (nie framework) do budowania interfejsów użytko
 
 ---
 
-#### 🔹 2. 🧑‍💻 Co to jest JSX?
+#### 🔹 2. 🧑‍💻 ⭐⭐ Co to jest JSX?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -52,7 +52,7 @@ const el = React.createElement('h1', { className: 'title' }, 'Hello, ', name, '!
 
 ---
 
-#### 🔹 3. 🧑‍💻 Czym różni się props od state?
+#### 🔹 3. 🧑‍💻 ⭐⭐⭐ Czym różni się props od state?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -76,7 +76,7 @@ function Counter() {
 
 ---
 
-#### 🔹 4. 🧑‍💻 Jak działa useState?
+#### 🔹 4. 🧑‍💻 ⭐⭐⭐ Jak działa useState?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -101,7 +101,7 @@ setCount(count + 1);   // niebezpieczne w batched updates
 
 ---
 
-#### 🔹 5. 🧑‍💻 Jak działa useEffect i czym są zależności?
+#### 🔹 5. 🧑‍💻 ⭐⭐⭐ Jak działa useEffect i czym są zależności?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -123,7 +123,7 @@ useEffect(() => { /* uruchom po każdym renderze */ }); // brak tablicy
 
 ---
 
-#### 🔹 6. 🧑‍💻 Co to jest Context API i kiedy go używać?
+#### 🔹 6. 🧑‍💻 ⭐⭐ Co to jest Context API i kiedy go używać?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -150,7 +150,7 @@ function Button() {
 
 ---
 
-#### 🔹 7. 🧑‍💻 Dlaczego klucze (keys) są ważne w listach?
+#### 🔹 7. 🧑‍💻 ⭐⭐ Dlaczego klucze (keys) są ważne w listach?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -168,7 +168,7 @@ Używanie indeksu jako klucza powoduje błędy gdy lista jest sortowana lub filt
 
 ---
 
-#### 🔹 8. 🧑‍💻 Czym różni się komponent kontrolowany od niekontrolowanego?
+#### 🔹 8. 🧑‍💻 ⭐⭐ Czym różni się komponent kontrolowany od niekontrolowanego?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -191,7 +191,7 @@ Kontrolowany = single source of truth (zalecany). Niekontrolowany = prostszy dla
 
 ---
 
-#### 🔹 9. 🧑‍💻 Do czego służy useRef?
+#### 🔹 9. 🧑‍💻 ⭐⭐ Do czego służy useRef?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -218,7 +218,7 @@ useEffect(() => {
 
 ---
 
-#### 🔹 10. 🧑‍💻 Co to są Higher-Order Components (HOC)?
+#### 🔹 10. 🧑‍💻 ⭐ Co to są Higher-Order Components (HOC)?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -240,7 +240,7 @@ HOC'i są w dużej mierze zastąpione przez hooki w nowoczesnym React, ale wcią
 
 ---
 
-#### 🔹 11. 🧑‍💻 Czym różnią się komponenty klasowe od funkcyjnych?
+#### 🔹 11. 🧑‍💻 ⭐⭐ Czym różnią się komponenty klasowe od funkcyjnych?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -257,7 +257,7 @@ Zalecenie: używaj komponentów funkcyjnych dla całego nowego kodu. Komponenty 
 
 ---
 
-#### 🔹 12. 🧑‍💻 Jak działa propagacja eventów w React?
+#### 🔹 12. 🧑‍💻 ⭐ Jak działa propagacja eventów w React?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -276,7 +276,7 @@ Syntetyczne zdarzenia React są znormalizowane między przeglądarkami. Od React
 
 ---
 
-#### 🔹 13. 🧑‍💻 Co to jest lazy initializer w useState?
+#### 🔹 13. 🧑‍💻 ⭐ Co to jest lazy initializer w useState?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -299,7 +299,7 @@ const [filters, setFilters] = useState(() =>
 
 ## 2️⃣ Advanced / Senior
 
-#### 🔹 14. 🧙‍♂️ Jak działa algorytm reconciliation (Fiber) w React?
+#### 🔹 14. 🧙‍♂️ ⭐⭐ Jak działa algorytm reconciliation (Fiber) w React?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -317,7 +317,7 @@ Przy zmianie state/props React tworzy nowy virtual DOM (plain JS objects). Algor
 
 ---
 
-#### 🔹 15. 🧙‍♂️ Kiedy i jak używać useMemo i useCallback?
+#### 🔹 15. 🧙‍♂️ ⭐⭐ Kiedy i jak używać useMemo i useCallback?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -345,7 +345,7 @@ const handleClick = useCallback(() => doSomething(id), [id]);
 
 ---
 
-#### 🔹 16. 🧙‍♂️ Jak wykrywać i naprawiać zbędne re-rendery?
+#### 🔹 16. 🧙‍♂️ ⭐⭐ Jak wykrywać i naprawiać zbędne re-rendery?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -366,7 +366,7 @@ const handleClick = useCallback(() => doSomething(id), [id]);
 
 ---
 
-#### 🔹 17. 🧙‍♂️ Jak projektować dobre custom hooks?
+#### 🔹 17. 🧙‍♂️ ⭐⭐ Jak projektować dobre custom hooks?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -404,7 +404,7 @@ function useFetch<T>(url: string) {
 
 ---
 
-#### 🔹 18. 🧙‍♂️ Jak działa code splitting z React.lazy i Suspense?
+#### 🔹 18. 🧙‍♂️ ⭐ Jak działa code splitting z React.lazy i Suspense?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -435,7 +435,7 @@ function App() {
 
 ---
 
-#### 🔹 19. 🧙‍♂️ Co to są Error Boundaries i kiedy je stosować?
+#### 🔹 19. 🧙‍♂️ ⭐⭐ Co to są Error Boundaries i kiedy je stosować?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -470,7 +470,7 @@ Biblioteka `react-error-boundary` dostarcza przyjazny wrapper z hookami.
 
 ---
 
-#### 🔹 20. 🧙‍♂️ Co to są React Server Components (RSC)?
+#### 🔹 20. 🧙‍♂️ ⭐ Co to są React Server Components (RSC)?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -493,7 +493,7 @@ async function ProductPage({ id }: { id: string }) {
 
 ---
 
-#### 🔹 21. 🧙‍♂️ Czym są Concurrent Features w React 18?
+#### 🔹 21. 🧙‍♂️ ⭐ Czym są Concurrent Features w React 18?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -519,7 +519,7 @@ const filteredList = useMemo(() => filter(list, deferredQuery), [list, deferredQ
 
 ---
 
-#### 🔹 22. 🧙‍♂️ Jak wybrać bibliotekę do zarządzania stanem?
+#### 🔹 22. 🧙‍♂️ ⭐⭐⭐ Jak wybrać bibliotekę do zarządzania stanem?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -541,7 +541,7 @@ const filteredList = useMemo(() => filter(list, deferredQuery), [list, deferredQ
 
 ---
 
-#### 🔹 23. 🧙‍♂️ Czym są wzorce render props i compound components?
+#### 🔹 23. 🧙‍♂️ ⭐ Czym są wzorce render props i compound components?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -571,7 +571,7 @@ Używaj compound components dla złożonych widgetów UI (Select, Tabs, Accordio
 
 ---
 
-#### 🔹 24. 🧙‍♂️ Jak testować komponenty React? (React Testing Library)
+#### 🔹 24. 🧙‍♂️ ⭐⭐ Jak testować komponenty React? (React Testing Library)
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -602,7 +602,7 @@ await waitFor(() => expect(screen.getByRole('alert')).toBeVisible());
 
 ---
 
-#### 🔹 25. 🧙‍♂️ Czym różni się useLayoutEffect od useEffect?
+#### 🔹 25. 🧙‍♂️ ⭐ Czym różni się useLayoutEffect od useEffect?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 
@@ -624,7 +624,7 @@ useLayoutEffect(() => {
 
 ---
 
-#### 🔹 26. 🧑‍💻 When to use `useReducer` instead of `useState`?
+#### 🔹 26. 🧑‍💻 ⭐⭐ When to use `useReducer` instead of `useState`?
 
 ✅ <span style="color:transparent">Odpowiedź</span>
 

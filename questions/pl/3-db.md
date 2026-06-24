@@ -35,7 +35,7 @@
 
 ## 1️⃣ Podstawy Teorii Transakcji
 
-#### 🔹 1. 🧑‍💻 Czym jest ACID?
+#### 🔹 1. 🧑‍💻 ⭐⭐⭐ Czym jest ACID?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -56,7 +56,7 @@ Durability (Trwałość)
 
 ---
 
-#### 🔹 2. 🧑‍💻 Czym są poziomy izolacji i jakie anomalie eliminują?
+#### 🔹 2. 🧑‍💻 ⭐⭐⭐ Czym są poziomy izolacji i jakie anomalie eliminują?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -84,7 +84,7 @@ Anomalie:
 
 ---
 
-#### 🔹 3. 🧑‍💻 Czym jest optimistic locking?
+#### 🔹 3. 🧑‍💻 ⭐⭐ Czym jest optimistic locking?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -99,7 +99,7 @@ Brak blokad na poziomie bazy.
 
 ---
 
-#### 🔹 4. 🧑‍💻 Czym jest pessimistic locking?
+#### 🔹 4. 🧑‍💻 ⭐ Czym jest pessimistic locking?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -114,7 +114,7 @@ Większe bezpieczeństwo, mniejsza skalowalność.
 
 ---
 
-#### 🔹 5. 🧑‍💻 Czym jest indeks i jak działa B-Tree?
+#### 🔹 5. 🧑‍💻 ⭐⭐⭐ Czym jest indeks i jak działa B-Tree?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -129,7 +129,7 @@ Indeks przyspiesza SELECT, ale spowalnia INSERT/UPDATE.
 
 ---
 
-#### 🔹 6. 🧑‍💻 Czym jest execution plan?
+#### 🔹 6. 🧑‍💻 ⭐ Czym jest execution plan?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -144,7 +144,7 @@ Analizowany przez EXPLAIN.
 
 ---
 
-#### 🔹 7. 🧑‍💻 Czym jest connection pool?
+#### 🔹 7. 🧑‍💻 ⭐⭐ Czym jest connection pool?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -167,7 +167,7 @@ Zmniejsza koszt tworzenia połączeń.
 
 ## 2️⃣ JPA Internals
 
-#### 🔹 8. 🧑‍💻 Czym jest Persistence Context?
+#### 🔹 8. 🧑‍💻 ⭐⭐⭐ Czym jest Persistence Context?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -182,7 +182,7 @@ Każda encja w kontekście ma tylko jedną reprezentację (identity guarantee).
 
 ---
 
-#### 🔹 9. 🧑‍💻 Jakie są stany encji w JPA?
+#### 🔹 9. 🧑‍💻 ⭐⭐⭐ Jakie są stany encji w JPA?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -195,7 +195,7 @@ Tylko encje Managed podlegają dirty checking.
 
 ---
 
-#### 🔹 10. 🧑‍💻 Czym jest 1st level cache?
+#### 🔹 10. 🧑‍💻 ⭐⭐ Czym jest 1st level cache?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -210,7 +210,7 @@ Jest powiązany z EntityManager.
 
 ---
 
-#### 🔹 11. 🧑‍💻 Czym jest dirty checking?
+#### 🔹 11. 🧑‍💻 ⭐⭐ Czym jest dirty checking?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -225,7 +225,7 @@ Działa tylko dla encji Managed.
 
 ---
 
-#### 🔹 12. 🧑‍💻 Czym jest flush?
+#### 🔹 12. 🧑‍💻 ⭐ Czym jest flush?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -240,7 +240,7 @@ Może nastąpić:
 
 ---
 
-#### 🔹 13. 🧑‍💻 Czym jest N+1 problem?
+#### 🔹 13. 🧑‍💻 ⭐⭐⭐ Czym jest N+1 problem?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -258,7 +258,7 @@ Rozwiązania:
 
 ---
 
-#### 🔹 14. 🧑‍💻 Czym różni się FetchType.LAZY od EAGER?
+#### 🔹 14. 🧑‍💻 ⭐⭐⭐ Czym różni się FetchType.LAZY od EAGER?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -274,7 +274,7 @@ EAGER często prowadzi do problemów wydajnościowych.
 
 ---
 
-#### 🔹 15. 🧑‍💻 Czym jest LazyInitializationException?
+#### 🔹 15. 🧑‍💻 ⭐⭐ Czym jest LazyInitializationException?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -295,7 +295,7 @@ Rozwiązania:
 
 ## 3️⃣ SQL vs NoSQL i Architektoniczne Aspekty Danych
 
-#### 🔹 16. 🧑‍💻 Czym jest normalizacja i denormalizacja?
+#### 🔹 16. 🧑‍💻 ⭐⭐ Czym jest normalizacja i denormalizacja?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -314,7 +314,7 @@ Systemy analityczne / read-heavy → często denormalizacja.
 
 ---
 
-#### 🔹 17. 🧑‍💻 Czym jest twierdzenie CAP?
+#### 🔹 17. 🧑‍💻 ⭐⭐ Czym jest twierdzenie CAP?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -332,7 +332,7 @@ Wybór jest więc między:
 
 ---
 
-#### 🔹 18. 🧑‍💻 Czym różni się SQL od NoSQL?
+#### 🔹 18. 🧑‍💻 ⭐⭐ Czym różni się SQL od NoSQL?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -359,7 +359,7 @@ NoSQL lepszy dla:
 
 ---
 
-#### 🔹 19. 🧑‍💻 Czym jest eventual consistency?
+#### 🔹 19. 🧑‍💻 ⭐ Czym jest eventual consistency?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -376,7 +376,7 @@ Wymaga projektowania systemu z myślą o:
 
 ---
 
-#### 🔹 20. 🧑‍💻 Czym jest replikacja?
+#### 🔹 20. 🧑‍💻 ⭐ Czym jest replikacja?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -395,7 +395,7 @@ Wady:
 
 ---
 
-#### 🔹 21. 🧙‍♂️ Czym jest sharding?
+#### 🔹 21. 🧙‍♂️ ⭐⭐ Czym jest sharding?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -412,7 +412,7 @@ Wyzwania:
 
 ---
 
-#### 🔹 22. 🧙‍♂️ Jak skalować bazę danych?
+#### 🔹 22. 🧙‍♂️ ⭐⭐ Jak skalować bazę danych?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -428,7 +428,7 @@ W systemach o dużej skali często łączy się oba podejścia.
 
 ---
 
-#### 🔹 23. 🧙‍♂️ Czym jest WAL (Write-Ahead Log)?
+#### 🔹 23. 🧙‍♂️ ⭐ Czym jest WAL (Write-Ahead Log)?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -443,7 +443,7 @@ PostgreSQL, MySQL (binlog) i większość baz używa tej techniki.
 
 ---
 
-#### 🔹 24. 🧙‍♂️ Czym są read replicas i kiedy je stosować?
+#### 🔹 24. 🧙‍♂️ ⭐ Czym są read replicas i kiedy je stosować?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -460,7 +460,7 @@ Wyzwania:
 
 ---
 
-#### 🔹 25. 🧙‍♂️ Jak prawidłowo skonfigurować connection pool?
+#### 🔹 25. 🧙‍♂️ ⭐ Jak prawidłowo skonfigurować connection pool?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 

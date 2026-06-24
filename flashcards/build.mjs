@@ -40,11 +40,17 @@ function parseCards(content, catId) {
     const raw = headers[i][1].trim();
     const lvMatch = raw.match(/^(🧑‍💻|🧙‍♂️)\s+/);
     const level = lvMatch ? LEVEL[lvMatch[1]] : 'middle';
-    const question = raw.replace(/^(🧑‍💻|🧙‍♂️)\s+/, '');
+    let question = raw.replace(/^(🧑‍💻|🧙‍♂️)\s+/, '');
+    const starMatch = question.match(/^(⭐{1,3})\s+/);
+    const stars = starMatch ? starMatch[1].length : 2;
+    question = question.replace(/^(⭐{1,3})\s+/, '');
 
     const bodyStart = headers[i].index + headers[i][0].length + 1;
     const bodyEnd = i + 1 < headers.length ? headers[i + 1].index : content.length;
     let answer = content.slice(bodyStart, bodyEnd);
+
+    const sectionHeader = answer.match(/^##\s+.+$/m);
+    if (sectionHeader) answer = answer.slice(0, sectionHeader.index);
 
     // Remove the "✅ <span...>Odpowiedź</span>" line (first occurrence)
     answer = answer.replace(/✅ <span[^>]*>[^<]*<\/span>\n\n?/, '');
@@ -55,7 +61,7 @@ function parseCards(content, catId) {
 
     if (!question || !answer) continue;
 
-    cards.push({ id: `${catId}-${i}`, q: question, a: answer, level });
+    cards.push({ id: `${catId}-${i}`, q: question, a: answer, level, stars });
   }
 
   return cards;
