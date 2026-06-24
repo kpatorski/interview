@@ -639,6 +639,12 @@ async function buildFlashcardPdf(label, cards, filename) {
   const padX = 2.5, padTop = 2.2, padBottom = 1.5, labelSpace = 4.2;
   const innerW = cellW - 2 * padX;
 
+  function headerFor(card) {
+    const num = parseInt(card.id.match(/(\d+)$/)[1], 10) + 1; // card.id = `${catId}-${index in full category}`
+    const lvlLbl = card.level === 'senior' ? 'Senior' : 'Mid';
+    return `${label} · ${num} · ${lvlLbl}`;
+  }
+
   function drawCell(col, row, headerText, bodyText, maxFont, minFont) {
     const x = margin + col * cellW;
     const y = margin + row * cellH;
@@ -663,16 +669,14 @@ async function buildFlashcardPdf(label, cards, filename) {
 
     batch.forEach((card, idx) => { // front side: questions
       const col = idx % cols, row = Math.floor(idx / cols);
-      const lvlLbl = card.level === 'senior' ? 'Senior' : 'Mid';
-      drawCell(col, row, `${label} · ${lvlLbl}`, card.q, 9, 4.5);
+      drawCell(col, row, headerFor(card), card.q, 9, 4.5);
     });
 
     doc.addPage(); // back of the same sheet
     batch.forEach((card, idx) => { // back side: answers, columns mirrored across the long edge
       const col = idx % cols, row = Math.floor(idx / cols);
       const mirroredCol = cols - 1 - col;
-      const lvlLbl = card.level === 'senior' ? 'Senior' : 'Mid';
-      drawCell(mirroredCol, row, `${label} · ${lvlLbl}`, simplifyMd(card.a), 8, 4);
+      drawCell(mirroredCol, row, headerFor(card), simplifyMd(card.a), 8, 4);
     });
   }
 
