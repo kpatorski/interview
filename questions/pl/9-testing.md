@@ -23,7 +23,7 @@
 
 ## 1️⃣ Fundamenty Testowania
 
-#### 🔹 1. 🧑‍💻 Czym różni się test jednostkowy od integracyjnego?
+#### 🔹 1. 🧑‍💻 ⭐⭐⭐ Czym różni się test jednostkowy od integracyjnego?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -39,7 +39,7 @@ Test integracyjny:
 
 ---
 
-#### 🔹 2. 🧑‍💻 Czym jest test end-to-end (E2E)?
+#### 🔹 2. 🧑‍💻 ⭐⭐ Czym jest test end-to-end (E2E)?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -53,7 +53,7 @@ Test E2E testuje cały system jako całość.
 
 ## 2️⃣ Mockowanie i Izolacja
 
-#### 🔹 3. 🧑‍💻 Czym jest mock, stub i spy?
+#### 🔹 3. 🧑‍💻 ⭐⭐⭐ Czym jest mock, stub i spy?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -71,7 +71,7 @@ Spy:
 
 ---
 
-#### 🔹 4. 🧑‍💻 Kiedy mockowanie jest złym pomysłem?
+#### 🔹 4. 🧑‍💻 ⭐⭐ Kiedy mockowanie jest złym pomysłem?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -85,7 +85,7 @@ Preferować testowanie zachowania, nie implementacji.
 
 ## 3️⃣ Testy Integracyjne i Środowisko
 
-#### 🔹 5. 🧑‍💻 Czym jest Testcontainers i dlaczego jest użyteczny?
+#### 🔹 5. 🧑‍💻 ⭐⭐ Czym jest Testcontainers i dlaczego jest użyteczny?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -98,7 +98,7 @@ Zalety:
 
 ---
 
-#### 🔹 6. 🧑‍💻 Czym jest Contract Testing?
+#### 🔹 6. 🧑‍💻 ⭐ Czym jest Contract Testing?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -113,7 +113,7 @@ Zapobiega breaking changes w mikroserwisach.
 
 ## 4️⃣ Zaawansowane Techniki
 
-#### 🔹 7. 🧑‍💻 Czym jest TDD?
+#### 🔹 7. 🧑‍💻 ⭐⭐⭐ Czym jest TDD?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -129,7 +129,7 @@ Cel:
 
 ---
 
-#### 🔹 8. 🧙‍♂️ Czym jest property-based testing?
+#### 🔹 8. 🧙‍♂️ ⭐ Czym jest property-based testing?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -142,7 +142,7 @@ Generowane są losowe dane wejściowe.
 
 ---
 
-#### 🔹 9. 🧙‍♂️ Czym jest mutation testing?
+#### 🔹 9. 🧙‍♂️ ⭐ Czym jest mutation testing?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -154,7 +154,7 @@ Pozwala ocenić skuteczność testów, nie tylko ich pokrycie.
 
 ---
 
-#### 🔹 10. 🧙‍♂️ Czym jest piramida testów i dlaczego jest ważna?
+#### 🔹 10. 🧙‍♂️ ⭐⭐⭐ Czym jest piramida testów i dlaczego jest ważna?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -169,7 +169,7 @@ W mikroserwisach: unit + integration (Testcontainers) + contract testing (Pact).
 
 ---
 
-#### 🔹 11. 🧑‍💻 Czym jest BDD i czym różni się od TDD?
+#### 🔹 11. 🧑‍💻 ⭐⭐ Czym jest BDD i czym różni się od TDD?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -187,7 +187,7 @@ Narzędzia: Cucumber, JBehave. BDD nie zastępuje TDD — to uzupełniające pod
 
 ---
 
-#### 🔹 12. 🧑‍💻 Jak testować kod asynchroniczny?
+#### 🔹 12. 🧑‍💻 ⭐⭐ Jak testować kod asynchroniczny?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -207,7 +207,7 @@ Unikaj: `Thread.sleep()` — kruche i spowalnia testy.
 
 ---
 
-#### 🔹 13. 🧑‍💻 Czym są flaky tests i jak z nimi walczyć?
+#### 🔹 13. 🧑‍💻 ⭐⭐ Czym są flaky tests i jak z nimi walczyć?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -228,7 +228,7 @@ Walka:
 
 ---
 
-#### 🔹 14. 🧑‍💻 Czym jest Consumer-Driven Contract Testing (Pact)?
+#### 🔹 14. 🧑‍💻 ⭐ Czym jest Consumer-Driven Contract Testing (Pact)?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -245,7 +245,7 @@ Zalety vs E2E:
 
 ---
 
-#### 🔹 15. 🧑‍💻 Jak zarządzać danymi testowymi?
+#### 🔹 15. 🧑‍💻 ⭐ Jak zarządzać danymi testowymi?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -261,7 +261,7 @@ Unikaj: shared fixtures mutowane przez testy — prowadzi do flakyness.
 
 ---
 
-#### 🔹 16. 🧙‍♂️ Jak testować z zewnętrznymi serwisami (WireMock)?
+#### 🔹 16. 🧙‍♂️ ⭐⭐ Jak testować z zewnętrznymi serwisami (WireMock)?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -280,7 +280,7 @@ Spring Boot: `@WireMockTest` lub `WireMockServer` w Testcontainers.
 
 ---
 
-#### 🔹 17. 🧑‍💻 Czym jest architektura testów integracyjnych w Spring Boot?
+#### 🔹 17. 🧑‍💻 ⭐⭐ Czym jest architektura testów integracyjnych w Spring Boot?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -302,7 +302,7 @@ Optymalizacja:
 
 ---
 
-#### 🔹 18. 🧑‍💻 Czym jest performance testing i jakie narzędzia stosować?
+#### 🔹 18. 🧑‍💻 ⭐ Czym jest performance testing i jakie narzędzia stosować?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -321,7 +321,7 @@ Typy testów:
 
 ---
 
-#### 🔹 19. 🧑‍💻 Co oznacza "test behavior, not implementation"?
+#### 🔹 19. 🧑‍💻 ⭐⭐ Co oznacza "test behavior, not implementation"?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -335,7 +335,7 @@ Reguła: test powinien przejść po dowolnym refaktorze który nie zmienia obser
 
 ---
 
-#### 🔹 20. 🧑‍💻 Jak testować security w aplikacji?
+#### 🔹 20. 🧑‍💻 ⭐ Jak testować security w aplikacji?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -351,7 +351,7 @@ Minimum w CI: SAST + dependency scan przy każdym merge.
 
 ---
 
-#### 🔹 21. 🧙‍♂️ Jakie są anti-patterns w testowaniu?
+#### 🔹 21. 🧙‍♂️ ⭐ Jakie są anti-patterns w testowaniu?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -364,7 +364,7 @@ Minimum w CI: SAST + dependency scan przy każdym merge.
 
 ---
 
-#### 🔹 22. 🧑‍💻 Jak mierzyć jakość testów poza coverage?
+#### 🔹 22. 🧑‍💻 ⭐ Jak mierzyć jakość testów poza coverage?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -380,7 +380,7 @@ Lepsze metryki:
 
 ---
 
-#### 🔹 23. 🧙‍♂️ Czym jest Chaos Testing?
+#### 🔹 23. 🧙‍♂️ ⭐ Czym jest Chaos Testing?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -397,7 +397,7 @@ Różnica od load testing: nie chodzi o skalę, ale o awarie.
 
 ---
 
-#### 🔹 24. 🧙‍♂️ Jak testować distributed transactions (Saga)?
+#### 🔹 24. 🧙‍♂️ ⭐ Jak testować distributed transactions (Saga)?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -412,7 +412,7 @@ Strategie:
 
 ---
 
-#### 🔹 25. 🧙‍♂️ Czym jest Test Data Builder pattern?
+#### 🔹 25. 🧙‍♂️ ⭐ Czym jest Test Data Builder pattern?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 

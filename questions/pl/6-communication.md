@@ -23,7 +23,7 @@
 
 ## 1️⃣ REST i Semantyka HTTP
 
-#### 🔹 1. 🧑‍💻 Co oznacza idempotency w HTTP i które metody są idempotentne?
+#### 🔹 1. 🧑‍💻 ⭐⭐⭐ Co oznacza idempotency w HTTP i które metody są idempotentne?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -43,7 +43,7 @@ Idempotency jest kluczowa dla retry.
 
 ---
 
-#### 🔹 2. 🧑‍💻 Jakie są najważniejsze klasy kodów HTTP i jak ich używać?
+#### 🔹 2. 🧑‍💻 ⭐⭐⭐ Jakie są najważniejsze klasy kodów HTTP i jak ich używać?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -70,7 +70,7 @@ Poprawne statusy zwiększają czytelność API i ułatwiają integracje.
 
 ---
 
-#### 🔹 3. 🧑‍💻 Czym jest caching w HTTP?
+#### 🔹 3. 🧑‍💻 ⭐⭐ Czym jest caching w HTTP?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -87,7 +87,7 @@ ETag pozwala na walidację wersji zasobu (304 Not Modified).
 
 ## 2️⃣ gRPC
 
-#### 🔹 4. 🧙‍♂️ Czym jest gRPC i kiedy jest lepsze od REST?
+#### 🔹 4. 🧙‍♂️ ⭐⭐ Czym jest gRPC i kiedy jest lepsze od REST?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -108,7 +108,7 @@ REST częściej dla komunikacji z frontendem (łatwiejsze debugowanie i kompatyb
 
 ## 3️⃣ Messaging: Kafka vs RabbitMQ
 
-#### 🔹 5. 🧑‍💻 Kafka vs RabbitMQ — kluczowe różnice
+#### 🔹 5. 🧑‍💻 ⭐⭐⭐ Kafka vs RabbitMQ — kluczowe różnice
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -127,7 +127,7 @@ RabbitMQ świetny do work distribution.
 
 ---
 
-#### 🔹 6. 🧑‍💻 Co oznacza at-least-once, at-most-once, exactly-once delivery?
+#### 🔹 6. 🧑‍💻 ⭐⭐⭐ Co oznacza at-least-once, at-most-once, exactly-once delivery?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -149,7 +149,7 @@ W praktyce exactly-once jest trudne i zwykle osiąga się je przez:
 
 ---
 
-#### 🔹 7. 🧑‍💻 Jak radzić sobie z duplikatami wiadomości?
+#### 🔹 7. 🧑‍💻 ⭐⭐ Jak radzić sobie z duplikatami wiadomości?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -162,7 +162,7 @@ Techniki:
 
 ---
 
-#### 🔹 8. 🧙‍♂️ Czym jest ordering i dlaczego jest trudny?
+#### 🔹 8. 🧙‍♂️ ⭐⭐ Czym jest ordering i dlaczego jest trudny?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -179,7 +179,7 @@ Rozwiązanie:
 
 ## 4️⃣ Schema Evolution
 
-#### 🔹 9. 🧙‍♂️ Czym jest schema evolution?
+#### 🔹 9. 🧙‍♂️ ⭐⭐ Czym jest schema evolution?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -194,7 +194,7 @@ Protobuf/Avro wspierają kompatybilne zmiany lepiej niż "goły" JSON.
 
 ---
 
-#### 🔹 10. 🧙‍♂️ Czym jest Richardson Maturity Model?
+#### 🔹 10. 🧙‍♂️ ⭐ Czym jest Richardson Maturity Model?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -209,7 +209,7 @@ Większość "REST" API w praktyce jest na poziomie 2.
 
 ---
 
-#### 🔹 11. 🧑‍💻 WebSocket vs SSE vs Long Polling — kiedy co?
+#### 🔹 11. 🧑‍💻 ⭐⭐ WebSocket vs SSE vs Long Polling — kiedy co?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -230,7 +230,7 @@ Większość "REST" API w praktyce jest na poziomie 2.
 
 ---
 
-#### 🔹 12. 🧑‍💻 Czym jest GraphQL i jakie są jego wady i zalety?
+#### 🔹 12. 🧑‍💻 ⭐⭐ Czym jest GraphQL i jakie są jego wady i zalety?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -251,7 +251,7 @@ Dobre do: BFF (Backend For Frontend), złożone frontendowe wymagania.
 
 ---
 
-#### 🔹 13. 🧑‍💻 Czym jest Webhook i czym różni się od pollingu?
+#### 🔹 13. 🧑‍💻 ⭐⭐ Czym jest Webhook i czym różni się od pollingu?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -268,7 +268,7 @@ Ważne przy odbiorze webhooków:
 
 ---
 
-#### 🔹 14. 🧑‍💻 Czym jest API Pagination i jakie są strategie?
+#### 🔹 14. 🧑‍💻 ⭐⭐ Czym jest API Pagination i jakie są strategie?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -285,7 +285,7 @@ Cursor to standard dla API produkcyjnych przy dużych zbiorach.
 
 ---
 
-#### 🔹 15. 🧑‍💻 Czym jest Content Negotiation?
+#### 🔹 15. 🧑‍💻 ⭐ Czym jest Content Negotiation?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -301,7 +301,7 @@ Pozwala serwerowi obsługiwać JSON, XML, Protobuf z tego samego endpointu.
 
 ---
 
-#### 🔹 16. 🧙‍♂️ Czym jest Correlation ID?
+#### 🔹 16. 🧙‍♂️ ⭐⭐ Czym jest Correlation ID?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -318,7 +318,7 @@ Implementacja:
 
 ---
 
-#### 🔹 17. 🧑‍💻 HTTP/2 vs HTTP/1.1 — kluczowe różnice
+#### 🔹 17. 🧑‍💻 ⭐ HTTP/2 vs HTTP/1.1 — kluczowe różnice
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -332,7 +332,7 @@ gRPC wymaga HTTP/2. Dla REST typowo HTTP/1.1 jest wystarczający, ale HTTP/2 pop
 
 ---
 
-#### 🔹 18. 🧑‍💻 Protobuf vs JSON vs Avro — kiedy co?
+#### 🔹 18. 🧑‍💻 ⭐⭐ Protobuf vs JSON vs Avro — kiedy co?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -349,7 +349,7 @@ Wybór:
 
 ---
 
-#### 🔹 19. 🧙‍♂️ Czym jest HATEOAS?
+#### 🔹 19. 🧙‍♂️ ⭐ Czym jest HATEOAS?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -372,7 +372,7 @@ W praktyce rzadko stosowane (złożoność > korzyść).
 
 ---
 
-#### 🔹 20. 🧑‍💻 Czym jest rate limiting na poziomie API?
+#### 🔹 20. 🧑‍💻 ⭐⭐ Czym jest rate limiting na poziomie API?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -393,7 +393,7 @@ Implementacja: API Gateway (Kong, AWS API GW), Redis (token bucket).
 
 ---
 
-#### 🔹 21. 🧙‍♂️ Czym jest OpenAPI/Swagger?
+#### 🔹 21. 🧙‍♂️ ⭐⭐ Czym jest OpenAPI/Swagger?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -411,7 +411,7 @@ Design-first vs code-first to wybór zależny od procesu — design-first lepiej
 
 ---
 
-#### 🔹 22. 🧑‍💻 Czym jest Circuit Breaker na poziomie HTTP?
+#### 🔹 22. 🧑‍💻 ⭐⭐ Czym jest Circuit Breaker na poziomie HTTP?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -427,7 +427,7 @@ Kluczowe: ustawić sensowny `timeout` przed circuit breakerem — bez timeoutu O
 
 ---
 
-#### 🔹 23. 🧑‍💻 Czym jest connection keep-alive i connection pooling w HTTP?
+#### 🔹 23. 🧑‍💻 ⭐ Czym jest connection keep-alive i connection pooling w HTTP?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -442,7 +442,7 @@ W RestTemplate/WebClient — skonfiguruj pool, nie używaj domyślnego klienta b
 
 ---
 
-#### 🔹 24. 🧑‍💻 Czym jest mTLS i kiedy go używać?
+#### 🔹 24. 🧑‍💻 ⭐ Czym jest mTLS i kiedy go używać?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -460,7 +460,7 @@ Zarządzanie certyfikatami to główna złożoność — HashiCorp Vault PKI lub
 
 ---
 
-#### 🔹 25. 🧑‍💻 Czym jest Request Hedging?
+#### 🔹 25. 🧑‍💻 ⭐ Czym jest Request Hedging?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -477,7 +477,7 @@ Popularne w Google (opisane w "The Tail at Scale" Jeff Dean).
 
 ---
 
-#### 🔹 26. 🧙‍♂️ Jak Kafka decyduje, który event trafia do której partycji?
+#### 🔹 26. 🧙‍♂️ ⭐⭐ Jak Kafka decyduje, który event trafia do której partycji?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -495,7 +495,7 @@ Zmiana liczby partycji zaburza routing dla istniejących kluczy — zrób to prz
 
 ---
 
-#### 🔹 27. 🧙‍♂️ Czym jest consumer group i zasada 1 partycja = 1 konsumer?
+#### 🔹 27. 🧙‍♂️ ⭐⭐ Czym jest consumer group i zasada 1 partycja = 1 konsumer?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -513,7 +513,7 @@ Różne consumer groups (np. billing-service i audit-service) czytają te same p
 
 ---
 
-#### 🔹 28. 🧙‍♂️ Kto zakłada Kafka topic i w jaki sposób?
+#### 🔹 28. 🧙‍♂️ ⭐ Kto zakłada Kafka topic i w jaki sposób?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -538,7 +538,7 @@ Na produkcji zawsze wyłącz auto-create i zarządzaj topicami jako kodem (wersj
 
 ---
 
-#### 🔹 29. 🧑‍💻 Jakich heurystyk używać przy podziale eventów na topiki?
+#### 🔹 29. 🧑‍💻 ⭐ Jakich heurystyk używać przy podziale eventów na topiki?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
@@ -558,7 +558,7 @@ Zaleta: gwarantowany ordering wszystkich eventów jednego agregatu (jeden klucz 
 
 ---
 
-#### 🔹 30. 🧙‍♂️ Czym jest Retry-After i jak działa?
+#### 🔹 30. 🧙‍♂️ ⭐ Czym jest Retry-After i jak działa?
 
 ✅ <span style='color:##a9b8c6;font-weight:bold;font-size:small'>Odpowiedź</span>
 
