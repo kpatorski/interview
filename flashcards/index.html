@@ -225,6 +225,33 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe 
   </div>
 </div>
 
+<!-- PDF RANGE DIALOG -->
+<div class="overlay" id="pdf-range-dlg">
+  <div class="dlg">
+    <h3 id="pdf-range-title" style="margin-bottom:6px;"></h3>
+    <p id="pdf-range-hint" style="margin-bottom:14px;"></p>
+    <label class="lvl-opt">
+      <input type="radio" name="pdf-range-mode" value="all" id="pr-all" checked onchange="updatePdfRangeInput()">
+      <div class="lvl-opt-info">
+        <div class="lvl-opt-title">Wszystkie fiszki</div>
+      </div>
+    </label>
+    <label class="lvl-opt">
+      <input type="radio" name="pdf-range-mode" value="range" id="pr-range" onchange="updatePdfRangeInput()">
+      <div class="lvl-opt-info">
+        <div class="lvl-opt-title">Wybrany zakres numerów</div>
+        <div class="lvl-opt-sub">np. 1-15,23,30-32 (numery jak na karcie)</div>
+      </div>
+    </label>
+    <input type="text" id="pdf-range-input" placeholder="np. 1-15,23,30-32" disabled
+      style="width:100%;margin-top:8px;padding:9px 11px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:.85rem;">
+    <div class="dlg-btns" style="margin-top:14px;">
+      <button class="btn-cancel" onclick="hidePdfRangeDlg()">Anuluj</button>
+      <button class="btn-confirm" style="background:var(--accent);color:#0f172a" onclick="confirmPdfRange()">📄 Generuj</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ─── Data & state ─────────────────────────────────────────────────────────────
 let DATA = null;
@@ -331,8 +358,8 @@ function renderHome() {
     el.innerHTML=`<div class="cat-info"><div class="cat-name">${cat.label}</div>`+
       `<div class="cat-meta">${ok}/${cat.cards.length} poznanych</div>`+
       `<div class="cat-pdf-row">`+
-        `<button class="pdf-btn" ${midCount?'':'disabled'} onclick="event.stopPropagation();generatePdf('${cat.id}','middle',this)">📄 PDF mid (${midCount})</button>`+
-        `<button class="pdf-btn" onclick="event.stopPropagation();generatePdf('${cat.id}','all',this)">📄 PDF all (${cat.cards.length})</button>`+
+        `<button class="pdf-btn" ${midCount?'':'disabled'} onclick="event.stopPropagation();openPdfRangeDlg('${cat.id}','middle',this)">📄 PDF mid (${midCount})</button>`+
+        `<button class="pdf-btn" onclick="event.stopPropagation();openPdfRangeDlg('${cat.id}','all',this)">📄 PDF all (${cat.cards.length})</button>`+
       `</div>`+
     `</div>${badge}`;
     list.appendChild(el);
@@ -361,6 +388,10 @@ function catCards(catId) {
   if (catId === '__all__') DATA.categories.forEach(c => all.push(...c.cards));
   else { const c = DATA.categories.find(x => x.id === catId); if (c) all = c.cards; }
   return all;
+}
+
+function cardNumber(card) {
+  return parseInt(card.id.match(/(\d+)$/)[1], 10) + 1; // card.id = `${catId}-${index in full category}`
 }
 
 function filterByLevel(cards, level) {
@@ -641,9 +672,8 @@ async function buildFlashcardPdf(label, cards, filename) {
   const innerW = cellW - 2 * padX;
 
   function headerFor(card) {
-    const num = parseInt(card.id.match(/(\d+)$/)[1], 10) + 1; // card.id = `${catId}-${index in full category}`
     const lvlLbl = card.level === 'senior' ? 'Senior' : 'Mid';
-    return `${label} · ${num} · ${lvlLbl}`;
+    return `${label} · ${cardNumber(card)} · ${lvlLbl}`;
   }
 
   function drawCell(col, row, headerText, starsCount, bodyText, maxFont, minFont) {
@@ -686,11 +716,67 @@ async function buildFlashcardPdf(label, cards, filename) {
   doc.save(filename);
 }
 
-async function generatePdf(catId, level, btn) {
+let pendingPdf = null;
+
+function openPdfRangeDlg(catId, level, btn) {
   const cat = DATA.categories.find(c => c.id === catId);
   if (!cat) return;
-  const cards = filterByLevel(cat.cards, level);
-  if (!cards.length) { alert('Brak fiszek do wygenerowania.'); return; }
+  pendingPdf = { catId, level, btn };
+  document.getElementById('pdf-range-title').textContent = `${cat.label} · PDF (${level === 'middle' ? 'mid' : 'all'})`;
+  document.getElementById('pdf-range-hint').textContent = `Numery fiszek w tej kategorii: 1–${cat.cards.length}`;
+  document.getElementById('pr-all').checked = true;
+  document.getElementById('pdf-range-input').value = '';
+  updatePdfRangeInput();
+  document.getElementById('pdf-range-dlg').classList.add('show');
+}
+
+function hidePdfRangeDlg() {
+  document.getElementById('pdf-range-dlg').classList.remove('show');
+  pendingPdf = null;
+}
+
+function updatePdfRangeInput() {
+  const isRange = document.getElementById('pr-range').checked;
+  const input = document.getElementById('pdf-range-input');
+  input.disabled = !isRange;
+  if (isRange) input.focus();
+}
+
+function parseRangeSpec(spec) {
+  const nums = new Set();
+  for (let part of spec.split(',')) {
+    part = part.trim();
+    if (!part) continue;
+    const range = part.match(/^(\d+)\s*-\s*(\d+)$/);
+    if (range) {
+      let [a, b] = [parseInt(range[1], 10), parseInt(range[2], 10)];
+      if (a > b) [a, b] = [b, a];
+      for (let n = a; n <= b; n++) nums.add(n);
+    } else if (/^\d+$/.test(part)) {
+      nums.add(parseInt(part, 10));
+    }
+  }
+  return nums;
+}
+
+function confirmPdfRange() {
+  if (!pendingPdf) return;
+  const { catId, level, btn } = pendingPdf;
+  let numbers = null;
+  if (document.getElementById('pr-range').checked) {
+    numbers = parseRangeSpec(document.getElementById('pdf-range-input').value);
+    if (!numbers.size) { alert('Podaj poprawny zakres, np. 1-15,23,30-32'); return; }
+  }
+  hidePdfRangeDlg();
+  generatePdf(catId, level, btn, numbers);
+}
+
+async function generatePdf(catId, level, btn, numbers) {
+  const cat = DATA.categories.find(c => c.id === catId);
+  if (!cat) return;
+  let cards = filterByLevel(cat.cards, level);
+  if (numbers) cards = cards.filter(c => numbers.has(cardNumber(c)));
+  if (!cards.length) { alert('Brak fiszek do wygenerowania (sprawdź zakres numerów).'); return; }
 
   const orig = btn.textContent;
   btn.disabled = true; btn.textContent = '⏳ Generuję…';
