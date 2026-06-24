@@ -55,7 +55,7 @@
         {
           "id": "jvm-8",
           "q": "Jak działa Garbage Collector w skrócie?",
-          "a": "GC usuwa obiekty, do których nie ma referencji.\n\nGłówne etapy:\n1. Mark — oznaczenie obiektów osiągalnych\n2. Sweep — usunięcie nieosiągalnych\n3. Compact — defragmentacja\n\nNowoczesne GC:\n- G1\n- ZGC\n- Shenandoah\n\n\n---\n\n## 2️⃣ Współbieżność (Concurrency)",
+          "a": "GC usuwa obiekty, do których nie ma referencji.\n\nGłówne etapy:\n1. Mark — oznaczenie obiektów osiągalnych\n2. Sweep — usunięcie nieosiągalnych\n3. Compact — defragmentacja\n\nNowoczesne GC:\n- G1\n- ZGC\n- Shenandoah",
           "level": "middle"
         },
         {
@@ -181,7 +181,7 @@
         {
           "id": "jvm-29",
           "q": "Czym jest backpressure?",
-          "a": "Backpressure to mechanizm kontroli przepływu danych między producentem a konsumentem.\n\nProblem:\n- Producent generuje dane szybciej niż konsument je przetwarza.\n- Może to prowadzić do przepełnienia pamięci.\n\nRozwiązania:\n- Ograniczone kolejki (bounded queue).\n- Odrzucanie zadań.\n- Reactive Streams (request(n)).\n\nW kontekście ThreadPoolExecutor:\n- Ograniczenie workQueue zapobiega niekontrolowanemu wzrostowi pamięci.\n\n\n---\n\n## 3️⃣ Kolekcje i Struktury Danych",
+          "a": "Backpressure to mechanizm kontroli przepływu danych między producentem a konsumentem.\n\nProblem:\n- Producent generuje dane szybciej niż konsument je przetwarza.\n- Może to prowadzić do przepełnienia pamięci.\n\nRozwiązania:\n- Ograniczone kolejki (bounded queue).\n- Odrzucanie zadań.\n- Reactive Streams (request(n)).\n\nW kontekście ThreadPoolExecutor:\n- Ograniczenie workQueue zapobiega niekontrolowanemu wzrostowi pamięci.",
           "level": "middle"
         },
         {
@@ -229,7 +229,7 @@
         {
           "id": "jvm-37",
           "q": "Jakie są złożoności czasowe (Big-O) podstawowych kolekcji?",
-          "a": "HashMap:\n- get/put: O(1) średnio, O(log n) przy drzewie.\n\nArrayList:\n- get: O(1)\n- add (na końcu): O(1) amortyzowane\n- insert/remove w środku: O(n)\n\nLinkedList:\n- get: O(n)\n- add/remove na początku: O(1)\n\nTreeMap:\n- get/put: O(log n)\n\n\n---\n\n## 4️⃣ Stream API",
+          "a": "HashMap:\n- get/put: O(1) średnio, O(log n) przy drzewie.\n\nArrayList:\n- get: O(1)\n- add (na końcu): O(1) amortyzowane\n- insert/remove w środku: O(n)\n\nLinkedList:\n- get: O(n)\n- add/remove na początku: O(1)\n\nTreeMap:\n- get/put: O(log n)",
           "level": "middle"
         },
         {
@@ -277,7 +277,7 @@
         {
           "id": "jvm-45",
           "q": "Czym różni się forEach od forEachOrdered?",
-          "a": "forEach:\n- Nie gwarantuje kolejności w parallel stream.\n- Szybszy.\n\nforEachOrdered:\n- Zachowuje kolejność źródła.\n- Może ograniczać równoległość.\n\nW sequential stream działają identycznie.\n\n\n---\n\n## 5️⃣ Typy, OOP i Generics",
+          "a": "forEach:\n- Nie gwarantuje kolejności w parallel stream.\n- Szybszy.\n\nforEachOrdered:\n- Zachowuje kolejność źródła.\n- Może ograniczać równoległość.\n\nW sequential stream działają identycznie.",
           "level": "senior"
         },
         {
@@ -325,7 +325,7 @@
         {
           "id": "jvm-53",
           "q": "Czym są value-based classes?",
-          "a": "Value-based class:\n- Reprezentuje wartość, nie tożsamość.\n- Nie należy polegać na referencyjnej równości (==).\n\nPrzykład: Integer, Optional.\n\nW przyszłości Project Valhalla wprowadzi value types bez narzutu obiektowego.\n\n\n\n---\n\n## 6️⃣ IO / NIO",
+          "a": "Value-based class:\n- Reprezentuje wartość, nie tożsamość.\n- Nie należy polegać na referencyjnej równości (==).\n\nPrzykład: Integer, Optional.\n\nW przyszłości Project Valhalla wprowadzi value types bez narzutu obiektowego.",
           "level": "senior"
         },
         {
@@ -355,7 +355,7 @@
         {
           "id": "jvm-58",
           "q": "Czym jest memory-mapped file?",
-          "a": "Memory-mapped file (MappedByteBuffer):\n- Mapuje plik bezpośrednio do pamięci.\n- OS zarządza synchronizacją z dyskiem.\n\nZalety:\n- Szybki dostęp do dużych plików.\n- Brak kopiowania danych między buforami.\n\nWady:\n- Trudniejsze zarządzanie pamięcią.\n\n---\n\n## 7️⃣ Wyjątki i API Design",
+          "a": "Memory-mapped file (MappedByteBuffer):\n- Mapuje plik bezpośrednio do pamięci.\n- OS zarządza synchronizacją z dyskiem.\n\nZalety:\n- Szybki dostęp do dużych plików.\n- Brak kopiowania danych między buforami.\n\nWady:\n- Trudniejsze zarządzanie pamięcią.",
           "level": "middle"
         },
         {
@@ -427,7 +427,7 @@
         {
           "id": "spring-5",
           "q": "Czym jest @Primary i @Qualifier?",
-          "a": "Jeśli istnieje wiele implementacji interfejsu:\n\n@Primary — wskazuje domyślny bean.\n@Qualifier — pozwala wybrać konkretną implementację.\n\nZapobiega NoUniqueBeanDefinitionException.\n\n\n---\n\n## 2️⃣ @Transactional (Mechanizm Transakcji)",
+          "a": "Jeśli istnieje wiele implementacji interfejsu:\n\n@Primary — wskazuje domyślny bean.\n@Qualifier — pozwala wybrać konkretną implementację.\n\nZapobiega NoUniqueBeanDefinitionException.",
           "level": "middle"
         },
         {
@@ -463,7 +463,7 @@
         {
           "id": "spring-11",
           "q": "Czym jest TransactionManager?",
-          "a": "PlatformTransactionManager zarządza cyklem życia transakcji.\n\nImplementacje:\n- DataSourceTransactionManager (JDBC).\n- JpaTransactionManager (JPA).\n- JtaTransactionManager (rozproszone transakcje).\n\nOdpowiada za:\n- begin,\n- commit,\n- rollback,\n- zarządzanie zasobami (Connection).\n\n\n---\n\n## 3️⃣ Spring AOP",
+          "a": "PlatformTransactionManager zarządza cyklem życia transakcji.\n\nImplementacje:\n- DataSourceTransactionManager (JDBC).\n- JpaTransactionManager (JPA).\n- JtaTransactionManager (rozproszone transakcje).\n\nOdpowiada za:\n- begin,\n- commit,\n- rollback,\n- zarządzanie zasobami (Connection).",
           "level": "middle"
         },
         {
@@ -499,7 +499,7 @@
         {
           "id": "spring-17",
           "q": "Czym jest pointcut?",
-          "a": "Pointcut definiuje, które metody mają być objęte aspektem.\n\nPrzykład:\nexecution(* com.example.service.*.*(..))\n\nMoże bazować na:\n- pakiecie,\n- nazwie metody,\n- adnotacji.\n\nPointcut + Advice = Aspect.\n\n\n---\n\n## 🚀 4️⃣ Spring Boot",
+          "a": "Pointcut definiuje, które metody mają być objęte aspektem.\n\nPrzykład:\nexecution(* com.example.service.*.*(..))\n\nMoże bazować na:\n- pakiecie,\n- nazwie metody,\n- adnotacji.\n\nPointcut + Advice = Aspect.",
           "level": "senior"
         },
         {
@@ -541,7 +541,7 @@
         {
           "id": "spring-24",
           "q": "Czym jest Spring Boot Actuator?",
-          "a": "Actuator dostarcza endpointy monitorujące aplikację.\n\nPrzykłady:\n- /actuator/health\n- /actuator/metrics\n- /actuator/env\n- /actuator/info\n\nPozwala monitorować:\n- stan aplikacji,\n- metryki,\n- konfigurację.\n\nCzęsto używany z Prometheus.\n\n\n---\n\n## 🔐 5️⃣ Spring Security",
+          "a": "Actuator dostarcza endpointy monitorujące aplikację.\n\nPrzykłady:\n- /actuator/health\n- /actuator/metrics\n- /actuator/env\n- /actuator/info\n\nPozwala monitorować:\n- stan aplikacji,\n- metryki,\n- konfigurację.\n\nCzęsto używany z Prometheus.",
           "level": "middle"
         },
         {
@@ -637,7 +637,7 @@
         {
           "id": "db-6",
           "q": "Czym jest connection pool?",
-          "a": "Connection pool zarządza pulą połączeń do bazy.\n\nZamiast tworzyć połączenie przy każdym zapytaniu:\n- połączenia są utrzymywane i ponownie wykorzystywane.\n\nNajpopularniejszy: HikariCP.\n\nParametry:\n- maximumPoolSize\n- connectionTimeout\n- idleTimeout\n\nZmniejsza koszt tworzenia połączeń.\n\n\n---\n\n## 2️⃣ JPA Internals",
+          "a": "Connection pool zarządza pulą połączeń do bazy.\n\nZamiast tworzyć połączenie przy każdym zapytaniu:\n- połączenia są utrzymywane i ponownie wykorzystywane.\n\nNajpopularniejszy: HikariCP.\n\nParametry:\n- maximumPoolSize\n- connectionTimeout\n- idleTimeout\n\nZmniejsza koszt tworzenia połączeń.",
           "level": "middle"
         },
         {
@@ -685,7 +685,7 @@
         {
           "id": "db-14",
           "q": "Czym jest LazyInitializationException?",
-          "a": "Występuje gdy:\n- Próbujemy odczytać relację LAZY,\n- Po zamknięciu Persistence Context.\n\nTypowy przypadek:\n- Dostęp do relacji poza transakcją.\n\nRozwiązania:\n- DTO projection,\n- JOIN FETCH,\n- OpenSessionInView (niezalecane w architekturze czystej).\n\n\n---\n\n## 3️⃣ SQL vs NoSQL i Architektoniczne Aspekty Danych",
+          "a": "Występuje gdy:\n- Próbujemy odczytać relację LAZY,\n- Po zamknięciu Persistence Context.\n\nTypowy przypadek:\n- Dostęp do relacji poza transakcją.\n\nRozwiązania:\n- DTO projection,\n- JOIN FETCH,\n- OpenSessionInView (niezalecane w architekturze czystej).",
           "level": "middle"
         },
         {
@@ -763,7 +763,7 @@
         {
           "id": "arch-1",
           "q": "Czym jest Dependency Inversion Principle?",
-          "a": "Dependency Inversion Principle (DIP):\n\n- Moduły wysokiego poziomu nie powinny zależeć od modułów niskiego poziomu.\n- Oba powinny zależeć od abstrakcji.\n\nPrzykład:\n- Serwis biznesowy zależy od interfejsu Repozytorium.\n- Implementacja repozytorium zależy od bazy danych.\n\nZmniejsza sprzężenie i ułatwia testowanie.\n\n---\n\n## 2️⃣ Clean / Hexagonal / Onion",
+          "a": "Dependency Inversion Principle (DIP):\n\n- Moduły wysokiego poziomu nie powinny zależeć od modułów niskiego poziomu.\n- Oba powinny zależeć od abstrakcji.\n\nPrzykład:\n- Serwis biznesowy zależy od interfejsu Repozytorium.\n- Implementacja repozytorium zależy od bazy danych.\n\nZmniejsza sprzężenie i ułatwia testowanie.",
           "level": "middle"
         },
         {
@@ -781,7 +781,7 @@
         {
           "id": "arch-4",
           "q": "Czym jest Onion Architecture?",
-          "a": "Onion Architecture:\n- Warstwy koncentryczne.\n- Rdzeń domenowy w środku.\n- Zależności skierowane do środka.\n\nPodobna do Clean i Hexagonal — różni się nazewnictwem i akcentem.\n\n---\n\n## 3️⃣ Domain-Driven Design (DDD)",
+          "a": "Onion Architecture:\n- Warstwy koncentryczne.\n- Rdzeń domenowy w środku.\n- Zależności skierowane do środka.\n\nPodobna do Clean i Hexagonal — różni się nazewnictwem i akcentem.",
           "level": "senior"
         },
         {
@@ -805,7 +805,7 @@
         {
           "id": "arch-8",
           "q": "Czym jest Event Sourcing?",
-          "a": "Event Sourcing:\n- Stan systemu przechowywany jako sekwencja zdarzeń.\n- Aktualny stan rekonstruowany przez odtworzenie zdarzeń.\n\nZalety:\n- Pełna historia.\n- Audytowalność.\n\nWyzwania:\n- Migracje eventów.\n- Złożoność.\n\n---\n\n## 4️⃣ Modularność i Skalowanie",
+          "a": "Event Sourcing:\n- Stan systemu przechowywany jako sekwencja zdarzeń.\n- Aktualny stan rekonstruowany przez odtworzenie zdarzeń.\n\nZalety:\n- Pełna historia.\n- Audytowalność.\n\nWyzwania:\n- Migracje eventów.\n- Złożoność.",
           "level": "senior"
         },
         {
@@ -925,7 +925,7 @@
         {
           "id": "micro-2",
           "q": "Czym jest API Gateway?",
-          "a": "API Gateway to punkt wejścia do systemu mikroserwisów.\n\nFunkcje:\n- routing,\n- auth,\n- rate limiting,\n- agregacja danych,\n- observability.\n\nZaleta:\n- klient nie musi znać topologii mikroserwisów.\n\nRyzyko:\n- single point of failure (trzeba skalować i zabezpieczać).\n\n---\n\n## 2️⃣ Odporność i Stabilność",
+          "a": "API Gateway to punkt wejścia do systemu mikroserwisów.\n\nFunkcje:\n- routing,\n- auth,\n- rate limiting,\n- agregacja danych,\n- observability.\n\nZaleta:\n- klient nie musi znać topologii mikroserwisów.\n\nRyzyko:\n- single point of failure (trzeba skalować i zabezpieczać).",
           "level": "middle"
         },
         {
@@ -943,7 +943,7 @@
         {
           "id": "micro-5",
           "q": "Czym jest idempotency i jak ją osiągnąć?",
-          "a": "Idempotency oznacza, że wielokrotne wykonanie tej samej operacji daje ten sam efekt.\n\nPrzykład:\n- PUT jest idempotentny,\n- POST zwykle nie.\n\nTechniki:\n- Idempotency-Key przechowywany po stronie serwera,\n- deduplikacja komunikatów,\n- naturalny klucz biznesowy.\n\n---\n\n## 3️⃣ Spójność w systemie rozproszonym",
+          "a": "Idempotency oznacza, że wielokrotne wykonanie tej samej operacji daje ten sam efekt.\n\nPrzykład:\n- PUT jest idempotentny,\n- POST zwykle nie.\n\nTechniki:\n- Idempotency-Key przechowywany po stronie serwera,\n- deduplikacja komunikatów,\n- naturalny klucz biznesowy.",
           "level": "middle"
         },
         {
@@ -961,7 +961,7 @@
         {
           "id": "micro-8",
           "q": "Dlaczego współdzielona baza danych między mikroserwisami jest problemem?",
-          "a": "Współdzielona baza:\n- zwiększa sprzężenie,\n- wymusza wspólne wdrożenia,\n- utrudnia niezależną ewolucję schematu,\n- zwiększa ryzyko blokad i konfliktów.\n\nZasada: Database per service.\n\n---\n\n## 4️⃣ Obserwowalność",
+          "a": "Współdzielona baza:\n- zwiększa sprzężenie,\n- wymusza wspólne wdrożenia,\n- utrudnia niezależną ewolucję schematu,\n- zwiększa ryzyko blokad i konfliktów.\n\nZasada: Database per service.",
           "level": "senior"
         },
         {
@@ -1081,13 +1081,13 @@
         {
           "id": "comm-2",
           "q": "Czym jest caching w HTTP?",
-          "a": "Caching pozwala ograniczyć liczbę requestów i poprawić wydajność.\n\nMechanizmy:\n- Cache-Control\n- ETag + If-None-Match\n- Last-Modified + If-Modified-Since\n\nETag pozwala na walidację wersji zasobu (304 Not Modified).\n\n---\n\n## 2️⃣ gRPC",
+          "a": "Caching pozwala ograniczyć liczbę requestów i poprawić wydajność.\n\nMechanizmy:\n- Cache-Control\n- ETag + If-None-Match\n- Last-Modified + If-Modified-Since\n\nETag pozwala na walidację wersji zasobu (304 Not Modified).",
           "level": "middle"
         },
         {
           "id": "comm-3",
           "q": "Czym jest gRPC i kiedy jest lepsze od REST?",
-          "a": "gRPC:\n- Protokół RPC oparty o HTTP/2.\n- Używa Protobuf.\n- Wspiera streaming.\n\nLepsze niż REST gdy:\n- potrzebujemy niskiej latencji,\n- komunikacja serwis-serwis,\n- silne kontrakty typów,\n- streaming.\n\nREST częściej dla komunikacji z frontendem (łatwiejsze debugowanie i kompatybilność).\n\n---\n\n## 3️⃣ Messaging: Kafka vs RabbitMQ",
+          "a": "gRPC:\n- Protokół RPC oparty o HTTP/2.\n- Używa Protobuf.\n- Wspiera streaming.\n\nLepsze niż REST gdy:\n- potrzebujemy niskiej latencji,\n- komunikacja serwis-serwis,\n- silne kontrakty typów,\n- streaming.\n\nREST częściej dla komunikacji z frontendem (łatwiejsze debugowanie i kompatybilność).",
           "level": "senior"
         },
         {
@@ -1111,7 +1111,7 @@
         {
           "id": "comm-7",
           "q": "Czym jest ordering i dlaczego jest trudny?",
-          "a": "Ordering oznacza zachowanie kolejności zdarzeń.\n\nWyzwania:\n- partycje w Kafka — ordering jest gwarantowany tylko w obrębie partycji.\n- równoległe konsumpcje.\n\nRozwiązanie:\n- klucz partycji oparty o agregat (np. aggregateId).\n\n---\n\n## 4️⃣ Schema Evolution",
+          "a": "Ordering oznacza zachowanie kolejności zdarzeń.\n\nWyzwania:\n- partycje w Kafka — ordering jest gwarantowany tylko w obrębie partycji.\n- równoległe konsumpcje.\n\nRozwiązanie:\n- klucz partycji oparty o agregat (np. aggregateId).",
           "level": "senior"
         },
         {
@@ -1261,13 +1261,13 @@
         {
           "id": "devops-1",
           "q": "Co powinno znaleźć się w dobrym Dockerfile dla aplikacji Java?",
-          "a": "Dobre praktyki:\n- Multi-stage build (osobno build i runtime).\n- Użycie lekkiego obrazu runtime (np. JRE zamiast JDK).\n- Uruchamianie jako non-root.\n- Stabilne warstwy (kopiuj najpierw pliki zależności, potem kod).\n- Parametry JVM dostosowane do kontenera (pamięć, GC).\n\nCel: mały obraz, szybki build, bezpieczeństwo.\n\n---\n\n## 2️⃣ CI/CD",
+          "a": "Dobre praktyki:\n- Multi-stage build (osobno build i runtime).\n- Użycie lekkiego obrazu runtime (np. JRE zamiast JDK).\n- Uruchamianie jako non-root.\n- Stabilne warstwy (kopiuj najpierw pliki zależności, potem kod).\n- Parametry JVM dostosowane do kontenera (pamięć, GC).\n\nCel: mały obraz, szybki build, bezpieczeństwo.",
           "level": "middle"
         },
         {
           "id": "devops-2",
           "q": "Czym jest CI/CD i jakie są typowe etapy pipeline?",
-          "a": "CI (Continuous Integration):\n- Częste integrowanie zmian.\n- Automatyczne budowanie i testy.\n\nCD (Continuous Delivery/Deployment):\n- Automatyczne dostarczanie na środowiska.\n- Deployment — automatyczne wdrożenie na produkcję.\n\nTypowe etapy:\n- build\n- unit tests\n- static analysis (np. Sonar)\n- integration tests (np. Testcontainers)\n- package (jar/docker)\n- deploy\n\n---\n\n## 3️⃣ Monitoring i Observability",
+          "a": "CI (Continuous Integration):\n- Częste integrowanie zmian.\n- Automatyczne budowanie i testy.\n\nCD (Continuous Delivery/Deployment):\n- Automatyczne dostarczanie na środowiska.\n- Deployment — automatyczne wdrożenie na produkcję.\n\nTypowe etapy:\n- build\n- unit tests\n- static analysis (np. Sonar)\n- integration tests (np. Testcontainers)\n- package (jar/docker)\n- deploy",
           "level": "middle"
         },
         {
@@ -1285,7 +1285,7 @@
         {
           "id": "devops-5",
           "q": "Czym jest distributed tracing?",
-          "a": "Distributed tracing śledzi przebieg jednego requestu przez wiele usług.\n\nPojęcia:\n- Trace — całe żądanie end-to-end.\n- Span — pojedynczy krok (np. HTTP call, DB query).\n\nWymaga propagacji:\n- traceId\n- spanId\n\nPozwala diagnozować:\n- wąskie gardła,\n- opóźnienia,\n- błędy w komunikacji.\n\n---\n\n## 4️⃣ Health Checks i Deploy",
+          "a": "Distributed tracing śledzi przebieg jednego requestu przez wiele usług.\n\nPojęcia:\n- Trace — całe żądanie end-to-end.\n- Span — pojedynczy krok (np. HTTP call, DB query).\n\nWymaga propagacji:\n- traceId\n- spanId\n\nPozwala diagnozować:\n- wąskie gardła,\n- opóźnienia,\n- błędy w komunikacji.",
           "level": "middle"
         },
         {
@@ -1297,7 +1297,7 @@
         {
           "id": "devops-7",
           "q": "Blue/Green vs Canary — czym się różnią?",
-          "a": "Blue/Green:\n- Dwa środowiska: stare (blue) i nowe (green).\n- Przełączenie ruchu na green.\n- Szybki rollback przez powrót na blue.\n\nCanary:\n- Nowa wersja dostaje mały procent ruchu.\n- Stopniowe zwiększanie.\n- Pozwala wykryć problemy zanim dotkną wszystkich.\n\n---\n\n## 5️⃣ Skalowanie",
+          "a": "Blue/Green:\n- Dwa środowiska: stare (blue) i nowe (green).\n- Przełączenie ruchu na green.\n- Szybki rollback przez powrót na blue.\n\nCanary:\n- Nowa wersja dostaje mały procent ruchu.\n- Stopniowe zwiększanie.\n- Pozwala wykryć problemy zanim dotkną wszystkich.",
           "level": "middle"
         },
         {
@@ -1417,13 +1417,13 @@
         {
           "id": "sec-1",
           "q": "Czym jest salt i dlaczego jest ważny?",
-          "a": "Salt to losowa wartość dodawana do hasła przed haszowaniem.\n\nZapobiega:\n- atakom rainbow table,\n- identycznym hashom dla tych samych haseł.\n\nKażde hasło powinno mieć unikalny salt.\n\n---\n\n## 2️⃣ TLS i Transport",
+          "a": "Salt to losowa wartość dodawana do hasła przed haszowaniem.\n\nZapobiega:\n- atakom rainbow table,\n- identycznym hashom dla tych samych haseł.\n\nKażde hasło powinno mieć unikalny salt.",
           "level": "middle"
         },
         {
           "id": "sec-2",
           "q": "Jak działa TLS w skrócie?",
-          "a": "TLS zapewnia poufność i integralność komunikacji.\n\nProces:\n1. Handshake.\n2. Wymiana kluczy (asymetryczna kryptografia).\n3. Ustalenie klucza symetrycznego.\n4. Szyfrowana komunikacja.\n\nChroni przed:\n- podsłuchem,\n- modyfikacją danych.\n\n---\n\n## 3️⃣ OWASP i Najczęstsze Ataki",
+          "a": "TLS zapewnia poufność i integralność komunikacji.\n\nProces:\n1. Handshake.\n2. Wymiana kluczy (asymetryczna kryptografia).\n3. Ustalenie klucza symetrycznego.\n4. Szyfrowana komunikacja.\n\nChroni przed:\n- podsłuchem,\n- modyfikacją danych.",
           "level": "middle"
         },
         {
@@ -1441,7 +1441,7 @@
         {
           "id": "sec-5",
           "q": "Czym jest CSRF?",
-          "a": "CSRF (Cross-Site Request Forgery):\n- Wysłanie żądania w imieniu zalogowanego użytkownika bez jego wiedzy.\n\nOchrona:\n- CSRF token,\n- SameSite cookies.\n\n---\n\n## 4️⃣ Autoryzacja i Dostęp",
+          "a": "CSRF (Cross-Site Request Forgery):\n- Wysłanie żądania w imieniu zalogowanego użytkownika bez jego wiedzy.\n\nOchrona:\n- CSRF token,\n- SameSite cookies.",
           "level": "middle"
         },
         {
@@ -1573,7 +1573,7 @@
         {
           "id": "test-1",
           "q": "Czym jest test end-to-end (E2E)?",
-          "a": "Test E2E testuje cały system jako całość.\n\n- Obejmuje warstwę HTTP, bazę danych, integracje.\n- Symuluje zachowanie użytkownika.\n- Najbardziej realistyczny, ale najwolniejszy i najbardziej kruchy.\n\n---\n\n## 2️⃣ Mockowanie i Izolacja",
+          "a": "Test E2E testuje cały system jako całość.\n\n- Obejmuje warstwę HTTP, bazę danych, integracje.\n- Symuluje zachowanie użytkownika.\n- Najbardziej realistyczny, ale najwolniejszy i najbardziej kruchy.",
           "level": "middle"
         },
         {
@@ -1585,7 +1585,7 @@
         {
           "id": "test-3",
           "q": "Kiedy mockowanie jest złym pomysłem?",
-          "a": "- Gdy test staje się testem implementacji zamiast zachowania.\n- Gdy mockujemy zbyt wiele zależności.\n- Gdy test jest kruchy przy refaktorze.\n\nPreferować testowanie zachowania, nie implementacji.\n\n---\n\n## 3️⃣ Testy Integracyjne i Środowisko",
+          "a": "- Gdy test staje się testem implementacji zamiast zachowania.\n- Gdy mockujemy zbyt wiele zależności.\n- Gdy test jest kruchy przy refaktorze.\n\nPreferować testowanie zachowania, nie implementacji.",
           "level": "middle"
         },
         {
@@ -1597,7 +1597,7 @@
         {
           "id": "test-5",
           "q": "Czym jest Contract Testing?",
-          "a": "Contract Testing weryfikuje zgodność między serwisami.\n\n- Consumer definiuje kontrakt.\n- Provider musi go spełniać.\n\nZapobiega breaking changes w mikroserwisach.\n\n---\n\n## 4️⃣ Zaawansowane Techniki",
+          "a": "Contract Testing weryfikuje zgodność między serwisami.\n\n- Consumer definiuje kontrakt.\n- Provider musi go spełniać.\n\nZapobiega breaking changes w mikroserwisach.",
           "level": "middle"
         },
         {
@@ -1729,7 +1729,7 @@
         {
           "id": "perf-1",
           "q": "Czym jest bottleneck i jak go znaleźć?",
-          "a": "Bottleneck to element systemu ograniczający wydajność całości.\n\nMoże to być:\n- CPU,\n- baza danych,\n- I/O,\n- lock contention,\n- sieć.\n\nIdentyfikacja:\n- Profilowanie CPU,\n- analiza metryk,\n- distributed tracing,\n- analiza GC.\n\nOptymalizuje się wąskie gardło, nie wszystko naraz.\n\n---\n\n## 2️⃣ JVM Profilowanie",
+          "a": "Bottleneck to element systemu ograniczający wydajność całości.\n\nMoże to być:\n- CPU,\n- baza danych,\n- I/O,\n- lock contention,\n- sieć.\n\nIdentyfikacja:\n- Profilowanie CPU,\n- analiza metryk,\n- distributed tracing,\n- analiza GC.\n\nOptymalizuje się wąskie gardło, nie wszystko naraz.",
           "level": "middle"
         },
         {
@@ -1747,13 +1747,13 @@
         {
           "id": "perf-4",
           "q": "Jak działa Garbage Collection i kiedy może być problemem?",
-          "a": "GC usuwa nieosiągalne obiekty.\n\nProblem gdy:\n- długie pauzy (Stop-The-World),\n- zbyt częste kolekcje,\n- wysokie allocation rate.\n\nRozwiązania:\n- zmiana GC (G1, ZGC),\n- tuning heap size,\n- zmniejszenie tworzenia obiektów.\n\n---\n\n## 3️⃣ Analiza Algorytmiczna",
+          "a": "GC usuwa nieosiągalne obiekty.\n\nProblem gdy:\n- długie pauzy (Stop-The-World),\n- zbyt częste kolekcje,\n- wysokie allocation rate.\n\nRozwiązania:\n- zmiana GC (G1, ZGC),\n- tuning heap size,\n- zmniejszenie tworzenia obiektów.",
           "level": "middle"
         },
         {
           "id": "perf-5",
           "q": "Dlaczego Big-O jest ważne w systemach backendowych?",
-          "a": "Big-O opisuje złożoność algorytmu względem rozmiaru danych.\n\nPrzykład:\n- O(1) — stały czas,\n- O(log n) — logarytmiczny,\n- O(n) — liniowy,\n- O(n²) — kwadratowy.\n\nPrzy dużej skali różnice stają się krytyczne.\n\n---\n\n## 4️⃣ Load Testing",
+          "a": "Big-O opisuje złożoność algorytmu względem rozmiaru danych.\n\nPrzykład:\n- O(1) — stały czas,\n- O(log n) — logarytmiczny,\n- O(n) — liniowy,\n- O(n²) — kwadratowy.\n\nPrzy dużej skali różnice stają się krytyczne.",
           "level": "middle"
         },
         {
@@ -1885,7 +1885,7 @@
         {
           "id": "sys-1",
           "q": "Jak rozumieć CAP w praktyce projektowej?",
-          "a": "W systemach rozproszonych Partition Tolerance jest obowiązkowe.\n\nPozostaje wybór między:\n- Consistency (CP)\n- Availability (AP)\n\nSystem finansowy → preferuje CP.\nSystem social media → często AP.\n\nProjekt musi uwzględniać konsekwencje chwilowej niespójności.\n\n---\n\n## 2️⃣ Projektowanie pod Skalę",
+          "a": "W systemach rozproszonych Partition Tolerance jest obowiązkowe.\n\nPozostaje wybór między:\n- Consistency (CP)\n- Availability (AP)\n\nSystem finansowy → preferuje CP.\nSystem social media → często AP.\n\nProjekt musi uwzględniać konsekwencje chwilowej niespójności.",
           "level": "senior"
         },
         {
@@ -1897,7 +1897,7 @@
         {
           "id": "sys-3",
           "q": "Czym jest latency budget?",
-          "a": "Latency budget to maksymalny czas odpowiedzi systemu rozłożony na komponenty.\n\nPrzykład:\n- API ma 300ms SLA.\n- DB może użyć 100ms.\n- Zewnętrzny serwis 80ms.\n- Reszta to logika.\n\nPomaga kontrolować zależności i unikać kaskadowych opóźnień.\n\n---\n\n## 3️⃣ Projektowanie na Awarię",
+          "a": "Latency budget to maksymalny czas odpowiedzi systemu rozłożony na komponenty.\n\nPrzykład:\n- API ma 300ms SLA.\n- DB może użyć 100ms.\n- Zewnętrzny serwis 80ms.\n- Reszta to logika.\n\nPomaga kontrolować zależności i unikać kaskadowych opóźnień.",
           "level": "senior"
         },
         {
@@ -1909,19 +1909,19 @@
         {
           "id": "sys-5",
           "q": "Czym jest graceful degradation?",
-          "a": "Graceful degradation oznacza, że przy awarii części systemu:\n- system nadal działa,\n- ale z ograniczoną funkcjonalnością.\n\nPrzykład:\n- brak rekomendacji, ale działa koszyk zakupowy.\n\n---\n\n## 4️⃣ Backpressure i Przepływ Danych",
+          "a": "Graceful degradation oznacza, że przy awarii części systemu:\n- system nadal działa,\n- ale z ograniczoną funkcjonalnością.\n\nPrzykład:\n- brak rekomendacji, ale działa koszyk zakupowy.",
           "level": "senior"
         },
         {
           "id": "sys-6",
           "q": "Czym jest backpressure na poziomie systemowym?",
-          "a": "Backpressure to kontrola przepływu danych między komponentami.\n\nBez backpressure:\n- kolejki rosną,\n- pamięć się wyczerpuje,\n- system się zapada.\n\nMechanizmy:\n- bounded queues,\n- rate limiting,\n- reactive streams (request(n)).\n\n---\n\n## 5️⃣ Failure Modes i Analiza Ryzyka",
+          "a": "Backpressure to kontrola przepływu danych między komponentami.\n\nBez backpressure:\n- kolejki rosną,\n- pamięć się wyczerpuje,\n- system się zapada.\n\nMechanizmy:\n- bounded queues,\n- rate limiting,\n- reactive streams (request(n)).",
           "level": "senior"
         },
         {
           "id": "sys-7",
           "q": "Jak analizować failure modes systemu?",
-          "a": "Należy zidentyfikować:\n- pojedyncze punkty awarii (SPOF),\n- zależności zewnętrzne,\n- operacje długotrwałe,\n- miejsca blokad.\n\nStosowane techniki:\n- Chaos engineering,\n- testy awarii,\n- analiza scenariuszy (\"what if\").\n\nCelem jest zwiększenie odporności systemu.\n\n---\n\n## 6️⃣ Myślenie Długoterminowe",
+          "a": "Należy zidentyfikować:\n- pojedyncze punkty awarii (SPOF),\n- zależności zewnętrzne,\n- operacje długotrwałe,\n- miejsca blokad.\n\nStosowane techniki:\n- Chaos engineering,\n- testy awarii,\n- analiza scenariuszy (\"what if\").\n\nCelem jest zwiększenie odporności systemu.",
           "level": "senior"
         },
         {
@@ -2059,7 +2059,7 @@
         {
           "id": "api-4",
           "q": "Jak obsługiwać backward compatibility?",
-          "a": "Zmiany bezpieczne (non-breaking):\n- dodanie nowego pola w response,\n- dodanie opcjonalnego pola w request,\n- nowy endpoint,\n- nowy query param (opcjonalny).\n\nZmiany breaking:\n- usunięcie pola,\n- zmiana semantyki istniejącego pola,\n- zmiana kodu HTTP,\n- nowe wymagane pole w request.\n\nZasada Postela dla konsumenta: \"be liberal in what you accept\" — ignoruj nieznane pola w JSON.\n\nTestowanie: Consumer-Driven Contract (Pact) wykrywa breaking changes przed release.\n\n---\n\n## 2️⃣ Walidacja i obsługa błędów w Spring",
+          "a": "Zmiany bezpieczne (non-breaking):\n- dodanie nowego pola w response,\n- dodanie opcjonalnego pola w request,\n- nowy endpoint,\n- nowy query param (opcjonalny).\n\nZmiany breaking:\n- usunięcie pola,\n- zmiana semantyki istniejącego pola,\n- zmiana kodu HTTP,\n- nowe wymagane pole w request.\n\nZasada Postela dla konsumenta: \"be liberal in what you accept\" — ignoruj nieznane pola w JSON.\n\nTestowanie: Consumer-Driven Contract (Pact) wykrywa breaking changes przed release.",
           "level": "middle"
         },
         {
@@ -2077,7 +2077,7 @@
         {
           "id": "api-7",
           "q": "Czym jest @Validated i czym różni się od @Valid?",
-          "a": "`@Valid` — standard JSR-380, kaskadowa walidacja (rekurencja na polach obiektu).\n\n`@Validated` — Spring-specific, obsługuje **validation groups**.\n\n```java\ninterface OnCreate {}\ninterface OnUpdate {}\n\nrecord ProductRequest(\n    @NotNull(groups = OnCreate.class) String name,\n    @NotNull(groups = {OnCreate.class, OnUpdate.class}) BigDecimal price\n) {}\n\n@PostMapping @Validated(OnCreate.class) create(@RequestBody ProductRequest req)\n@PutMapping  @Validated(OnUpdate.class) update(@RequestBody ProductRequest req)\n```\n\n`@Validated` na klasie service-owej włącza walidację parametrów metod (method-level validation via AOP).\n\n---\n\n## 3️⃣ Bezpieczeństwo API",
+          "a": "`@Valid` — standard JSR-380, kaskadowa walidacja (rekurencja na polach obiektu).\n\n`@Validated` — Spring-specific, obsługuje **validation groups**.\n\n```java\ninterface OnCreate {}\ninterface OnUpdate {}\n\nrecord ProductRequest(\n    @NotNull(groups = OnCreate.class) String name,\n    @NotNull(groups = {OnCreate.class, OnUpdate.class}) BigDecimal price\n) {}\n\n@PostMapping @Validated(OnCreate.class) create(@RequestBody ProductRequest req)\n@PutMapping  @Validated(OnUpdate.class) update(@RequestBody ProductRequest req)\n```\n\n`@Validated` na klasie service-owej włącza walidację parametrów metod (method-level validation via AOP).",
           "level": "senior"
         },
         {
@@ -2107,7 +2107,7 @@
         {
           "id": "api-12",
           "q": "Jak skonfigurować CORS w Spring Security?",
-          "a": "Dla publicznego API serwowanego z innej domeny niż frontend — CORS musi być skonfigurowany przez Spring, nie przez `@CrossOrigin` (nie działa z Spring Security).\n\n```java\n@Bean\nCorsConfigurationSource corsConfig() {\n    var config = new CorsConfiguration();\n    config.setAllowedOrigins(List.of(\"https://app.example.com\"));\n    config.setAllowedMethods(List.of(\"GET\",\"POST\",\"PUT\",\"DELETE\",\"OPTIONS\"));\n    config.setAllowedHeaders(List.of(\"Authorization\",\"Content-Type\"));\n    config.setMaxAge(3600L); // cache preflight\n\n    var source = new UrlBasedCorsConfigurationSource();\n    source.registerCorsConfiguration(\"/api/**\", config);\n    return source;\n}\n\n// W HttpSecurity:\n.cors(cors -> cors.configurationSource(corsConfig()))\n```\n\nWildcard `*` w `allowedOrigins` nie działa z `allowCredentials(true)`.\n\n---\n\n## 4️⃣ API Gateway",
+          "a": "Dla publicznego API serwowanego z innej domeny niż frontend — CORS musi być skonfigurowany przez Spring, nie przez `@CrossOrigin` (nie działa z Spring Security).\n\n```java\n@Bean\nCorsConfigurationSource corsConfig() {\n    var config = new CorsConfiguration();\n    config.setAllowedOrigins(List.of(\"https://app.example.com\"));\n    config.setAllowedMethods(List.of(\"GET\",\"POST\",\"PUT\",\"DELETE\",\"OPTIONS\"));\n    config.setAllowedHeaders(List.of(\"Authorization\",\"Content-Type\"));\n    config.setMaxAge(3600L); // cache preflight\n\n    var source = new UrlBasedCorsConfigurationSource();\n    source.registerCorsConfiguration(\"/api/**\", config);\n    return source;\n}\n\n// W HttpSecurity:\n.cors(cors -> cors.configurationSource(corsConfig()))\n```\n\nWildcard `*` w `allowedOrigins` nie działa z `allowCredentials(true)`.",
           "level": "middle"
         },
         {
@@ -2125,7 +2125,7 @@
         {
           "id": "api-15",
           "q": "Czym jest Spring Cloud Gateway?",
-          "a": "Spring Cloud Gateway to reaktywny API Gateway oparty na Netty i Project Reactor.\n\nKonfiguracja:\n```yaml\nspring.cloud.gateway.routes:\n  - id: order-service\n    uri: lb://order-service  # service discovery\n    predicates:\n      - Path=/api/orders/**\n    filters:\n      - StripPrefix=1\n      - AddRequestHeader=X-Gateway-Source,scg\n      - name: CircuitBreaker\n        args: { name: orderCB, fallbackUri: forward:/fallback }\n      - name: RequestRateLimiter\n        args: { redis-rate-limiter.replenishRate: 100 }\n```\n\nFiltr globalny: `GlobalFilter` dla auth, correlation ID, logging.\n\nReaktywny = nie blokuje wątków przy I/O — idealny do proxy i aggregation z wieloma upstream.\n\n---\n\n## 5️⃣ Caching i idempotency dla API",
+          "a": "Spring Cloud Gateway to reaktywny API Gateway oparty na Netty i Project Reactor.\n\nKonfiguracja:\n```yaml\nspring.cloud.gateway.routes:\n  - id: order-service\n    uri: lb://order-service  # service discovery\n    predicates:\n      - Path=/api/orders/**\n    filters:\n      - StripPrefix=1\n      - AddRequestHeader=X-Gateway-Source,scg\n      - name: CircuitBreaker\n        args: { name: orderCB, fallbackUri: forward:/fallback }\n      - name: RequestRateLimiter\n        args: { redis-rate-limiter.replenishRate: 100 }\n```\n\nFiltr globalny: `GlobalFilter` dla auth, correlation ID, logging.\n\nReaktywny = nie blokuje wątków przy I/O — idealny do proxy i aggregation z wieloma upstream.",
           "level": "senior"
         },
         {
@@ -2137,7 +2137,7 @@
         {
           "id": "api-17",
           "q": "Czym jest Idempotency-Key i jak go implementować?",
-          "a": "Problem: klient nie wie czy request dotarł (timeout) → powtarza POST → duplikat transakcji.\n\nRozwiązanie: klient wysyła unikalny `Idempotency-Key: <uuid>` w nagłówku.\n\n```\nPOST /payments\nIdempotency-Key: 3d9f7c82-1234-5678-abcd-ef0123456789\n```\n\nImplementacja serwera:\n1. Sprawdź Redis: czy klucz już istnieje?\n2. Jeśli tak — zwróć zapamiętaną odpowiedź.\n3. Jeśli nie — przetwórz, zapisz `{key → response}` w Redis z TTL (np. 24h).\n\nWażne: zapis do Redis powinien być atomowy z przetworzeniem (lub optimistic lock) — race condition przy równoległych requestach.\n\nStripe, Adyen, Wise — wszystkie implementują ten wzorzec.\n\n---\n\n## 6️⃣ Observability API",
+          "a": "Problem: klient nie wie czy request dotarł (timeout) → powtarza POST → duplikat transakcji.\n\nRozwiązanie: klient wysyła unikalny `Idempotency-Key: <uuid>` w nagłówku.\n\n```\nPOST /payments\nIdempotency-Key: 3d9f7c82-1234-5678-abcd-ef0123456789\n```\n\nImplementacja serwera:\n1. Sprawdź Redis: czy klucz już istnieje?\n2. Jeśli tak — zwróć zapamiętaną odpowiedź.\n3. Jeśli nie — przetwórz, zapisz `{key → response}` w Redis z TTL (np. 24h).\n\nWażne: zapis do Redis powinien być atomowy z przetworzeniem (lub optimistic lock) — race condition przy równoległych requestach.\n\nStripe, Adyen, Wise — wszystkie implementują ten wzorzec.",
           "level": "senior"
         },
         {
@@ -2155,7 +2155,7 @@
         {
           "id": "api-20",
           "q": "Jakie metryki SLO definiować dla publicznego API?",
-          "a": "Typowe SLI/SLO dla REST API:\n\n**Availability**: `% żądań bez 5xx` → SLO: 99.9% (43min downtime/miesiąc).\n\n**Latency**: `p99 < 500ms` dla endpointów read, `p99 < 1s` dla write.\n\n**Error rate**: `% 4xx i 5xx` → alert gdy > 1% na 5 min window.\n\n**Throughput**: req/s jako baseline — alert gdy < 50% normy.\n\nAlerting:\n- Prometheus `ALERTS` + Alertmanager,\n- PagerDuty/OpsGenie przy breach SLO,\n- error budget burn rate alert (szybsze reakcje niż threshold).\n\n---\n\n## 7️⃣ Zaawansowane wzorce",
+          "a": "Typowe SLI/SLO dla REST API:\n\n**Availability**: `% żądań bez 5xx` → SLO: 99.9% (43min downtime/miesiąc).\n\n**Latency**: `p99 < 500ms` dla endpointów read, `p99 < 1s` dla write.\n\n**Error rate**: `% 4xx i 5xx` → alert gdy > 1% na 5 min window.\n\n**Throughput**: req/s jako baseline — alert gdy < 50% normy.\n\nAlerting:\n- Prometheus `ALERTS` + Alertmanager,\n- PagerDuty/OpsGenie przy breach SLO,\n- error budget burn rate alert (szybsze reakcje niż threshold).",
           "level": "senior"
         },
         {
@@ -2269,7 +2269,7 @@
         {
           "id": "angular-12",
           "q": "Czym jest standalone component (Angular 14+)?",
-          "a": "Standalone component nie należy do żadnego NgModule — deklaruje własne importy.\n\n```typescript\n@Component({\n  standalone: true,\n  selector: 'app-hero',\n  imports: [CommonModule, RouterModule],  // importowane bezpośrednio\n  template: `<h1>{{ hero.name }}</h1>`\n})\nexport class HeroComponent {}\n```\n\n**Korzyści:**\n- Prostszy model mentalny\n- Lepsza tree-shaking\n- Lazy loading bez modułów: `loadComponent: () => import('./hero.component').then(m => m.HeroComponent)`\n- Angular zaleca standalone dla nowych projektów (Angular 17+: domyślny)\n\n---\n\n## 2️⃣ Components & Templates (Senior)",
+          "a": "Standalone component nie należy do żadnego NgModule — deklaruje własne importy.\n\n```typescript\n@Component({\n  standalone: true,\n  selector: 'app-hero',\n  imports: [CommonModule, RouterModule],  // importowane bezpośrednio\n  template: `<h1>{{ hero.name }}</h1>`\n})\nexport class HeroComponent {}\n```\n\n**Korzyści:**\n- Prostszy model mentalny\n- Lepsza tree-shaking\n- Lazy loading bez modułów: `loadComponent: () => import('./hero.component').then(m => m.HeroComponent)`\n- Angular zaleca standalone dla nowych projektów (Angular 17+: domyślny)",
           "level": "middle"
         },
         {
@@ -2449,7 +2449,7 @@
         {
           "id": "react-12",
           "q": "Co to jest lazy initializer w useState?",
-          "a": "Jeśli wartość inicjalna wymaga kosztownych obliczeń, przekaż funkcję (nie wartość) do `useState`. React wywoła ją tylko przy pierwszym renderze.\n\n```jsx\n// ❌ Źle: getExpensiveValue() wywoływane przy każdym renderze\nconst [state, setState] = useState(getExpensiveValue());\n\n// ✅ Dobrze: funkcja wywołana tylko raz (lazy initializer)\nconst [state, setState] = useState(() => getExpensiveValue());\n\n// Praktyczny przykład:\nconst [filters, setFilters] = useState(() =>\n  JSON.parse(localStorage.getItem('filters') ?? '{}')\n);\n```\n\n---\n\n## 2️⃣ Advanced / Senior",
+          "a": "Jeśli wartość inicjalna wymaga kosztownych obliczeń, przekaż funkcję (nie wartość) do `useState`. React wywoła ją tylko przy pierwszym renderze.\n\n```jsx\n// ❌ Źle: getExpensiveValue() wywoływane przy każdym renderze\nconst [state, setState] = useState(getExpensiveValue());\n\n// ✅ Dobrze: funkcja wywołana tylko raz (lazy initializer)\nconst [state, setState] = useState(() => getExpensiveValue());\n\n// Praktyczny przykład:\nconst [filters, setFilters] = useState(() =>\n  JSON.parse(localStorage.getItem('filters') ?? '{}')\n);\n```",
           "level": "middle"
         },
         {

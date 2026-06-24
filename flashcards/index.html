@@ -43,6 +43,13 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe 
 .foot{display:flex;gap:10px;margin-top:22px;padding-bottom:16px;flex-wrap:wrap;}
 .lnk{font-size:.7rem;color:var(--muted);background:none;border:none;cursor:pointer;text-decoration:underline;}
 
+/* ── PDF BUTTONS ── */
+.cat-pdf-row{display:flex;gap:6px;margin-top:7px;}
+.pdf-btn{font-size:.62rem;padding:3px 8px;border-radius:6px;border:1px solid var(--border);
+  background:none;color:var(--muted);cursor:pointer;white-space:nowrap;}
+.pdf-btn:hover:not(:disabled){border-color:var(--accent);color:var(--accent);}
+.pdf-btn:disabled{opacity:.3;cursor:default;}
+
 /* ── LEVEL DIALOG ── */
 .lvl-opt{display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:10px;
   border:1px solid var(--border);cursor:pointer;transition:border-color .15s;margin-bottom:8px;}
@@ -310,6 +317,7 @@ function renderHome() {
       else ok++;
     }
     totDue+=due; totNew+=nw; totOk+=ok;
+    const midCount = cat.cards.filter(c=>c.level==='middle').length;
 
     const el = document.createElement('div');
     el.className='cat-item'+(due===0&&nw===0?' dim':'');
@@ -321,7 +329,12 @@ function renderHome() {
     else badge=`<span class="badge bdg-ok">✓ gotowe</span>`;
 
     el.innerHTML=`<div class="cat-info"><div class="cat-name">${cat.label}</div>`+
-      `<div class="cat-meta">${ok}/${cat.cards.length} poznanych</div></div>${badge}`;
+      `<div class="cat-meta">${ok}/${cat.cards.length} poznanych</div>`+
+      `<div class="cat-pdf-row">`+
+        `<button class="pdf-btn" ${midCount?'':'disabled'} onclick="event.stopPropagation();generatePdf('${cat.id}','middle',this)">📄 PDF mid (${midCount})</button>`+
+        `<button class="pdf-btn" onclick="event.stopPropagation();generatePdf('${cat.id}','all',this)">📄 PDF all (${cat.cards.length})</button>`+
+      `</div>`+
+    `</div>${badge}`;
     list.appendChild(el);
   }
 
@@ -540,6 +553,140 @@ function renderMd(md) {
   closeLists();
   if (inCode&&codeLines.length) out+=`<pre><code>${escH(codeLines.join('\n'))}</code></pre>`;
   return out;
+}
+
+// ─── PDF export ───────────────────────────────────────────────────────────────
+let jsPdfPromise = null;
+function ensureJsPDF() {
+  if (window.jspdf) return Promise.resolve();
+  if (jsPdfPromise) return jsPdfPromise;
+  jsPdfPromise = new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = './vendor/jspdf.umd.min.js';
+    s.onload = resolve;
+    s.onerror = () => { jsPdfPromise = null; reject(new Error('jsPDF load failed')); };
+    document.head.appendChild(s);
+  });
+  return jsPdfPromise;
+}
+
+let dejaVuFontPromise = null;
+function arrayBufferToBase64(buf) {
+  let binary = '';
+  const bytes = new Uint8Array(buf);
+  const chunk = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunk) binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
+  return btoa(binary);
+}
+function ensureDejaVuFont(doc) {
+  if (!dejaVuFontPromise) {
+    dejaVuFontPromise = fetch('./vendor/DejaVuSans.ttf').then(r => r.arrayBuffer()).then(arrayBufferToBase64);
+  }
+  return dejaVuFontPromise.then(base64 => {
+    doc.addFileToVFS('DejaVuSans.ttf', base64);
+    doc.addFont('DejaVuSans.ttf', 'DejaVuSans', 'normal');
+    doc.setFont('DejaVuSans', 'normal');
+  });
+}
+
+function simplifyMd(md) {
+  return md.split('\n').map(line => {
+    let t = line.trim();
+    if (!t) return '';
+    if (/^```/.test(t)) return '';
+    if (/^-{3,}$/.test(t)) return '';
+    t = t.replace(/<span[^>]*>([^<]*)<\/span>/g, '$1');
+    const h = t.match(/^#{1,6}\s+(.+)$/);
+    if (h) t = h[1];
+    t = t.replace(/^[-*]\s+/, '• ');
+    t = t.replace(/^>\s?/, '');
+    t = t.replace(/\*\*([^*\n]+)\*\*/g, '$1');
+    t = t.replace(/\*([^*\n]+)\*/g, '$1');
+    t = t.replace(/`([^`\n]+)`/g, '$1');
+    t = t.replace(/~~([^~]+)~~/g, '$1');
+    return t;
+  }).filter(Boolean).join('\n');
+}
+
+function fitFontSize(doc, text, maxW, maxH, maxSize, minSize) {
+  for (let size = maxSize; size >= minSize; size -= 0.5) {
+    doc.setFontSize(size);
+    const lines = doc.splitTextToSize(text, maxW);
+    const lineH = size * 0.3528 * 1.15;
+    if (lines.length * lineH <= maxH) return { size, lines, lineH };
+  }
+  doc.setFontSize(minSize);
+  const lineH = minSize * 0.3528 * 1.15;
+  const maxLines = Math.max(1, Math.floor(maxH / lineH));
+  let lines = doc.splitTextToSize(text, maxW);
+  if (lines.length > maxLines) {
+    lines = lines.slice(0, maxLines);
+    lines[maxLines - 1] = lines[maxLines - 1].replace(/.{0,3}$/, '…');
+  }
+  return { size: minSize, lines, lineH };
+}
+
+async function buildFlashcardPdf(label, cards, filename) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  await ensureDejaVuFont(doc);
+  const pageW = 210, pageH = 297, margin = 8;
+  const cols = 4, finalRows = 3;
+  const cellW = (pageW - 2 * margin) / cols;
+  const cellH = (pageH - 2 * margin) / (finalRows * 2);
+  const perPage = cols * finalRows;
+  const padX = 2.5, padTop = 2.2, padBottom = 1.5, labelSpace = 4.2;
+  const innerW = cellW - 2 * padX;
+
+  cards.forEach((card, idx) => {
+    const onPage = idx % perPage;
+    if (idx > 0 && onPage === 0) doc.addPage();
+    const col = onPage % cols;
+    const finalRow = Math.floor(onPage / cols);
+    const x = margin + col * cellW;
+    const yTop = margin + finalRow * 2 * cellH;
+
+    doc.setDrawColor(180);
+    doc.setLineWidth(0.15);
+    doc.rect(x, yTop, cellW, cellH * 2);
+    doc.setLineDashPattern([1, 1], 0);
+    doc.line(x, yTop + cellH, x + cellW, yTop + cellH);
+    doc.setLineDashPattern([], 0);
+
+    doc.setTextColor(140);
+    doc.setFontSize(5.5);
+    doc.text(label, x + padX, yTop + padTop + 1.4);
+
+    doc.setTextColor(20);
+    const q = fitFontSize(doc, card.q, innerW, cellH - padTop - padBottom - labelSpace, 9, 4.5);
+    doc.setFontSize(q.size);
+    doc.text(q.lines, x + padX, yTop + padTop + labelSpace + q.size * 0.3528, { lineHeightFactor: 1.15 });
+
+    const aText = simplifyMd(card.a);
+    const a = fitFontSize(doc, aText, innerW, cellH - padTop - padBottom, 8, 4);
+    doc.setFontSize(a.size);
+    doc.text(a.lines, x + padX, yTop + cellH + padTop + a.size * 0.3528, { lineHeightFactor: 1.15 });
+  });
+
+  doc.save(filename);
+}
+
+async function generatePdf(catId, level, btn) {
+  const cat = DATA.categories.find(c => c.id === catId);
+  if (!cat) return;
+  const cards = filterByLevel(cat.cards, level);
+  if (!cards.length) { alert('Brak fiszek do wygenerowania.'); return; }
+
+  const orig = btn.textContent;
+  btn.disabled = true; btn.textContent = '⏳ Generuję…';
+  try {
+    await ensureJsPDF();
+    await buildFlashcardPdf(cat.label, cards, `fiszki-${catId}-${level}.pdf`);
+  } catch (e) {
+    alert('Błąd generowania PDF: ' + e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = orig;
+  }
 }
 
 // ─── Screen management ────────────────────────────────────────────────────────

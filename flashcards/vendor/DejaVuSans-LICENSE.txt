@@ -1,0 +1,3 @@
+DejaVu Sans font, vendored for Polish-diacritics support in generated PDFs.
+Source: https://dejavu-fonts.github.io/
+License: Bitstream Vera License + public domain DejaVu changes (free to embed/redistribute).

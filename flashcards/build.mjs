@@ -46,6 +46,9 @@ function parseCards(content, catId) {
     const bodyEnd = i + 1 < headers.length ? headers[i + 1].index : content.length;
     let answer = content.slice(bodyStart, bodyEnd);
 
+    const sectionHeader = answer.match(/^##\s+.+$/m);
+    if (sectionHeader) answer = answer.slice(0, sectionHeader.index);
+
     // Remove the "✅ <span...>Odpowiedź</span>" line (first occurrence)
     answer = answer.replace(/✅ <span[^>]*>[^<]*<\/span>\n\n?/, '');
     // Strip remaining HTML spans throughout the answer
